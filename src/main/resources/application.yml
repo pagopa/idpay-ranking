@@ -7,6 +7,7 @@ info:
     name: "@project.artifactId@"
     description: "@project.description@"
     version: "@project.version@"
+
 spring:
   application:
     name: "@project.artifactId@"
