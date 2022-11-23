@@ -1,7 +1,7 @@
-package it.gov.pagopa.idpay.ranking.config;
+package it.gov.pagopa.ranking.config;
 
 import com.mongodb.lang.NonNull;
-import it.gov.pagopa.idpay.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import lombok.Setter;
 import org.bson.types.Decimal128;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableMongoRepositories(basePackageClasses = OnboardingRankingRequests.class)
+@EnableMongoRepositories(basePackageClasses = OnboardingRankingRequestsRepository.class)
 public class DbConfig {
 
     @Configuration

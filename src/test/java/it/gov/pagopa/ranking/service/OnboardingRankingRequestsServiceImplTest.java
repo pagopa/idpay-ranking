@@ -1,8 +1,8 @@
-package it.gov.pagopa.idpay.ranking.service;
+package it.gov.pagopa.ranking.service;
 
-import it.gov.pagopa.idpay.ranking.model.OnboardingRankingRequests;
-import it.gov.pagopa.idpay.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.idpay.ranking.test.fakers.OnboardingRankingRequestsFaker;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

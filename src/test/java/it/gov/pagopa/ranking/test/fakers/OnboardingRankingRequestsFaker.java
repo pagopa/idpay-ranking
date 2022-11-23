@@ -1,8 +1,8 @@
-package it.gov.pagopa.idpay.ranking.test.fakers;
+package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import it.gov.pagopa.idpay.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
