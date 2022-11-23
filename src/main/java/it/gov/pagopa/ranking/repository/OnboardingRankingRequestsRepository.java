@@ -1,6 +1,6 @@
-package it.gov.pagopa.idpay.ranking.repository;
+package it.gov.pagopa.ranking.repository;
 
-import it.gov.pagopa.idpay.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface OnboardingRankingRequestsRepository extends MongoRepository<OnboardingRankingRequests,String> {

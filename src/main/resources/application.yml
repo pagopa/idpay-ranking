@@ -19,25 +19,25 @@ spring:
   cloud:
     stream:
       function:
-        definition: #onboardingRankingRequestsConsumer
+        definition: onboardingRankingRequestsConsumer
       bindings:
-#        onboardingRankingRequestsConsumer-in-0:
-#          destination: ${KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC:idpay-transaction}
-#          group: ${KAFKA_ONBOARDING_RANKING_REQUESTS_GROUP_ID:idpay-trx-consumer}
-#          content-type: ${KAFKA_CONTENT_TYPE:application/json}
-#          binder: kafka-onboarding-ranking-requests
+        onboardingRankingRequestsConsumer-in-0:
+          destination: ${KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC:idpay-onboarding-ranking-request}
+          group: ${KAFKA_ONBOARDING_RANKING_REQUESTS_GROUP_ID:idpay-onboarding-ranking-request-consumer-group}
+          content-type: ${KAFKA_CONTENT_TYPE:application/json}
+          binder: kafka-onboarding-ranking-requests
         errors-out-0:
           destination: ${KAFKA_ERROR_TOPIC:idpay-errors}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
           binder: kafka-errors
       binders:
-#        kafka-onboarding-ranking-requests:
-#          type: kafka
-#          environment:
-#            spring.cloud.stream.kafka.binder:
-#              brokers: ${KAFKA_ONBOARDING_RANKING_REQUESTS_BROKER:${KAFKA_BROKER:}}
-#              configuration:
-#                sasl.jaas.config: ${KAFKA_ONBOARDING_RANKING_REQUESTS_SASL_JAAS_CONFIG:}
+        kafka-onboarding-ranking-requests:
+          type: kafka
+          environment:
+            spring.cloud.stream.kafka.binder:
+              brokers: ${KAFKA_ONBOARDING_RANKING_REQUESTS_BROKER:${KAFKA_BROKER:}}
+              configuration:
+                sasl.jaas.config: ${KAFKA_ONBOARDING_RANKING_REQUESTS_SASL_JAAS_CONFIG:}
         kafka-errors:
           type: kafka
           environment:
@@ -56,21 +56,21 @@ spring:
             sasl.mechanism: ${KAFKA_RANKING_SASL_MECHANISM:PLAIN}
             security.protocol: ${KAFKA_RANKING_SECURITY_PROTOCOL:SASL_SSL}
         bindings:
-#          onboardingRankingRequestsConsumer-in-0:
-#            consumer:
-#              startOffset: ${KAFKA_ONBOARDING_RANKING_REQUESTS_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
-#              autoCommitOffset: false
-#              ackMode: MANUAL_IMMEDIATE
-#              ackTime: ${KAFKA_ONBOARDING_RANKING_REQUESTS__ACK_MILLIS:10000}
-#              standardHeaders: ${KAFKA_ONBOARDING_RANKING_REQUESTS_STANDARD_HEADERS:${KAFKA_CONSUMER_CONFIG_STANDARD_HEADERS:both}}
-#              configuration:
-#                max.poll:
-#                  records: ${KAFKA_ONBOARDING_RANKING_REQUESTS_MAX_POLL_SIZE:${KAFKA_CONSUMER_CONFIG_MAX_POLL_SIZE:500}}
-#                  interval.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_INTERVAL_TIMEOUT_MS:${KAFKA_CONFIG_MAX_POLL_INTERVAL_TIMEOUT_MS:300000}}
-#                connections.max.idle.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTIONS_MAX_IDLE_MS:${KAFKA_CONSUMER_CONFIG_CONNECTIONS_MAX_IDLE_MS:300000}}
-#                socket.connection.setup.timeout:
-#                  max.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MAX_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MAX_MS:200000}}
-#                  ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MS:100000}}
+          onboardingRankingRequestsConsumer-in-0:
+            consumer:
+              startOffset: ${KAFKA_ONBOARDING_RANKING_REQUESTS_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
+              autoCommitOffset: false
+              ackMode: MANUAL_IMMEDIATE
+              ackTime: ${KAFKA_ONBOARDING_RANKING_REQUESTS__ACK_MILLIS:10000}
+              standardHeaders: ${KAFKA_ONBOARDING_RANKING_REQUESTS_STANDARD_HEADERS:${KAFKA_CONSUMER_CONFIG_STANDARD_HEADERS:both}}
+              configuration:
+                max.poll:
+                  records: ${KAFKA_ONBOARDING_RANKING_REQUESTS_MAX_POLL_SIZE:${KAFKA_CONSUMER_CONFIG_MAX_POLL_SIZE:500}}
+                  interval.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_INTERVAL_TIMEOUT_MS:${KAFKA_CONFIG_MAX_POLL_INTERVAL_TIMEOUT_MS:300000}}
+                connections.max.idle.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTIONS_MAX_IDLE_MS:${KAFKA_CONSUMER_CONFIG_CONNECTIONS_MAX_IDLE_MS:300000}}
+                socket.connection.setup.timeout:
+                  max.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MAX_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MAX_MS:200000}}
+                  ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MS:100000}}
           errors-out-0:
             producer:
               configuration:

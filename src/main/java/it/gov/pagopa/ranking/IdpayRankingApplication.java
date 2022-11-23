@@ -1,4 +1,4 @@
-package it.gov.pagopa.idpay.ranking;
+package it.gov.pagopa.ranking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
