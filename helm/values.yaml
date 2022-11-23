@@ -54,6 +54,12 @@ microservice-chart:
   envConfigMapExternals:
     idpay-common:
       TZ: TZ
+    idpay-eventhub-00:
+      KAFKA_BROKER: kafka_broker
+      KAFKA_CONFIG_SASL_MECHANISM: kafka_sasl_mechanism
+      KAFKA_CONFIG_SECURITY_PROTOCOL: kafka_security_protocol
+      KAFKA_ONBOARDING_RANKING_REQUESTS_BROKER: kafka_broker
+      KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC: idpay_onboarding_request_topic
     idpay-eventhub-01:
       KAFKA_ERRORS_BROKER: kafka_broker
       KAFKA_ERRORS_TOPIC: idpay_error_topic
@@ -62,3 +68,4 @@ microservice-chart:
     #    APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-instrumentation-key
     MONGODB_URI: mongodb-connection-string
     KAFKA_ERRORS_SASL_JAAS_CONFIG: evh-idpay-errors-idpay-errors-producer-jaas-config-idpay-01
+    KAFKA_ONBOARDING_RANKING_REQUESTS_SASL_JAAS_CONFIG: evh-idpay-onboarding-ranking-request-idpay-onboarding-ranking-request-consumer-jaas-config-idpay-00
