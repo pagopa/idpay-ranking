@@ -68,7 +68,7 @@ import static org.awaitility.Awaitility.await;
 @TestPropertySource(
         properties = {
                 //region common feature disabled
-                "logging.level.it.gov.pagopa.idpay.transactions.service.ErrorNotifierServiceImpl=WARN",
+                "logging.level.it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl=WARN",
                 //endregion
 
                 //region kafka brokers

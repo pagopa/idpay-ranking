@@ -32,7 +32,6 @@ import java.util.stream.IntStream;
 @TestPropertySource(properties = {
         "logging.level.it.gov.pagopa.ranking.service.OnboardingRankingRequestsMediatorImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.OnboardingRankingRequestsServiceImpl=WARN",
-        "logging.level.it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.BaseKafkaConsumer=WARN",
 })
 class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
