@@ -34,7 +34,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     }
 
     @Override
-    public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size) {
+    public List<RankingRequestsApiDTO>  findByInitiativeId(String organizationId, String initiativeId, int page, int size) {
         LocalDate today = LocalDate.now();
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
