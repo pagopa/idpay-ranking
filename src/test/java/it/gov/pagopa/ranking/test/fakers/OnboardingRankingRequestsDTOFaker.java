@@ -34,7 +34,7 @@ public class OnboardingRankingRequestsDTOFaker {
     }
 
     /**
-     * It will return an example of {@link OnboardingRankingRequests}. Providing a bias, it will return a pseudo-casual object
+     * It will return an example of {@link OnboardingRankingRequestDTO}. Providing a bias, it will return a pseudo-casual object
      */
     public static OnboardingRankingRequestDTO mockInstance(Integer bias) {
         return mockInstanceBuilder(bias).build();

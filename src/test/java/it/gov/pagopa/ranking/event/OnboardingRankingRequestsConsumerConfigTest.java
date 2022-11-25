@@ -67,7 +67,7 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         System.out.printf("""
             ************************
             Time spent to send %d (%d + %d + 1) messages (from start): %d millis
-            Time spent to assert trx stored count (from previous check): %d millis
+            Time spent to assert onboarding requests stored count (from previous check): %d millis
             ************************
             Test Completed in %d millis
             ************************
@@ -105,7 +105,7 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
     private long waitForOnboardingStored(int N) {
         long[] countSaved={0};
         //noinspection ConstantConditions
-        waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved rules, read %d".formatted(N, countSaved[0]), 60, 1000);
+        waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved onboarding ranking request, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }
 
