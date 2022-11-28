@@ -47,4 +47,16 @@ class RankingApiControllerImplTest {
         String expected = "[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T01:00:00\",\"rankingValue\":1155869325,\"rank\":1}]";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
+
+    @Test
+    void testNotFound() throws Exception {
+
+        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10))
+                .thenReturn(null);
+
+        mvc.perform(MockMvcRequestBuilders
+                .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
+                        "orgId", "initiativeId"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }

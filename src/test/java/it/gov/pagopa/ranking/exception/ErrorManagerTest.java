@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -47,6 +48,19 @@ class ErrorManagerTest extends BaseIntegrationTest {
                                 "{\"code\":\"Error\",\"message\":\"Error ClientExceptionWithBody\"}",
                                 r.getResponse().getContentAsString()
                         ));
+
+        Mockito.when(controller.rankingRequests("ClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable", "INITIATIVE_ID", 0,10))
+                .thenThrow(new ClientExceptionWithBody(HttpStatus.BAD_REQUEST, "Error","Error ClientExceptionWithBody", new Throwable()));
+        ErrorDTO errorClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable = new ErrorDTO("Error","Error ClientExceptionWithBody");
+
+        mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
+                        "ClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable", "INITIATIVE_ID"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(r ->
+                        Assertions.assertEquals(
+                                "{\"code\":\"Error\",\"message\":\"Error ClientExceptionWithBody\"}",
+                                r.getResponse().getContentAsString()
+                        ));
     }
 
     @Test
@@ -63,6 +77,16 @@ class ErrorManagerTest extends BaseIntegrationTest {
                 .thenThrow(new ClientException(HttpStatus.BAD_REQUEST, "ClientException with httpStatus and message"));
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "ClientExceptionStatusAndMessage", "INITIATIVE_ID"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(r -> Assertions.assertEquals(
+                        "{\"code\":\"Error\",\"message\":\"Something gone wrong\"}",
+                        r.getResponse().getContentAsString()
+                ));
+
+        Mockito.when(controller.rankingRequests("ClientExceptionStatusAndMessageAndThrowable", "INITIATIVE_ID", 0,10))
+                .thenThrow(new ClientException(HttpStatus.BAD_REQUEST, "ClientException with httpStatus, message and throwable", new Throwable()));
+        mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
+                        "ClientExceptionStatusAndMessageAndThrowable", "INITIATIVE_ID"))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
                 .andExpect(r -> Assertions.assertEquals(
                         "{\"code\":\"Error\",\"message\":\"Something gone wrong\"}",

@@ -49,7 +49,7 @@ public class RankingRequestsApiDTOFaker {
                 .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(today)
                 .criteriaConsensusTimestamp(today)
-                .rankingValue(getRandomPositiveNumber(1))
+                .rankingValue(getRandomPositiveNumber(bias))
                 .rank(1);
 
     }
