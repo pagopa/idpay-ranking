@@ -4,6 +4,7 @@ import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
@@ -42,11 +43,12 @@ class RankingRequestsApiServiceImplTest {
     void testOk() {
         // Given
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
+        initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(initiativeConfig.getInitiativeId(), initiativeConfig.getOrganizationId()))
                 .thenReturn(initiativeConfig);
 
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
-        Pageable pageable = PageRequest.of(0,10, Sort.by(Sort.Direction.ASC, "rankingValue"));
+        Pageable pageable = PageRequest.of(0,10, Sort.by("rank"));
         Mockito.when(requestsRepositoryMock.findByInitiativeId(initiativeConfig.getInitiativeId(), pageable))
                 .thenReturn(List.of(request));
 
