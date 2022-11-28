@@ -2,12 +2,15 @@ package it.gov.pagopa.ranking.exception;
 
 import it.gov.pagopa.ranking.dto.ErrorDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @RestControllerAdvice
@@ -18,9 +21,9 @@ public class ErrorManager {
         defaultErrorDTO =new ErrorDTO("Error", "Something gone wrong");
     }
     @ExceptionHandler(RuntimeException.class)
-    protected ResponseEntity<ErrorDTO> handleException(RuntimeException error, ServerWebExchange exchange) {
+    protected ResponseEntity<ErrorDTO> handleException(RuntimeException error, HttpServletRequest request) {
         if(!(error instanceof ClientException clientException) || clientException.isPrintStackTrace()){
-            log.error("Something gone wrong handlind request: " + exchange.getRequest().getId(), error);
+            log.error("Something gone wrong handlind request: " + request.getRequestURI(), error);
         }
         if(error instanceof ClientExceptionNoBody clientExceptionNoBody){
             return ResponseEntity.status(clientExceptionNoBody.getHttpStatus()).build();

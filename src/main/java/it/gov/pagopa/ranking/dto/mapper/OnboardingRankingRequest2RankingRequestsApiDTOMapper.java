@@ -4,20 +4,19 @@ import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
-
 @Service
-public class OnboardingRankingRequest2RankingRequestsApiDTOMapper implements Function<OnboardingRankingRequests, RankingRequestsApiDTO> {
+public class OnboardingRankingRequest2RankingRequestsApiDTOMapper {
 
-    @Override
-    public RankingRequestsApiDTO apply(OnboardingRankingRequests onboardingRankingRequests) {
+    public RankingRequestsApiDTO apply(OnboardingRankingRequests onboardingRankingRequests, String organizationId) {
         RankingRequestsApiDTO out = new RankingRequestsApiDTO();
 
         out.setUserId(onboardingRankingRequests.getUserId());
         out.setInitiativeId(onboardingRankingRequests.getInitiativeId());
+        out.setOrganizationId(organizationId);
         out.setAdmissibilityCheckDate(onboardingRankingRequests.getAdmissibilityCheckDate());
         out.setCriteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp());
         out.setRankingValue(onboardingRankingRequests.getRankingValue());
+        out.setRank(onboardingRankingRequests.getRank());
 
         return out;
     }

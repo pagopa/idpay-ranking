@@ -1,7 +1,6 @@
 package it.gov.pagopa.ranking.controller;
 
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +15,9 @@ import java.util.List;
 public interface RankingApiController {
 
     @GetMapping(value = "/organization/{organizationId}/initiative/{initiativeId}")
-    ResponseEntity<List<RankingRequestsApiDTO>> rankingRequests(
+    List<RankingRequestsApiDTO> rankingRequests(
             @PathVariable(value = "organizationId") String organizationId,
             @PathVariable(value = "initiativeId") String initiativeId,
-            @RequestParam(value = "page", required = false , defaultValue = "1") int page,
+            @RequestParam(value = "page", required = false , defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size);
 }

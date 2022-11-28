@@ -22,13 +22,16 @@ public class RankingApiControllerImpl implements RankingApiController{
     }
 
     @Override
-    public ResponseEntity<List<RankingRequestsApiDTO>> rankingRequests(String organizationId, String initiativeId, int page, int size) {
+    public List<RankingRequestsApiDTO> rankingRequests(String organizationId, String initiativeId, int page, int size) {
+        log.info("[RANKING_LIST] Requesting ranking list of initiativeId {} and organizationId {}, with page {} and size {}",
+                initiativeId, organizationId, page, size);
+
        List<RankingRequestsApiDTO> result = rankingRequestsApiService.findByInitiativeId(organizationId, initiativeId, page, size);
 
        if (result == null) {
            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
        } else {
-           return ResponseEntity.ok(result);
+           return result;
        }
     }
 

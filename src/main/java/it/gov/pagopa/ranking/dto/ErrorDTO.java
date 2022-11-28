@@ -1,7 +1,6 @@
 package it.gov.pagopa.ranking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,10 +16,10 @@ import javax.validation.constraints.NotBlank;
 public class ErrorDTO {
 
     @NotBlank
-    @ApiModelProperty(required = true, value = "Code of the error message", example = "Code")
+//    @ApiModelProperty(required = true, value = "Code of the error message", example = "Code")
     String code;
     @NotBlank
-    @ApiModelProperty(required = true, value = "Content of the error message", example = "Message")
+//    @ApiModelProperty(required = true, value = "Content of the error message", example = "Message")
     String message;
 
 }

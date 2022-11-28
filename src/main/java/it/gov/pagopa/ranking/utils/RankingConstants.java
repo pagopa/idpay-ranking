@@ -10,10 +10,4 @@ public final class RankingConstants {
     public static final String INITIATIVE_RANKING_STATUS_READY = "READY";
     public static final String INITIATIVE_RANKING_STATUS_COMPLETED = "COMPLETED";
     //endregion
-
-    //region criteria code
-    public static final String CRITERIA_CODE_ISEE = "ISEE";
-    public static final String CRITERIA_CODE_BIRTHDATE = "BIRTHDATE";
-    public static final String CRITERIA_CODE_RESIDENCE = "RESIDENCE";
-    //endregion
 }
