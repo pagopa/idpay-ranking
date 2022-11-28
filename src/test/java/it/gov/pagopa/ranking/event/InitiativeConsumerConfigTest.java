@@ -3,6 +3,9 @@ package it.gov.pagopa.ranking.event;
 import com.mongodb.MongoException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
+import it.gov.pagopa.ranking.model.Order;
+import it.gov.pagopa.ranking.model.RankingStatusEnum;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
@@ -14,19 +17,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.TestPropertySource;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 
 @TestPropertySource(properties = {
-        "logging.level.it.gov.pagopa.ranking.service.initiative.InitiativePersistenceMediatorImpl=WARN",
+        "logging.level.it.gov.pagopa.ranking.service.initiative.InitiativePersistenceMediatorImpl=OFF",
         "logging.level.it.gov.pagopa.ranking.service.initiative.InitiativeConfigServiceImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.BaseKafkaConsumer=WARN",
 })
@@ -55,11 +61,11 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         publishIntoEmbeddedKafka(topicInitiativeRanking, List.of(new RecordHeader(ErrorNotifierServiceImpl.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHERAPPNAME".getBytes(StandardCharsets.UTF_8))), null, "OTHERAPPMESSAGE");
         long timePublishingEnd=System.currentTimeMillis();
 
-        long countSaved = waitForInitiativeStored(validInitiative/2);
+
+        waitForInitiativeStored((validInitiative/useCases.size()*6));
         long timeEnd=System.currentTimeMillis();
 
-        Assertions.assertEquals(validInitiative/2, countSaved);
-
+        checkResponse();
         checkErrorsPublished(notValidInitiative, maxWaitingMs, errorUseCases);
 
         System.out.printf("""
@@ -82,9 +88,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     private List<String> buildValidPayloads(int bias, int n) {
         return IntStream.range(bias, bias + n)
-                .mapToObj(i -> Initiative2BuildDTOFaker.mockInstanceBuilder(i)
-                        .beneficiaryRanking(i%2 == 0)
-                        .build())
+                .mapToObj(this::mockInstance)
                 .map(TestUtils::jsonSerializer)
                 .toList();
     }
@@ -95,6 +99,159 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         waitFor(()->(countSaved[0]=initiativeConfigRepository.count()) >= N, ()->"Expected %d saved ranking initiative, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }
+
+    private InitiativeBuildDTO mockInstance(int bias) {
+        return useCases.get(bias % useCases.size()).getFirst().apply(bias);
+    }
+
+    //region valid useCases
+    private final List<Pair<Function<Integer, InitiativeBuildDTO>, Consumer<InitiativeConfig>>> useCases = List.of(
+            //useCase 0: initiative not present into DB
+            Pair.of(
+                    Initiative2BuildDTOFaker::mockInstance,
+                    initiativeConfig -> {
+                        InitiativeConfig initiativeConfigRetrieved = initiativeConfigRepository.findById(initiativeConfig.getInitiativeId()).orElse(null);
+                        Assertions.assertNotNull(initiativeConfigRetrieved);
+                        Assertions.assertEquals(RankingStatusEnum.RANKING_STATUS_WAITING_END, initiativeConfigRetrieved.getRankingStatus());
+                    }
+            ),
+
+            //useCase 1: initiative not present into DB with ranking date before from today
+            Pair.of(i -> {
+                        InitiativeBuildDTO initiativeEndDateBeforeActual = Initiative2BuildDTOFaker.mockInstance(i);
+                        initiativeEndDateBeforeActual.getGeneral().setRankingStartDate(LocalDate.of(2020,1,21));
+                        initiativeEndDateBeforeActual.getGeneral().setRankingEndDate(LocalDate.of(2020,12,21));
+                        
+                        return initiativeEndDateBeforeActual;
+                    },
+                    initiativeConfig -> {
+                        InitiativeConfig initiativeConfigRetrieved = initiativeConfigRepository.findById(initiativeConfig.getInitiativeId()).orElse(null);
+                        Assertions.assertNotNull(initiativeConfigRetrieved);
+                        Assertions.assertEquals(RankingStatusEnum.RANKING_STATUS_BUILDING, initiativeConfigRetrieved.getRankingStatus());
+                    }
+            ),
+
+            //useCase 2: initiative present into DB with status WAITING_END
+            Pair.of(
+                    i -> {
+                        InitiativeBuildDTO initiativeAlredyInDbStatusWaitingEnding = Initiative2BuildDTOFaker.mockInstance(i);
+                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
+                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_WAITING_END);
+                        initiativeConfigRepository.save(initiativeInDb);
+                        return  initiativeAlredyInDbStatusWaitingEnding;
+
+                    },
+                    initiativeConfig -> {
+                        Assertions.assertNotNull(initiativeConfig);
+                        checkFields(initiativeConfig, RankingStatusEnum.RANKING_STATUS_WAITING_END);
+                    }
+            ),
+
+            //useCase 3: initiative present into DB with status BUILDING
+            Pair.of(
+                    i -> {
+                        InitiativeBuildDTO initiativeAlredyInDbStatusBuilding = Initiative2BuildDTOFaker.mockInstance(i);
+                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
+                        initiativeInDb.setRankingEndDate(LocalDate.now().minusMonths(1L));
+                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_BUILDING);
+                        initiativeConfigRepository.save(initiativeInDb);
+
+                        return  initiativeAlredyInDbStatusBuilding;
+                    },
+                    initiativeConfig -> {
+                        Assertions.assertNotNull(initiativeConfig);
+                        checkFields(initiativeConfig, RankingStatusEnum.RANKING_STATUS_WAITING_END);
+                    }
+            ),
+
+            //useCase 4: initiative present into DB with status READY
+            Pair.of(
+                    i -> {
+                        InitiativeBuildDTO initiativeAlredyInDbStatusReady = Initiative2BuildDTOFaker.mockInstance(i);
+                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
+                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_READY);
+                        initiativeConfigRepository.save(initiativeInDb);
+                        return  initiativeAlredyInDbStatusReady;
+
+                    },
+                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatusEnum.RANKING_STATUS_READY)
+            ),
+
+            //useCase 5: initiative present into DB with status COMPLETED
+            Pair.of(
+                    i -> {
+                        InitiativeBuildDTO initiativeAlredyInDbStatusCompleted = Initiative2BuildDTOFaker.mockInstance(i);
+                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
+                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_COMPLETED);
+                        initiativeConfigRepository.save(initiativeInDb);
+                        return  initiativeAlredyInDbStatusCompleted;
+                    },
+                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatusEnum.RANKING_STATUS_COMPLETED)
+            ),
+
+            //useCase 6: not ranking initiative
+            Pair.of(
+                    i -> Initiative2BuildDTOFaker.mockInstanceBuilder(i)
+                                .beneficiaryRanking(false)
+                                .build(),
+                    initiativeConfig -> Assertions.assertTrue("INITIATIVE_NOT_RANKING".contains(initiativeConfig.getInitiativeId()), "Initiative not ranking type")
+            )
+    );
+
+    private InitiativeConfig getInitiativeForDB(Integer i) {
+        LocalDate nowDate = LocalDate.now();
+        return InitiativeConfig.builder()
+                .initiativeId("initiativeId_%d".formatted(i))
+                .initiativeName("old_initiative_name_%d".formatted(i))
+                .organizationId("old_organization_id_%d".formatted(i))
+                .initiativeStatus("old_initiative_status_%d".formatted(i))
+                .rankingStartDate(nowDate.plusMonths(1L))
+                .rankingEndDate(nowDate.plusMonths(8L))
+                .initiativeBudget(BigDecimal.TEN)
+                .beneficiaryInitiativeBudget(BigDecimal.ONE)
+                .rankingFields(List.of(
+                        Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
+                ))
+                .build();
+    }
+
+    private void checkResponse() {
+        initiativeConfigRepository.findAll().forEach(i -> {
+            int biasRetrieve = Integer.parseInt(i.getInitiativeId().substring(13));
+            if(biasRetrieve >= errorUseCases.size()){
+                useCases.get(biasRetrieve % useCases.size()).getSecond().accept(i);
+            }else {
+                Assertions.assertTrue("NOT_EXIST_INITIATIVE_ID".contains(i.getInitiativeId()), "Invalid initiativeConfig: " + i);
+            }
+        });
+    }
+
+    private void assertInitiativeNotChanged(InitiativeConfig initiativeConfig, RankingStatusEnum rankingStatus){
+        Assertions.assertNotNull(initiativeConfig);
+        TestUtils.checkNotNullFields(initiativeConfig);
+
+        int biasRetrieved = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
+        InitiativeConfig initiativeExpected = getInitiativeForDB(biasRetrieved);
+        initiativeExpected.setRankingStatus(rankingStatus);
+        Assertions.assertEquals(initiativeExpected, initiativeConfig);
+    }
+
+    private void checkFields(InitiativeConfig initiativeConfig, RankingStatusEnum rankingStatus){
+        int biasRetrieve = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
+        InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(biasRetrieve);
+
+        TestUtils.checkNotNullFields(initiativeConfig);
+        Assertions.assertEquals(initiativeBuildDTO.getInitiativeId(), initiativeConfig.getInitiativeId());
+        Assertions.assertEquals(initiativeBuildDTO.getInitiativeName(), initiativeConfig.getInitiativeName());
+        Assertions.assertEquals(initiativeBuildDTO.getOrganizationId(),initiativeConfig.getOrganizationId());
+        Assertions.assertEquals(initiativeBuildDTO.getStatus(), initiativeConfig.getInitiativeStatus());
+        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingStartDate(), initiativeConfig.getRankingStartDate());
+        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingEndDate(), initiativeConfig.getRankingEndDate());
+        Assertions.assertEquals(rankingStatus, initiativeConfig.getRankingStatus());
+    }
+
+    //endregion
+
 
     //region not valid useCases
     // all use cases configured must have a unique id recognized by the regexp getErrorUseCaseIdPatternMatch
