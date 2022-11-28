@@ -81,7 +81,7 @@ class RankingContextHolderServiceImplTest {
     }
 
     @Test
-    void getUserInfoNotInCache(){
+    void getInitiativeNotInCache(){
         // Given
         String initiativeIdTest = "NEW_INITIATIVEID";
         String organizationIdTest = "NEW_ORGANIZATIONID";
@@ -107,7 +107,7 @@ class RankingContextHolderServiceImplTest {
     }
 
     @Test
-    void getUserInfoNotInCacheAndNotMatchOrganizationId(){
+    void getInitiativeNotInCacheAndNotMatchOrganizationId(){
         // Given
         String initiativeIdTest = "NEW_INITIATIVEID";
         String organizationIdTest = "NEW_ORGANIZATIONID";
@@ -125,6 +125,28 @@ class RankingContextHolderServiceImplTest {
 
         Assertions.assertNotNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(2,inspectCache.size());
+
+        Mockito.verify(initiativeConfigServiceMock).findById(initiativeIdTest);
+    }
+
+    @Test
+    void getInitiativeNotInDB(){
+        // Given
+        String initiativeIdTest = "NEW_INITIATIVEID";
+        Mockito.when(initiativeConfigServiceMock.findById(initiativeIdTest)).thenReturn(null);
+
+        // When
+        Map<String, InitiativeConfig> inspectCache = retrieveCache();
+        Assertions.assertNull(inspectCache.get(initiativeIdTest));
+        Assertions.assertEquals(1,inspectCache.size());
+
+        InitiativeConfig result = rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "NEW_ORGANIZATIONID");
+
+        // Then
+        Assertions.assertNull(result);
+
+        Assertions.assertNull(inspectCache.get(initiativeIdTest));
+        Assertions.assertEquals(1,inspectCache.size());
 
         Mockito.verify(initiativeConfigServiceMock).findById(initiativeIdTest);
     }
