@@ -70,6 +70,5 @@ microservice-chart:
     #    APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-instrumentation-key
     MONGODB_URI: mongodb-connection-string
     KAFKA_ERRORS_SASL_JAAS_CONFIG: evh-idpay-errors-idpay-errors-producer-jaas-config-idpay-01
-<<<<<<< HEAD
     KAFKA_ONBOARDING_RANKING_REQUESTS_SASL_JAAS_CONFIG: evh-idpay-onboarding-ranking-request-idpay-onboarding-ranking-request-consumer-jaas-config-idpay-00
     KAFKA_INITIATIVE_RANKING_SASL_JAAS_CONFIG: evh-idpay-rule-update-idpay-rule-update-consumer-jaas-config-idpay-01
