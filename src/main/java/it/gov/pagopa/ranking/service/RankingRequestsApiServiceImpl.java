@@ -4,14 +4,13 @@ import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.ranking.utils.RankingConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
         } else {
             List<RankingRequestsApiDTO> out = new ArrayList<>();
 
-            if (!initiative.getRankingStatus().equals(RankingConstants.INITIATIVE_RANKING_STATUS_WAITING_END)) {
+            if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
 
                 List<OnboardingRankingRequests> requests =
                         onboardingRankingRequestsRepository.findByInitiativeId(
@@ -52,22 +51,6 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             }
 
             return out;
-        }
-    }
-
-    private Sort getSorting(InitiativeConfig initiativeConfig) {
-
-        if (!initiativeConfig.getRankingFields().isEmpty()) {
-            Sort.Direction direction;
-
-            if (initiativeConfig.getRankingFields().get(0).getFieldCode() != null) {
-                direction = initiativeConfig.getRankingFields().get(0).getDirection();
-                return Sort.by(direction, "rankingValue");
-            } else {
-                throw new IllegalStateException("[RANKING] Cannot find field code in ranking fields of initiative %s".formatted(initiativeConfig.getInitiativeId()));
-            }
-        } else {
-            throw new IllegalStateException("[RANKING] Ranking fields of initiative %s are not configured".formatted(initiativeConfig.getInitiativeId()));
         }
     }
 }
