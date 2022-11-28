@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,20 +15,19 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Document(collection = "onboarding_ranking_rule")
 public class InitiativeConfig {
+    @Id
     private String initiativeId;
     private String initiativeName;
     private String organizationId;
-    private String status;
-//    private LocalDate startDate;
-//    private LocalDate endDate;
+    private String initiativeStatus;
     private LocalDate rankingStartDate;
     private LocalDate rankingEndDate;
-//    private String pdndToken;
-//    private List<String> automatedCriteriaCodes;
     private BigDecimal initiativeBudget;
     private BigDecimal beneficiaryInitiativeBudget;
-    private String rankingStatus;
+    private RankingStatus rankingStatus;
     private long size;
     private List<Order> rankingFields;
+    private String rankingPathFile;
 }

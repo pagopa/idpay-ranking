@@ -3,14 +3,12 @@ package it.gov.pagopa.ranking.test.fakers;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.Order;
-import it.gov.pagopa.ranking.utils.RankingConstants;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -47,22 +45,25 @@ public class InitiativeConfigFaker {
     }
 
     public static InitiativeConfig.InitiativeConfigBuilder mockInstanceBuilder(Integer bias) {
-        LocalDate today = LocalDate.now();
-
         InitiativeConfig.InitiativeConfigBuilder out = InitiativeConfig.builder();
-        return out.initiativeId("initiativeId_%d".formatted(bias))
-                .initiativeName("initiativeName")
-                .organizationId("organizationId_%d".formatted(bias))
-                .status("STATUS")
-                .rankingStartDate(today.minusDays(5))
-                .rankingEndDate(today.plusDays(5))
-                .initiativeBudget(BigDecimal.valueOf(10000L))
-                .beneficiaryInitiativeBudget(BigDecimal.valueOf(200L))
-                .rankingStatus(RankingConstants.INITIATIVE_RANKING_STATUS_COMPLETED)
-                .size(getRandomPositiveNumber(bias))
-                .rankingFields(List.of(
-                      new Order("ISEE", Sort.Direction.ASC)
-                ));
+        LocalDate now = LocalDate.now();
+
+        out.initiativeId(bias!=null? "initiativeId_%d".formatted(bias) : "?????");
+        out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
+        out.organizationId(bias!=null? "organizationId_%d".formatted(bias) : "?????");
+        out.initiativeStatus(bias!=null? "status_%d".formatted(bias) : "?????");
+        out.rankingStartDate(now);
+        out.rankingEndDate(now.plusMonths(7L));
+        out.initiativeBudget(BigDecimal.TEN);
+        out.beneficiaryInitiativeBudget(BigDecimal.ONE);
+        out.rankingStatus(RankingStatus.WAITING_END);
+        out.size(10);
+        out.rankingFields(List.of(
+                Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
+        ));
+
+        return out;
 
     }
 }
+
