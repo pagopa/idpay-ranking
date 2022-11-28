@@ -4,8 +4,7 @@ import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
-import it.gov.pagopa.ranking.utils.RankingConstants;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
@@ -57,7 +56,7 @@ public class InitiativeConfigFaker {
         out.rankingEndDate(now.plusMonths(7L));
         out.initiativeBudget(BigDecimal.TEN);
         out.beneficiaryInitiativeBudget(BigDecimal.ONE);
-        out.rankingStatus(RankingStatusEnum.RANKING_STATUS_WAITING_END);
+        out.rankingStatus(RankingStatus.WAITING_END);
         out.size(10);
         out.rankingFields(List.of(
                 Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()

@@ -4,7 +4,7 @@ import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.ErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
@@ -74,7 +74,7 @@ class InitiativePersistenceMediatorImplTest {
         InitiativeBuildDTO initiativeRequest = Initiative2BuildDTOFaker.mockInstance(1);
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
-        initiativeConfig.setRankingStatus(RankingStatusEnum.RANKING_STATUS_READY);
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
         Mockito.when(initiativeConfigServiceMock.findById(initiativeRequest.getInitiativeId())).thenReturn(initiativeConfig);
 
         // When
@@ -93,7 +93,7 @@ class InitiativePersistenceMediatorImplTest {
         InitiativeBuildDTO initiativeRequest = Initiative2BuildDTOFaker.mockInstance(1);
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
-        initiativeConfig.setRankingStatus(RankingStatusEnum.RANKING_STATUS_COMPLETED);
+        initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
         Mockito.when(initiativeConfigServiceMock.findById(initiativeRequest.getInitiativeId())).thenReturn(initiativeConfig);
 
         // When
@@ -118,9 +118,7 @@ class InitiativePersistenceMediatorImplTest {
 
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstanceBuilder(1)
-                .rankingStatus(RankingStatusEnum.RANKING_STATUS_WAITING_END)
-                .rankingStartDate(now)
-                .rankingEndDate(now.plusMonths(7L))
+                .rankingStatus(RankingStatus.WAITING_END)
                 .build();
         Mockito.when(initiativeConfigServiceMock.findById(initiativeRequest.getInitiativeId())).thenReturn(initiativeConfig);
 
@@ -140,7 +138,7 @@ class InitiativePersistenceMediatorImplTest {
     }
 
     @Test
-    void executeInitiativeRankingStatusBuilding(){
+    void executeInitiativeRankingStatusPublishing(){
         // Given
         LocalDate now = LocalDate.now();
 
@@ -151,29 +149,23 @@ class InitiativePersistenceMediatorImplTest {
 
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstanceBuilder(1)
-                .rankingStatus(RankingStatusEnum.RANKING_STATUS_BUILDING)
+                .rankingStatus(RankingStatus.PUBLISHING)
                 .rankingStartDate(now)
                 .rankingEndDate(now.plusMonths(7L))
                 .build();
         Mockito.when(initiativeConfigServiceMock.findById(initiativeRequest.getInitiativeId())).thenReturn(initiativeConfig);
-
-        InitiativeConfig expectedToSave = getInitiativeConfigExpected(initiativeRequest);
-        Mockito.when(initiativeBuild2ConfigMapperMock.apply(initiativeRequest)).thenReturn(expectedToSave);
-        Mockito.when(initiativeConfigServiceMock.save(Mockito.any())).thenAnswer(i -> i.getArguments()[0]);
-
-
         // When
         initiativePersistenceMediator.execute(MessageBuilder.withPayload(TestUtils.jsonSerializer(initiativeRequest)).build());
 
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
-        Mockito.verify(initiativeBuild2ConfigMapperMock).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock).save(expectedToSave);
-        Mockito.verify(rankingContextHolderServiceMock).setInitiativeConfig(Mockito.any());
+        Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
+        Mockito.verify(initiativeConfigServiceMock,Mockito.never()).save(Mockito.any());
+        Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
     }
 
     private InitiativeConfig getInitiativeConfigExpected(InitiativeBuildDTO initiativeRequest) {
-        InitiativeConfig expectedToSave = InitiativeConfig.builder()
+        return InitiativeConfig.builder()
                 .initiativeId(initiativeRequest.getInitiativeId())
                 .initiativeName(initiativeRequest.getInitiativeName())
                 .organizationId(initiativeRequest.getOrganizationId())
@@ -182,11 +174,9 @@ class InitiativePersistenceMediatorImplTest {
                 .rankingEndDate(initiativeRequest.getGeneral().getRankingEndDate())
                 .initiativeBudget(initiativeRequest.getGeneral().getBudget())
                 .beneficiaryInitiativeBudget(initiativeRequest.getGeneral().getBeneficiaryBudget())
-                .rankingStatus(!LocalDate.now().isAfter(initiativeRequest.getGeneral().getRankingEndDate()) ? RankingStatusEnum.RANKING_STATUS_WAITING_END
-                        : RankingStatusEnum.RANKING_STATUS_BUILDING)
+                .rankingStatus(RankingStatus.WAITING_END)
                 .size(InitiativeBuild2ConfigMapper.calculateSize(initiativeRequest))
                 .rankingFields(InitiativeBuild2ConfigMapper.retrieveRankingFieldCodes(initiativeRequest.getBeneficiaryRule().getAutomatedCriteria()))
                 .build();
-        return expectedToSave;
     }
 }

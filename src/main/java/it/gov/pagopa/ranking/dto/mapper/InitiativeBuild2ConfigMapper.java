@@ -4,12 +4,11 @@ import it.gov.pagopa.ranking.dto.initiative.AutomatedCriteriaDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -30,8 +29,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .rankingEndDate(initiativeBuildDTO.getGeneral().getRankingEndDate())
                 .initiativeBudget(initiativeBuildDTO.getGeneral().getBudget())
                 .beneficiaryInitiativeBudget(initiativeBuildDTO.getGeneral().getBeneficiaryBudget())
-                .rankingStatus(!LocalDate.now().isAfter(initiativeBuildDTO.getGeneral().getRankingEndDate()) ? RankingStatusEnum.RANKING_STATUS_WAITING_END
-                        : RankingStatusEnum.RANKING_STATUS_BUILDING)
+                .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
                 .build();

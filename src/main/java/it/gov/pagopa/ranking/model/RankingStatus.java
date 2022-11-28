@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * Gets or Sets rankingStatus
  */
-public enum RankingStatusEnum {
-    RANKING_STATUS_WAITING_END("WAITING_END"),
-    RANKING_STATUS_BUILDING("BUILDING"),
-    RANKING_STATUS_READY("READY"),
-    RANKING_STATUS_COMPLETED("COMPLETED");
+public enum RankingStatus {
+    WAITING_END("WAITING_END"),
+    READY("READY"),
+    PUBLISHING("PUBLISHING"),
+    COMPLETED("COMPLETED");
 
     private final String value;
 
-    RankingStatusEnum(String value) {
+    RankingStatus(String value) {
             this.value = value;
         }
 
@@ -24,8 +24,8 @@ public enum RankingStatusEnum {
         }
 
     @JsonCreator
-    public static RankingStatusEnum fromValue(String text) {
-        for (RankingStatusEnum b : RankingStatusEnum.values()) {
+    public static RankingStatus fromValue(String text) {
+        for (RankingStatus b : RankingStatus.values()) {
             if (String.valueOf(b.value).equals(text)) {
                 return b;
             }

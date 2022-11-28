@@ -6,7 +6,7 @@ import com.mongodb.MongoException;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.BaseKafkaConsumer;
 import it.gov.pagopa.ranking.service.ErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
@@ -58,14 +58,14 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
             try {
                 InitiativeConfig initiativeRetrieved = initiativeConfigService.findById(payload.getInitiativeId());
                 if(initiativeRetrieved == null
-                        || (!initiativeRetrieved.getRankingStatus().equals(RankingStatusEnum.RANKING_STATUS_READY) && !initiativeRetrieved.getRankingStatus().equals(RankingStatusEnum.RANKING_STATUS_COMPLETED))){
+                        || initiativeRetrieved.getRankingStatus().equals(RankingStatus.WAITING_END)){
 
                     InitiativeConfig initiativeConfig = initiativeBuild2ConfigMapper.apply(payload);
                     InitiativeConfig initiativeSave = initiativeConfigService.save(initiativeConfig);
 
                     rankingContextHolderService.setInitiativeConfig(initiativeSave);
                 }else {
-                   log.error("Initiative in terminal state");
+                   log.error("The initiative is in the ending phase: {}", payload);
                 }
             }catch (MongoException | IllegalStateException e){
                 errorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] An error occurred handling initiative ranking build", true, e);

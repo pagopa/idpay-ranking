@@ -5,7 +5,7 @@ import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
@@ -62,7 +62,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         long timePublishingEnd=System.currentTimeMillis();
 
 
-        waitForInitiativeStored((validInitiative/useCases.size()*6));
+        waitForInitiativeStored((validInitiative/useCases.size()*5));
         long timeEnd=System.currentTimeMillis();
 
         checkResponse();
@@ -112,84 +112,64 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                     initiativeConfig -> {
                         InitiativeConfig initiativeConfigRetrieved = initiativeConfigRepository.findById(initiativeConfig.getInitiativeId()).orElse(null);
                         Assertions.assertNotNull(initiativeConfigRetrieved);
-                        Assertions.assertEquals(RankingStatusEnum.RANKING_STATUS_WAITING_END, initiativeConfigRetrieved.getRankingStatus());
+                        Assertions.assertEquals(RankingStatus.WAITING_END, initiativeConfigRetrieved.getRankingStatus());
                     }
             ),
 
-            //useCase 1: initiative not present into DB with ranking date before from today
-            Pair.of(i -> {
-                        InitiativeBuildDTO initiativeEndDateBeforeActual = Initiative2BuildDTOFaker.mockInstance(i);
-                        initiativeEndDateBeforeActual.getGeneral().setRankingStartDate(LocalDate.of(2020,1,21));
-                        initiativeEndDateBeforeActual.getGeneral().setRankingEndDate(LocalDate.of(2020,12,21));
-                        
-                        return initiativeEndDateBeforeActual;
-                    },
-                    initiativeConfig -> {
-                        InitiativeConfig initiativeConfigRetrieved = initiativeConfigRepository.findById(initiativeConfig.getInitiativeId()).orElse(null);
-                        Assertions.assertNotNull(initiativeConfigRetrieved);
-                        Assertions.assertEquals(RankingStatusEnum.RANKING_STATUS_BUILDING, initiativeConfigRetrieved.getRankingStatus());
-                    }
-            ),
-
-            //useCase 2: initiative present into DB with status WAITING_END
+            //useCase 1: initiative present into DB with status WAITING_END
             Pair.of(
                     i -> {
                         InitiativeBuildDTO initiativeAlredyInDbStatusWaitingEnding = Initiative2BuildDTOFaker.mockInstance(i);
                         InitiativeConfig initiativeInDb = getInitiativeForDB(i);
-                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_WAITING_END);
+                        initiativeInDb.setRankingStatus(RankingStatus.WAITING_END);
                         initiativeConfigRepository.save(initiativeInDb);
                         return  initiativeAlredyInDbStatusWaitingEnding;
 
                     },
                     initiativeConfig -> {
                         Assertions.assertNotNull(initiativeConfig);
-                        checkFields(initiativeConfig, RankingStatusEnum.RANKING_STATUS_WAITING_END);
+                        checkFields(initiativeConfig, RankingStatus.WAITING_END);
                     }
             ),
 
-            //useCase 3: initiative present into DB with status BUILDING
-            Pair.of(
-                    i -> {
-                        InitiativeBuildDTO initiativeAlredyInDbStatusBuilding = Initiative2BuildDTOFaker.mockInstance(i);
-                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
-                        initiativeInDb.setRankingEndDate(LocalDate.now().minusMonths(1L));
-                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_BUILDING);
-                        initiativeConfigRepository.save(initiativeInDb);
-
-                        return  initiativeAlredyInDbStatusBuilding;
-                    },
-                    initiativeConfig -> {
-                        Assertions.assertNotNull(initiativeConfig);
-                        checkFields(initiativeConfig, RankingStatusEnum.RANKING_STATUS_WAITING_END);
-                    }
-            ),
-
-            //useCase 4: initiative present into DB with status READY
+            //useCase 2: initiative present into DB with status READY
             Pair.of(
                     i -> {
                         InitiativeBuildDTO initiativeAlredyInDbStatusReady = Initiative2BuildDTOFaker.mockInstance(i);
                         InitiativeConfig initiativeInDb = getInitiativeForDB(i);
-                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_READY);
+                        initiativeInDb.setRankingStatus(RankingStatus.READY);
                         initiativeConfigRepository.save(initiativeInDb);
                         return  initiativeAlredyInDbStatusReady;
 
                     },
-                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatusEnum.RANKING_STATUS_READY)
+                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatus.READY)
             ),
 
-            //useCase 5: initiative present into DB with status COMPLETED
+            //useCase 3: initiative present into DB with status PUBLISHING
+            Pair.of(
+                    i -> {
+                        InitiativeBuildDTO initiativeAlredyInDbStatusPublishing = Initiative2BuildDTOFaker.mockInstance(i);
+                        InitiativeConfig initiativeInDb = getInitiativeForDB(i);
+                        initiativeInDb.setRankingStatus(RankingStatus.PUBLISHING);
+                        initiativeConfigRepository.save(initiativeInDb);
+                        return  initiativeAlredyInDbStatusPublishing;
+                    },
+                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatus.PUBLISHING)
+            ),
+
+            //useCase 4: initiative present into DB with status COMPLETED
             Pair.of(
                     i -> {
                         InitiativeBuildDTO initiativeAlredyInDbStatusCompleted = Initiative2BuildDTOFaker.mockInstance(i);
                         InitiativeConfig initiativeInDb = getInitiativeForDB(i);
-                        initiativeInDb.setRankingStatus(RankingStatusEnum.RANKING_STATUS_COMPLETED);
+                        initiativeInDb.setRankingStatus(RankingStatus.COMPLETED);
                         initiativeConfigRepository.save(initiativeInDb);
                         return  initiativeAlredyInDbStatusCompleted;
                     },
-                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatusEnum.RANKING_STATUS_COMPLETED)
+                    initiativeConfig -> assertInitiativeNotChanged(initiativeConfig, RankingStatus.COMPLETED)
             ),
 
-            //useCase 6: not ranking initiative
+            //useCase 5: not ranking initiative
             Pair.of(
                     i -> Initiative2BuildDTOFaker.mockInstanceBuilder(i)
                                 .beneficiaryRanking(false)
@@ -226,9 +206,9 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         });
     }
 
-    private void assertInitiativeNotChanged(InitiativeConfig initiativeConfig, RankingStatusEnum rankingStatus){
+    private void assertInitiativeNotChanged(InitiativeConfig initiativeConfig, RankingStatus rankingStatus){
         Assertions.assertNotNull(initiativeConfig);
-        TestUtils.checkNotNullFields(initiativeConfig);
+        TestUtils.checkNotNullFields(initiativeConfig, "rankingPathFile");
 
         int biasRetrieved = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
         InitiativeConfig initiativeExpected = getInitiativeForDB(biasRetrieved);
@@ -236,11 +216,11 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         Assertions.assertEquals(initiativeExpected, initiativeConfig);
     }
 
-    private void checkFields(InitiativeConfig initiativeConfig, RankingStatusEnum rankingStatus){
+    private void checkFields(InitiativeConfig initiativeConfig, RankingStatus rankingStatus){
         int biasRetrieve = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
         InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(biasRetrieve);
 
-        TestUtils.checkNotNullFields(initiativeConfig);
+        TestUtils.checkNotNullFields(initiativeConfig, "rankingPathFile");
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeId(), initiativeConfig.getInitiativeId());
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeName(), initiativeConfig.getInitiativeName());
         Assertions.assertEquals(initiativeBuildDTO.getOrganizationId(),initiativeConfig.getOrganizationId());

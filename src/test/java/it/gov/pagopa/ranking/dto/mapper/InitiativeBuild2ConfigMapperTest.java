@@ -3,7 +3,7 @@ package it.gov.pagopa.ranking.dto.mapper;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
 import it.gov.pagopa.ranking.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -33,11 +33,11 @@ class InitiativeBuild2ConfigMapperTest {
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingEndDate(), result.getRankingEndDate());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBudget(), result.getInitiativeBudget());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBeneficiaryBudget(), result.getBeneficiaryInitiativeBudget());
-        Assertions.assertEquals(RankingStatusEnum.RANKING_STATUS_WAITING_END, result.getRankingStatus());
+        Assertions.assertEquals(RankingStatus.WAITING_END, result.getRankingStatus());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.calculateSize(initiativeBuildDTO), result.getSize());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.retrieveRankingFieldCodes(initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria()), result.getRankingFields());
 
-        TestUtils.checkNotNullFields(result);
+        TestUtils.checkNotNullFields(result,"rankingPathFile");
     }
 
     @Test

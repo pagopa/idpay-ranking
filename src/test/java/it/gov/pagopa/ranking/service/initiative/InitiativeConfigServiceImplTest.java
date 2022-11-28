@@ -2,7 +2,7 @@ package it.gov.pagopa.ranking.service.initiative;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
-import it.gov.pagopa.ranking.model.RankingStatusEnum;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class InitiativeConfigServiceImplTest {
                 .rankingEndDate(now.plusMonths(7L))
                 .initiativeBudget(BigDecimal.TEN)
                 .beneficiaryInitiativeBudget(BigDecimal.ONE)
-                .rankingStatus(RankingStatusEnum.RANKING_STATUS_WAITING_END)
+                .rankingStatus(RankingStatus.WAITING_END)
                 .size(10)
                 .rankingFields(List.of(
                         Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()))

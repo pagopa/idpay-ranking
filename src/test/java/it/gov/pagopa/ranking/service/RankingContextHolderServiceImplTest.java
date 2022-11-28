@@ -55,7 +55,7 @@ class RankingContextHolderServiceImplTest {
 
         // Then
         Assertions.assertNotNull(result);
-        TestUtils.checkNotNullFields(result);
+        TestUtils.checkNotNullFields(result, "rankingPathFile");
         Assertions.assertEquals(initiativeIdInCache, result.getInitiativeId());
         Assertions.assertEquals(organizationIdInCache, result.getOrganizationId());
         Assertions.assertNotNull(inspectCache.get(initiativeIdInCache));
@@ -97,7 +97,7 @@ class RankingContextHolderServiceImplTest {
 
         // Then
         Assertions.assertNotNull(result);
-        TestUtils.checkNotNullFields(result);
+        TestUtils.checkNotNullFields(result, "rankingPathFile");
         Assertions.assertEquals(initiativeIdTest, result.getInitiativeId());
         Assertions.assertEquals(organizationIdTest, result.getOrganizationId());
         Assertions.assertNotNull(inspectCache.get(initiativeIdTest));

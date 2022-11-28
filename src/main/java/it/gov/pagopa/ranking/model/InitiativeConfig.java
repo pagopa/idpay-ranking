@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "ranking_initiative_config") //TODO define collection
+@Document(collection = "onboarding_ranking_rule")
 public class InitiativeConfig {
     @Id
     private String initiativeId;
@@ -26,7 +26,8 @@ public class InitiativeConfig {
     private LocalDate rankingEndDate;
     private BigDecimal initiativeBudget;
     private BigDecimal beneficiaryInitiativeBudget;
-    private RankingStatusEnum rankingStatus;
+    private RankingStatus rankingStatus;
     private long size;
     private List<Order> rankingFields;
+    private String rankingPathFile;
 }
