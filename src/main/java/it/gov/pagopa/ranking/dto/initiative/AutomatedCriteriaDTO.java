@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 @Builder
 public class AutomatedCriteriaDTO   {
     private String authority;
-    private String code ;
+    private String code;
     private String field;
     private Sort.Direction orderDirection;
 }
