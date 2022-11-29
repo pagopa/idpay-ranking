@@ -2,15 +2,16 @@ package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Random;
 
-public class OnboardingRankingRequestsFaker {
+public class RankingRequestsApiDTOFaker {
 
-    private OnboardingRankingRequestsFaker() {
+    private RankingRequestsApiDTOFaker() {
     }
     private static final Random randomGenerator = new Random();
 
@@ -33,23 +34,23 @@ public class OnboardingRankingRequestsFaker {
     }
 
     /**
-     * It will return an example of {@link OnboardingRankingRequests}. Providing a bias, it will return a pseudo-casual object
+     * It will return an example of {@link InitiativeConfig}. Providing a bias, it will return a pseudo-casual object
      */
-    public static OnboardingRankingRequests mockInstance(Integer bias) {
+    public static RankingRequestsApiDTO mockInstance(Integer bias) {
         return mockInstanceBuilder(bias).build();
     }
 
-    public static OnboardingRankingRequests.OnboardingRankingRequestsBuilder mockInstanceBuilder(Integer bias) {
-        OnboardingRankingRequests.OnboardingRankingRequestsBuilder out = OnboardingRankingRequests.builder();
-        return out.id("userId_%dinitiativeId_%d")
-                .userId("userId_%d".formatted(bias))
+    public static RankingRequestsApiDTO.RankingRequestsApiDTOBuilder mockInstanceBuilder(Integer bias) {
+        LocalDateTime today = LocalDateTime.now();
+
+        RankingRequestsApiDTO.RankingRequestsApiDTOBuilder out = RankingRequestsApiDTO.builder();
+        return out.userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
-                .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
-                .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
+                .admissibilityCheckDate(today)
+                .criteriaConsensusTimestamp(today)
                 .rankingValue(getRandomPositiveNumber(bias))
-                .rank(bias);
+                .rank(1);
 
     }
 }
-
