@@ -46,7 +46,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                         );
 
                 for (OnboardingRankingRequests r : requests) {
-                    out.add(dtoMapper.apply(r, initiative.getOrganizationId()));
+                    out.add(dtoMapper.apply(r));
                 }
             }
 

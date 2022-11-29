@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
-    private static final String ORGANIZATION_ID = "organizationId_1";
-
     @Test
     void test() {
         // Given
@@ -22,7 +20,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
 
         // When
-        RankingRequestsApiDTO result = mapper.apply(request, ORGANIZATION_ID);
+        RankingRequestsApiDTO result = mapper.apply(request);
 
         // Then
         Assertions.assertNotNull(request);
@@ -34,7 +32,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
     private void checkResult(OnboardingRankingRequests expected, RankingRequestsApiDTO result) {
         Assertions.assertEquals(expected.getUserId(), result.getUserId());
         Assertions.assertEquals(expected.getInitiativeId(), result.getInitiativeId());
-        Assertions.assertEquals(ORGANIZATION_ID, result.getOrganizationId());
+        Assertions.assertEquals(expected.getOrganizationId(), result.getOrganizationId());
         Assertions.assertEquals(expected.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(expected.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(expected.getRankingValue(), result.getRankingValue());

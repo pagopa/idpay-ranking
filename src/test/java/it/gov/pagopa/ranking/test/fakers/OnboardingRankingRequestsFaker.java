@@ -44,6 +44,7 @@ public class OnboardingRankingRequestsFaker {
         return out.id("userId_%dinitiativeId_%d")
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
+                .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
                 .rankingValue(getRandomPositiveNumber(bias))
