@@ -4,6 +4,6 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 
 import java.util.List;
 
-public interface OnboardingRankingBuildFileMediatorService {
-    List<InitiativeConfig> execute();
+public interface InitiativeOnboardingRankingEndingService {
+    List<InitiativeConfig> retrieve();
 }

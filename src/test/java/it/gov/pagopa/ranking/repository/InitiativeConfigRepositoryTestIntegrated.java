@@ -6,5 +6,5 @@ import org.springframework.test.context.TestPropertySource;
         "classpath:/mongodbEmbeddedDisabled.properties",
         "classpath:/secrets/mongodbConnectionString.properties"
 })
-public class InitiativeConfigRepositoryTestIntegrated extends InitiativeConfigRepositoryTest{
+class InitiativeConfigRepositoryTestIntegrated extends InitiativeConfigRepositoryTest{
 }
