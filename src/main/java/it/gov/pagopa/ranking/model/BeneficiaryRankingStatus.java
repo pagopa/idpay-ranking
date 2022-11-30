@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum BeneficiaryRankingStatus {
 
     ELIGIBLE_OK("ELIGIBLE_OK"),
-    ELIBIGLE_KO("ELIBIGLE_KO"),
+    ELIGIBLE_KO("ELIGIBLE_KO"),
     TO_NOTIFY("TO_NOTIFY");
     private final String value;
 
