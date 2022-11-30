@@ -32,7 +32,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         Assertions.assertEquals(expected.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(expected.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(expected.getRankingValue(), result.getRankingValue());
-        Assertions.assertEquals(expected.getRanking(), result.getRanking());
+        Assertions.assertEquals(expected.getRank(), result.getRanking());
     }
 
 }

@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.service;
 
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
+import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -28,12 +29,13 @@ class RankingRequestsApiServiceImplTest {
     @Mock private OnboardingRankingRequestsRepository requestsRepositoryMock;
     @Mock private RankingContextHolderService contextHolderServiceMock;
     private final OnboardingRankingRequest2RankingRequestsApiDTOMapper mapper = new OnboardingRankingRequest2RankingRequestsApiDTOMapper();
+    private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper = new PageOnboardingRequests2RankingPageDTOMapper();
 
     private RankingRequestsApiService service;
 
     @BeforeEach
     void init() {
-        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, contextHolderServiceMock);
+        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, pageDtoMapper, contextHolderServiceMock);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.repository;
 
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -10,5 +11,5 @@ public interface OnboardingRankingRequestsRepository extends MongoRepository<Onb
 
     List<OnboardingRankingRequests> findByInitiativeId(String initiativeId, Pageable pageable);
 
-    long countByInitiativeId(String initiativeId);
+    Page<List<OnboardingRankingRequests>> findByInitiativeIdPaged(String initiativeId, Pageable pageable);
 }

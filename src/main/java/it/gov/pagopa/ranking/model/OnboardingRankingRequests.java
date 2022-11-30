@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.model;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(of = {"id"}, callSuper = false)
+@FieldNameConstants
 @Document(collection = "onboarding_ranking_requests")
 public class OnboardingRankingRequests {
     @Id
@@ -28,5 +30,6 @@ public class OnboardingRankingRequests {
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
     private long rankingValueOriginal;
-    private long ranking;
+    private long rank;
+    private BeneficiaryRankingStatus beneficiaryRankingStatus;
 }

@@ -1,13 +1,11 @@
 package it.gov.pagopa.ranking.controller;
 
-import it.gov.pagopa.ranking.dto.PageRankingDTO;
+import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.service.RankingRequestsApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -37,11 +35,11 @@ public class RankingApiControllerImpl implements RankingApiController{
     }
 
     @Override
-    public PageRankingDTO<RankingRequestsApiDTO> rankingRequestsPaged(String organizationId, String initiativeId, int page, int size) {
+    public RankingPageDTO rankingRequestsPaged(String organizationId, String initiativeId, int page, int size) {
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
                 initiativeId, organizationId, page, size);
 
-        PageRankingDTO<RankingRequestsApiDTO> result = rankingRequestsApiService.findByInitiativeIdPaged(organizationId, initiativeId, page, size);
+        RankingPageDTO result = rankingRequestsApiService.findByInitiativeIdPaged(organizationId, initiativeId, page, size);
 
         if (result == null) {
             throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);

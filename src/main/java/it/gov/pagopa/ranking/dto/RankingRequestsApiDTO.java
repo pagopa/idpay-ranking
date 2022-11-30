@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.dto;
 
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,5 +27,5 @@ public class RankingRequestsApiDTO {
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
     private long ranking;
-    private String beneficiaryRankingStatus;
+    private BeneficiaryRankingStatus beneficiaryRankingStatus;
 }
