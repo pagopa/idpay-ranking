@@ -5,11 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
-
 public interface OnboardingRankingRequestsRepository extends MongoRepository<OnboardingRankingRequests,String> {
 
-    List<OnboardingRankingRequests> findByInitiativeId(String initiativeId, Pageable pageable);
-
-    Page<List<OnboardingRankingRequests>> findByInitiativeIdPaged(String initiativeId, Pageable pageable);
+    Page<OnboardingRankingRequests> findByInitiativeId(String initiativeId, Pageable pageable);
 }

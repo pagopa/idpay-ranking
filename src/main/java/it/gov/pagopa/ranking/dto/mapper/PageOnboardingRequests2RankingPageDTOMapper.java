@@ -14,7 +14,7 @@ import java.util.List;
 public class PageOnboardingRequests2RankingPageDTOMapper {
 
     public RankingPageDTO apply(
-            Page<List<OnboardingRankingRequests>> pageOnboardingRequests,
+            Page<OnboardingRankingRequests> pageOnboardingRequests,
             List<RankingRequestsApiDTO> content,
             RankingStatus rankingStatus,
             LocalDateTime rankingPublishedTimeStamp,

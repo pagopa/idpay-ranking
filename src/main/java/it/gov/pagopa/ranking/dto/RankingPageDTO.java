@@ -24,9 +24,9 @@ public class RankingPageDTO {
     private LocalDateTime rankingPublishedTimeStamp;
     private LocalDateTime rankingGeneratedTimeStamp;
     @Builder.Default
-    private long totalOnboardingOk = 0;
+    private long totalEligibleOk = 0;
     @Builder.Default
-    private long totalOnboardingKo = 0;
+    private long totalEligibleKo = 0;
 
 }
 

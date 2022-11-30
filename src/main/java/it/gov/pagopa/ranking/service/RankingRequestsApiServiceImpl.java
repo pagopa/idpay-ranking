@@ -50,7 +50,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                         onboardingRankingRequestsRepository.findByInitiativeId(
                                 initiativeId,
                                 PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
-                        );
+                        ).getContent();
 
                 for (OnboardingRankingRequests r : requests) {
                     out.add(dtoMapper.apply(r));
@@ -69,16 +69,16 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             return null;
         } else {
             List<RankingRequestsApiDTO> rankingDtoList = new ArrayList<>();
-            Page<List<OnboardingRankingRequests>> pageRequests = new PageImpl<>(Collections.emptyList());
+            Page<OnboardingRankingRequests> pageRequests = new PageImpl<>(Collections.emptyList());
 
             if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
 
-                pageRequests = onboardingRankingRequestsRepository.findByInitiativeIdPaged(
+                pageRequests = onboardingRankingRequestsRepository.findByInitiativeId(
                                 initiativeId,
                                 PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
                         );
 
-                for (OnboardingRankingRequests r : pageRequests.getContent().get(0)) {
+                for (OnboardingRankingRequests r : pageRequests.getContent()) {
                     rankingDtoList.add(dtoMapper.apply(r));
                 }
             }
