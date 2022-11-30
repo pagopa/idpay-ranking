@@ -9,4 +9,6 @@ import java.util.List;
 public interface OnboardingRankingRequestsRepository extends MongoRepository<OnboardingRankingRequests,String> {
 
     List<OnboardingRankingRequests> findByInitiativeId(String initiativeId, Pageable pageable);
+
+    long countByInitiativeId(String initiativeId);
 }

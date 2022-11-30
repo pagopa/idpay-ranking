@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @Slf4j
 public class RankingContextHolderServiceImpl implements RankingContextHolderService{
-    private final InitiativeConfigService initiativeConfiginitiativeConfigService;
+    private final InitiativeConfigService initiativeConfigService;
     private final Map<String, InitiativeConfig> initiativeId2Config=new ConcurrentHashMap<>();
 
-    public RankingContextHolderServiceImpl(InitiativeConfigService initiativeConfiginitiativeConfigService) {
-        this.initiativeConfiginitiativeConfigService = initiativeConfiginitiativeConfigService;
+    public RankingContextHolderServiceImpl(InitiativeConfigService initiativeConfigService) {
+        this.initiativeConfigService = initiativeConfigService;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
     private InitiativeConfig retrieveInitiativeConfig(String initiativeId) {
         log.debug("[CACHE_MISS] Cannot find locally initiativeId {}", initiativeId);
         long startTime = System.currentTimeMillis();
-        InitiativeConfig initiativeConfig = initiativeConfiginitiativeConfigService.findById(initiativeId);
+        InitiativeConfig initiativeConfig = initiativeConfigService.findById(initiativeId);
         log.info("[CACHE_MISS] [PERFORMANCE_LOG] Time spent fetching initiativeId: {} ms", System.currentTimeMillis() - startTime);
         if (initiativeConfig==null){
             log.error("[RANKING_CONTEXT] cannot find initiative having id %s".formatted(initiativeId));

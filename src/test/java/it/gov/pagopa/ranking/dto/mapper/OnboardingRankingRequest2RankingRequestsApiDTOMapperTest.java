@@ -1,15 +1,11 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
-import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
-import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
     @Test
@@ -36,7 +32,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         Assertions.assertEquals(expected.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(expected.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(expected.getRankingValue(), result.getRankingValue());
-        Assertions.assertEquals(expected.getRank(), result.getRank());
+        Assertions.assertEquals(expected.getRanking(), result.getRanking());
     }
 
 }

@@ -50,7 +50,7 @@ public class RankingRequestsApiDTOFaker {
                 .admissibilityCheckDate(today)
                 .criteriaConsensusTimestamp(today)
                 .rankingValue(getRandomPositiveNumber(bias))
-                .rank(1);
+                .ranking(1);
 
     }
 }

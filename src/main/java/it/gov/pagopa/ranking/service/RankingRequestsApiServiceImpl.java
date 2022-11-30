@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.service;
 
+import it.gov.pagopa.ranking.dto.PageRankingDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                 List<OnboardingRankingRequests> requests =
                         onboardingRankingRequestsRepository.findByInitiativeId(
                                 initiativeId,
-                                PageRequest.of(page, size, Sort.by("rank"))
+                                PageRequest.of(page, size, Sort.by("ranking"))
                         );
 
                 for (OnboardingRankingRequests r : requests) {
@@ -52,5 +54,42 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
 
             return out;
         }
+    }
+
+    @Override
+    public PageRankingDTO<RankingRequestsApiDTO> findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size) {
+
+        InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
+        if (initiative == null) {
+            return null;
+        } else {
+            List<RankingRequestsApiDTO> out = new ArrayList<>();
+
+            if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
+
+                List<OnboardingRankingRequests> requests =
+                        onboardingRankingRequestsRepository.findByInitiativeId(
+                                initiativeId,
+                                PageRequest.of(page, size, Sort.by("ranking"))
+                        );
+
+                for (OnboardingRankingRequests r : requests) {
+                    out.add(dtoMapper.apply(r));
+                }
+            }
+
+            long total = onboardingRankingRequestsRepository.countByInitiativeId(initiativeId);
+
+            return new PageRankingDTO<>(
+                    out,
+                    initiative.getRankingStatus().toString(),
+                    initiative.getRankingPublishedTimeStamp(),
+                    initiative.getRankingGeneratedTimeStamp(),
+                    page,
+                    size,
+                    total
+            );
+        }
+
     }
 }

@@ -18,12 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class RankingRequestsApiServiceImplTest {
@@ -59,7 +56,7 @@ class RankingRequestsApiServiceImplTest {
         Assertions.assertFalse(results.isEmpty());
         RankingRequestsApiDTO result = results.get(0);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.getRank());
+        Assertions.assertEquals(1, result.getRanking());
     }
 
     @Test

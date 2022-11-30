@@ -16,7 +16,7 @@ public class OnboardingRankingRequest2RankingRequestsApiDTOMapper {
         out.setAdmissibilityCheckDate(onboardingRankingRequests.getAdmissibilityCheckDate());
         out.setCriteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp());
         out.setRankingValue(onboardingRankingRequests.getRankingValue());
-        out.setRank(onboardingRankingRequests.getRank());
+        out.setRanking(onboardingRankingRequests.getRanking());
 
         return out;
     }

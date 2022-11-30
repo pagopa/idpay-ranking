@@ -28,5 +28,5 @@ public class OnboardingRankingRequests {
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
     private long rankingValueOriginal;
-    private long rank;
+    private long ranking;
 }

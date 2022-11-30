@@ -25,5 +25,6 @@ public class RankingRequestsApiDTO {
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
-    private long rank;
+    private long ranking;
+    private String beneficiaryRankingStatus;
 }
