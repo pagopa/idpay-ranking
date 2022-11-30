@@ -4,7 +4,6 @@ import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
-import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -37,7 +36,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     }
 
     @Override
-    public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
+    public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
         if (initiative == null) {
@@ -71,7 +70,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     }
 
     @Override
-    public RankingPageDTO findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
+    public RankingPageDTO findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
         if (initiative == null) {
@@ -102,9 +101,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             return pageDtoMapper.apply(
                     pageRequests,
                     rankingDtoList,
-                    initiative.getRankingStatus(),
-                    initiative.getRankingPublishedTimeStamp(),
-                    initiative.getRankingGeneratedTimeStamp());
+                    initiative);
         }
     }
 }

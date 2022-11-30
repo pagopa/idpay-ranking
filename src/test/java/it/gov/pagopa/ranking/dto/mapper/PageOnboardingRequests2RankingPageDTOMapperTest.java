@@ -15,8 +15,6 @@ import org.springframework.data.domain.*;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class PageOnboardingRequests2RankingPageDTOMapperTest {
 
     @Test
@@ -30,6 +28,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         List<RankingRequestsApiDTO> dtoList = List.of(RankingRequestsApiDTOFaker.mockInstance(1));
         InitiativeConfig initiative = InitiativeConfigFaker.mockInstance(1);
         initiative.setRankingStatus(RankingStatus.COMPLETED);
+        initiative.setRankingPathFile("test.zip");
 
         RankingPageDTO expected = RankingPageDTO.builder()
                 .content(dtoList)
@@ -42,6 +41,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
                 .rankingGeneratedTimeStamp(initiative.getRankingGeneratedTimeStamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
+                .rankingFilePath("test.zip")
                 .build();
 
         PageOnboardingRequests2RankingPageDTOMapper mapper = new PageOnboardingRequests2RankingPageDTOMapper();
@@ -50,9 +50,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         RankingPageDTO result = mapper.apply(
                 page,
                 dtoList,
-                initiative.getRankingStatus(),
-                initiative.getRankingPublishedTimeStamp(),
-                initiative.getRankingGeneratedTimeStamp());
+                initiative);
 
         // Then
         Assertions.assertNotNull(result);
@@ -67,6 +65,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         Assertions.assertEquals(expected.getRankingGeneratedTimeStamp(), result.getRankingGeneratedTimeStamp());
         Assertions.assertEquals(expected.getTotalEligibleOk(), result.getTotalEligibleOk());
         Assertions.assertEquals(expected.getTotalEligibleKo(), result.getTotalEligibleKo());
+        Assertions.assertEquals(expected.getRankingFilePath(), result.getRankingFilePath());
     }
 
 }

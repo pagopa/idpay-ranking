@@ -28,5 +28,4 @@ public class RankingRequestsApiDTO {
     private long rankingValue;
     private long ranking;
     private BeneficiaryRankingStatus beneficiaryRankingStatus;
-    private String rankingPathFile;
 }

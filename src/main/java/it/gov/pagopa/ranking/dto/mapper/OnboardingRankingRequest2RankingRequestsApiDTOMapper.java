@@ -18,7 +18,6 @@ public class OnboardingRankingRequest2RankingRequestsApiDTOMapper {
         out.setRankingValue(onboardingRankingRequests.getRankingValue());
         out.setRanking(onboardingRankingRequests.getRank());
         out.setBeneficiaryRankingStatus(onboardingRankingRequests.getBeneficiaryRankingStatus());
-        // TODO set rankingPathFile
 
         return out;
     }

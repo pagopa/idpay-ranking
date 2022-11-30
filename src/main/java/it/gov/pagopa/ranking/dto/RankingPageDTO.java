@@ -27,6 +27,7 @@ public class RankingPageDTO {
     private long totalEligibleOk = 0;
     @Builder.Default
     private long totalEligibleKo = 0;
+    private String rankingFilePath;
 
 }
 

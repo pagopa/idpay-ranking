@@ -4,11 +4,9 @@ import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.RankingRequestsApiServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
-import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.test.fakers.RankingRequestsApiDTOFaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,16 +14,11 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,7 +48,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T01:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\",\"rankingPathFile\":null}]";
+        String expected = "[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T01:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}]";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
@@ -69,7 +62,7 @@ class RankingApiControllerImplTest {
         RankingRequestsApiDTO dto3 = RankingRequestsApiDTOFaker.mockInstance(1);
         dto3.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
-        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK))
+        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK.toString()))
                 .thenReturn(List.of(dto1));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -81,7 +74,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T01:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\",\"rankingPathFile\":null}]";
+        String expected = "[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T01:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}]";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
@@ -135,7 +128,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\",\"rankingPathFile\":null}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
@@ -182,7 +175,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\",\"rankingPathFile\":null}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
