@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -30,4 +31,9 @@ public class InitiativeConfig {
     private long size;
     private List<Order> rankingFields;
     private String rankingPathFile;
+    private LocalDateTime rankingGeneratedTimeStamp;
+    private LocalDateTime rankingPublishedTimeStamp;
+    private long totalEligibleOk;
+    private long totalEligibleKo;
+    private long totalOnboardingKo;
 }

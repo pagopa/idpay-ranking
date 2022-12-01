@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -47,6 +48,7 @@ public class InitiativeConfigFaker {
     public static InitiativeConfig.InitiativeConfigBuilder mockInstanceBuilder(Integer bias) {
         InitiativeConfig.InitiativeConfigBuilder out = InitiativeConfig.builder();
         LocalDate now = LocalDate.now();
+        LocalDateTime nowTime = LocalDateTime.now();
 
         out.initiativeId(bias!=null? "initiativeId_%d".formatted(bias) : "?????");
         out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
@@ -61,6 +63,11 @@ public class InitiativeConfigFaker {
         out.rankingFields(List.of(
                 Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
         ));
+        out.rankingPublishedTimeStamp(nowTime);
+        out.rankingGeneratedTimeStamp(nowTime);
+        out.totalEligibleOk(0);
+        out.totalEligibleKo(0);
+        out.totalOnboardingKo(0);
 
         return out;
 
