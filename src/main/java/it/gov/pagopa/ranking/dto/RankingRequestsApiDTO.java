@@ -1,8 +1,9 @@
-package it.gov.pagopa.ranking.model;
+package it.gov.pagopa.ranking.dto;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -12,11 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(of = {"id"}, callSuper = false)
-@Document(collection = "onboarding_ranking_requests")
-public class OnboardingRankingRequests {
-    @Id
-    private String id;
+public class RankingRequestsApiDTO {
+
     @NotEmpty
     private String userId;
     @NotEmpty
@@ -27,6 +25,5 @@ public class OnboardingRankingRequests {
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
-    private long rankingValueOriginal;
     private long rank;
 }

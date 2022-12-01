@@ -14,6 +14,7 @@ public class OnboardingRankingRequestsDTO2ModelMapper implements Function<Onboar
         out.setId(buildId(onboardingRankingRequestDTO));
         out.setUserId(onboardingRankingRequestDTO.getUserId());
         out.setInitiativeId(onboardingRankingRequestDTO.getInitiativeId());
+        out.setOrganizationId(onboardingRankingRequestDTO.getOrganizationId());
         out.setAdmissibilityCheckDate(onboardingRankingRequestDTO.getAdmissibilityCheckDate());
         out.setCriteriaConsensusTimestamp(onboardingRankingRequestDTO.getCriteriaConsensusTimestamp());
         out.setRankingValue(onboardingRankingRequestDTO.getRankingValue());
