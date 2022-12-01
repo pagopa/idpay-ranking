@@ -53,7 +53,7 @@ public class InitiativeOnboardingRankingEndingServiceImpl implements InitiativeO
         try (receiverClient){
             while(serviceBusReceivedMessage != null && count<=messageInQueue){
                 OnboardingRequestDTO body = serviceBusReceivedMessage.getBody().toObject(OnboardingRequestDTO.class);
-                if(body.getInitiativeId().equals(initiativeConfig.getInitiativeId())){
+                if(body.getInitiativeId() != null && body.getInitiativeId().equals(initiativeConfig.getInitiativeId())){
                     return false;
                 } else{
                     serviceBusReceivedMessage = receiverClient.peekMessage();
