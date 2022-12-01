@@ -146,6 +146,8 @@ app:
       # days before current to search initiative
       day-before: ${RETRIEVE_INITIATIVE_DAY_BEFORE:7}
   service-bus:
+    namespace:
+      string-connection: ${SERVICEBUS_NAMESPACE_ONBOARDING_CONNECTION_STRING:}
     onboarding-request-pending:
       string-connection: ${SERVICEBUS_ONBOARDING_CONNECTION_STRING:}
       destination: ${KAFKA_ONBOARDING_REQUEST_PENDING_TOPIC:idpay-onboarding-request}
