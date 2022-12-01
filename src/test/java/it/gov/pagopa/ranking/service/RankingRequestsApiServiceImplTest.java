@@ -81,11 +81,11 @@ class RankingRequestsApiServiceImplTest {
         request1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
         Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
-        Mockito.when(requestsRepositoryMock.findByInitiativeIdAndBeneficiaryRankingStatus(initiativeConfig.getInitiativeId(), BeneficiaryRankingStatus.ELIGIBLE_OK.toString(), pageable))
+        Mockito.when(requestsRepositoryMock.findByInitiativeIdAndBeneficiaryRankingStatus(initiativeConfig.getInitiativeId(), BeneficiaryRankingStatus.ELIGIBLE_OK, pageable))
                 .thenReturn(new PageImpl<>(List.of(request1, request2, request3)));
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK.toString());
+        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK);
 
         // Then
         Assertions.assertFalse(results.isEmpty());
@@ -163,6 +163,7 @@ class RankingRequestsApiServiceImplTest {
                 .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
+                .totalOnboardingKo(0)
                 .build();
 
         // When

@@ -3,6 +3,7 @@ package it.gov.pagopa.ranking.controller;
 import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.service.RankingRequestsApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class RankingApiControllerImpl implements RankingApiController{
     }
 
     @Override
-    public List<RankingRequestsApiDTO> rankingRequests(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
+    public List<RankingRequestsApiDTO> rankingRequests(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
                 initiativeId, organizationId, page, size);
 
@@ -35,7 +36,7 @@ public class RankingApiControllerImpl implements RankingApiController{
     }
 
     @Override
-    public RankingPageDTO rankingRequestsPaged(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
+    public RankingPageDTO rankingRequestsPaged(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
                 initiativeId, organizationId, page, size);
 

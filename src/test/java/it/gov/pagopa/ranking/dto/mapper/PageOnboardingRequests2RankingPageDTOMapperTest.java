@@ -41,6 +41,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
                 .rankingGeneratedTimeStamp(initiative.getRankingGeneratedTimeStamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
+                .totalOnboardingKo(0)
                 .rankingFilePath("test.zip")
                 .build();
 
@@ -65,6 +66,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         Assertions.assertEquals(expected.getRankingGeneratedTimeStamp(), result.getRankingGeneratedTimeStamp());
         Assertions.assertEquals(expected.getTotalEligibleOk(), result.getTotalEligibleOk());
         Assertions.assertEquals(expected.getTotalEligibleKo(), result.getTotalEligibleKo());
+        Assertions.assertEquals(expected.getTotalOnboardingKo(), result.getTotalOnboardingKo());
         Assertions.assertEquals(expected.getRankingFilePath(), result.getRankingFilePath());
     }
 

@@ -62,7 +62,7 @@ class RankingApiControllerImplTest {
         RankingRequestsApiDTO dto3 = RankingRequestsApiDTOFaker.mockInstance(1);
         dto3.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
-        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK.toString()))
+        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK))
                 .thenReturn(List.of(dto1));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -116,6 +116,7 @@ class RankingApiControllerImplTest {
                 .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
+                .totalOnboardingKo(0)
                 .build();
 
         Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null))
@@ -128,7 +129,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"rankingFilePath\":null}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
@@ -175,7 +176,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"rankingFilePath\":null}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 

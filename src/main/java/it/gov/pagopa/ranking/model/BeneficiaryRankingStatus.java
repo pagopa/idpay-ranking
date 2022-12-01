@@ -7,6 +7,7 @@ public enum BeneficiaryRankingStatus {
 
     ELIGIBLE_OK("ELIGIBLE_OK"),
     ELIGIBLE_KO("ELIGIBLE_KO"),
+    ONBOARDING_KO("ONBOARDING_KO"),
     TO_NOTIFY("TO_NOTIFY");
     private final String value;
 

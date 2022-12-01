@@ -23,10 +23,17 @@ public class RankingPageDTO {
     private RankingStatus rankingStatus;
     private LocalDateTime rankingPublishedTimeStamp;
     private LocalDateTime rankingGeneratedTimeStamp;
+
+    // Number of eligible users
     @Builder.Default
     private long totalEligibleOk = 0;
+    // Number of not eligible users
     @Builder.Default
     private long totalEligibleKo = 0;
+    // Number of users rejected from admissibility-assessor
+    @Builder.Default
+    private long totalOnboardingKo = 0;
+
     private String rankingFilePath;
 
 }

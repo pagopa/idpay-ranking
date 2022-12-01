@@ -27,7 +27,9 @@ public class PageOnboardingRequests2RankingPageDTOMapper {
         out.setRankingPublishedTimeStamp(initiativeConfig.getRankingPublishedTimeStamp());
         out.setRankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp());
         out.setRankingFilePath(initiativeConfig.getRankingPathFile());
-        // TODO total OK and KO
+        out.setTotalEligibleOk(initiativeConfig.getTotalEligibleOk());
+        out.setTotalEligibleKo(initiativeConfig.getTotalEligibleKo());
+        out.setTotalOnboardingKo(initiativeConfig.getTotalOnboardingKo());
 
         return out;
     }

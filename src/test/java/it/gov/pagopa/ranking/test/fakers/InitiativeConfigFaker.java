@@ -65,6 +65,9 @@ public class InitiativeConfigFaker {
         ));
         out.rankingPublishedTimeStamp(nowTime);
         out.rankingGeneratedTimeStamp(nowTime);
+        out.totalEligibleOk(0);
+        out.totalEligibleKo(0);
+        out.totalOnboardingKo(0);
 
         return out;
 

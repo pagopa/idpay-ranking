@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.controller;
 
 import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public interface RankingApiController {
             @PathVariable(value = "initiativeId") String initiativeId,
             @RequestParam(value = "page", required = false , defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "beneficiaryRankingStatus", required = false) String beneficiaryRankingStatus);
+            @RequestParam(value = "beneficiaryRankingStatus", required = false) BeneficiaryRankingStatus beneficiaryRankingStatus);
 
     @GetMapping(value = "/organization/{organizationId}/initiative/{initiativeId}/paged")
     RankingPageDTO rankingRequestsPaged(
@@ -29,6 +30,6 @@ public interface RankingApiController {
             @PathVariable(value = "initiativeId") String initiativeId,
             @RequestParam(value = "page", required = false , defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "beneficiaryRankingStatus", required = false) String beneficiaryRankingStatus);
+            @RequestParam(value = "beneficiaryRankingStatus", required = false) BeneficiaryRankingStatus beneficiaryRankingStatus);
 
 }

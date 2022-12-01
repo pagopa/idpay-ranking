@@ -33,4 +33,7 @@ public class InitiativeConfig {
     private String rankingPathFile;
     private LocalDateTime rankingGeneratedTimeStamp;
     private LocalDateTime rankingPublishedTimeStamp;
+    private long totalEligibleOk;
+    private long totalEligibleKo;
+    private long totalOnboardingKo;
 }

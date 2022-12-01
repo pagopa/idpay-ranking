@@ -4,6 +4,7 @@ import it.gov.pagopa.ranking.dto.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,49 +36,46 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     }
 
     @Override
-    public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
+    public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
         if (initiative == null) {
             return null;
         } else {
-            List<RankingRequestsApiDTO> out = new ArrayList<>();
-
             if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
-
-                List<OnboardingRankingRequests> requests;
                 if (beneficiaryRankingStatus != null) {
-                    requests = onboardingRankingRequestsRepository.findByInitiativeIdAndBeneficiaryRankingStatus(
+                    return onboardingRankingRequestsRepository.findByInitiativeIdAndBeneficiaryRankingStatus(
                                     initiativeId,
                                     beneficiaryRankingStatus,
                                     PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
-                            ).getContent();
+                            ).getContent()
+                            .stream()
+                            .map(dtoMapper::apply)
+                            .toList();
                 } else {
-                    requests = onboardingRankingRequestsRepository.findByInitiativeId(
+                    return onboardingRankingRequestsRepository.findByInitiativeId(
                                     initiativeId,
                                     PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
-                            ).getContent();
+                            ).getContent()
+                            .stream()
+                            .map(dtoMapper::apply)
+                            .toList();
                 }
-
-                for (OnboardingRankingRequests r : requests) {
-                    out.add(dtoMapper.apply(r));
-                }
+            } else {
+                return Collections.emptyList();
             }
-
-            return out;
         }
     }
 
     @Override
-    public RankingPageDTO findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size, String beneficiaryRankingStatus) {
+    public RankingPageDTO findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size, BeneficiaryRankingStatus beneficiaryRankingStatus) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
         if (initiative == null) {
             return null;
         } else {
-            List<RankingRequestsApiDTO> rankingDtoList = new ArrayList<>();
-            Page<OnboardingRankingRequests> pageRequests = new PageImpl<>(Collections.emptyList());
 
+            Page<OnboardingRankingRequests> pageRequests = new PageImpl<>(Collections.emptyList());
             if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
                 if(beneficiaryRankingStatus != null) {
                     pageRequests = onboardingRankingRequestsRepository.findByInitiativeIdAndBeneficiaryRankingStatus(
@@ -93,15 +90,18 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                     );
                 }
 
-                for (OnboardingRankingRequests r : pageRequests.getContent()) {
-                    rankingDtoList.add(dtoMapper.apply(r));
-                }
+                return pageDtoMapper.apply(
+                        pageRequests,
+                        pageRequests.getContent().stream().map(dtoMapper::apply).toList(),
+                        initiative
+                );
+            } else {
+               return pageDtoMapper.apply(
+                       pageRequests,
+                       Collections.emptyList(),
+                       initiative
+               );
             }
-
-            return pageDtoMapper.apply(
-                    pageRequests,
-                    rankingDtoList,
-                    initiative);
         }
     }
 }
