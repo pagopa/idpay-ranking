@@ -214,7 +214,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     private void assertInitiativeNotChanged(InitiativeConfig initiativeConfig, RankingStatus rankingStatus){
         Assertions.assertNotNull(initiativeConfig);
-        TestUtils.checkNotNullFields(initiativeConfig, "rankingPathFile", "rankingPublishedTimeStamp", "rankingGeneratedTimeStamp");
+        TestUtils.checkNotNullFields(initiativeConfig, "rankingFilePath", "rankingPublishedTimestamp", "rankingGeneratedTimestamp");
 
         int biasRetrieved = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
         InitiativeConfig initiativeExpected = getInitiativeForDB(biasRetrieved);
@@ -226,7 +226,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         int biasRetrieve = Integer.parseInt(initiativeConfig.getInitiativeId().substring(13));
         InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(biasRetrieve);
 
-        TestUtils.checkNotNullFields(initiativeConfig, "rankingPathFile", "rankingPublishedTimeStamp", "rankingGeneratedTimeStamp");
+        TestUtils.checkNotNullFields(initiativeConfig, "rankingFilePath", "rankingPublishedTimestamp", "rankingGeneratedTimestamp");
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeId(), initiativeConfig.getInitiativeId());
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeName(), initiativeConfig.getInitiativeName());
         Assertions.assertEquals(initiativeBuildDTO.getOrganizationId(),initiativeConfig.getOrganizationId());

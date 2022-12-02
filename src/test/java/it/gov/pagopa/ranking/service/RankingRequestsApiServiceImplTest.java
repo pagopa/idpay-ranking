@@ -134,8 +134,8 @@ class RankingRequestsApiServiceImplTest {
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
         initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
-        initiativeConfig.setRankingPublishedTimeStamp(date);
-        initiativeConfig.setRankingGeneratedTimeStamp(date);
+        initiativeConfig.setRankingPublishedTimestamp(date);
+        initiativeConfig.setRankingGeneratedTimestamp(date);
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(initiativeConfig.getInitiativeId(), initiativeConfig.getOrganizationId()))
                 .thenReturn(initiativeConfig);
 
@@ -161,8 +161,8 @@ class RankingRequestsApiServiceImplTest {
                 .totalElements(1)
                 .totalPages(1)
                 .rankingStatus(RankingStatus.COMPLETED)
-                .rankingPublishedTimeStamp(initiativeConfig.getRankingPublishedTimeStamp())
-                .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
+                .rankingPublishedTimestamp(initiativeConfig.getRankingPublishedTimestamp())
+                .rankingGeneratedTimestamp(initiativeConfig.getRankingGeneratedTimestamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
                 .totalOnboardingKo(0)

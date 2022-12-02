@@ -20,7 +20,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
 
         // Then
         Assertions.assertNotNull(request);
-        TestUtils.checkNotNullFields(result, "rankingPathFile");
+        TestUtils.checkNotNullFields(result, "rankingFilePath");
         checkResult(request, result);
 
     }

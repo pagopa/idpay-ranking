@@ -63,8 +63,8 @@ public class InitiativeConfigFaker {
         out.rankingFields(List.of(
                 Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
         ));
-        out.rankingPublishedTimeStamp(nowTime);
-        out.rankingGeneratedTimeStamp(nowTime);
+        out.rankingPublishedTimestamp(nowTime);
+        out.rankingGeneratedTimestamp(nowTime);
         out.totalEligibleOk(0);
         out.totalEligibleKo(0);
         out.totalOnboardingKo(0);

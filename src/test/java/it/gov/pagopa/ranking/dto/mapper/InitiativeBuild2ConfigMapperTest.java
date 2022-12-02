@@ -37,7 +37,7 @@ class InitiativeBuild2ConfigMapperTest {
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.calculateSize(initiativeBuildDTO), result.getSize());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.retrieveRankingFieldCodes(initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria()), result.getRankingFields());
 
-        TestUtils.checkNotNullFields(result,"rankingPathFile", "rankingPublishedTimeStamp", "rankingGeneratedTimeStamp");
+        TestUtils.checkNotNullFields(result,"rankingFilePath", "rankingPublishedTimestamp", "rankingGeneratedTimestamp");
     }
 
     @Test

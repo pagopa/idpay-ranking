@@ -21,8 +21,8 @@ public class RankingPageDTO {
     private long totalElements;
     private long totalPages;
     private RankingStatus rankingStatus;
-    private LocalDateTime rankingPublishedTimeStamp;
-    private LocalDateTime rankingGeneratedTimeStamp;
+    private LocalDateTime rankingPublishedTimestamp;
+    private LocalDateTime rankingGeneratedTimestamp;
 
     /** Number of eligible users */
     @Builder.Default

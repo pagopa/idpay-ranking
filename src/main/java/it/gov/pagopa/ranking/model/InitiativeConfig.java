@@ -30,9 +30,9 @@ public class InitiativeConfig {
     private RankingStatus rankingStatus;
     private long size;
     private List<Order> rankingFields;
-    private String rankingPathFile;
-    private LocalDateTime rankingGeneratedTimeStamp;
-    private LocalDateTime rankingPublishedTimeStamp;
+    private String rankingFilePath;
+    private LocalDateTime rankingGeneratedTimestamp;
+    private LocalDateTime rankingPublishedTimestamp;
     private long totalEligibleOk;
     private long totalEligibleKo;
     private long totalOnboardingKo;
