@@ -138,3 +138,16 @@ logging:
     javax.persistence: ${LOG_LEVEL_JAVAX_PERSISTENCE:INFO}
     org.hibernate: ${LOG_LEVEL_ORG_HIBERNATE:INFO}
     org.mongodb.driver: ${LOG_LEVEL_MONGODB_DRIVER:WARN}
+
+app:
+  ranking-build-file:
+    retrieve-initiative:
+      schedule: ${SCHEDULE_RETRIEVE_INITIATIVE:0 0 1 * * ?} # each day at 01:00AM
+      # days before current to search initiative
+      day-before: ${RETRIEVE_INITIATIVE_DAY_BEFORE:7}
+  service-bus:
+    namespace:
+      string-connection: ${SERVICEBUS_NAMESPACE_ONBOARDING_CONNECTION_STRING:}
+    onboarding-request-pending:
+      string-connection: ${SERVICEBUS_ONBOARDING_CONNECTION_STRING:}
+      destination: ${KAFKA_ONBOARDING_REQUEST_PENDING_TOPIC:idpay-onboarding-request}
