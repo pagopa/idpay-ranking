@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.dto.initiative.filter;
+package it.gov.pagopa.ranking.dto.initiative;
 
 import lombok.Data;
 

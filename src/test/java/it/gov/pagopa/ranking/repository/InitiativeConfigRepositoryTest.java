@@ -65,15 +65,17 @@ class InitiativeConfigRepositoryTest extends BaseIntegrationTest {
         List<InitiativeConfig> result = initiativeConfigRepository.findByRankingStatusAndRankingEndDateBetween(RankingStatus.WAITING_END, nowDate.minusDays(dayBefore +1),nowDate);
 
         //Then
-        List<InitiativeConfig> resultTest = result.stream().filter(initiativeConfig -> initiativeConfig.getInitiativeId().matches("initiativeid_test_[0-9]+")).toList();
+        List<String> resultTest = result.stream().map(InitiativeConfig::getInitiativeId).filter(id -> id.matches("initiativeid_test_[0-9]+")).toList();
         Assertions.assertEquals((initiativeEqualsStartDate / 2) + (initiativeBetweenStartAndEndDate / 2), resultTest.size());
 
-        List<InitiativeConfig> initiativeStartExpected = initiativeStartInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
-        initiativeStartExpected.forEach(System.out::println);
-        Assertions.assertTrue(result.containsAll(initiativeStartExpected), "result list" + result+ " elements expected" + initiativeStartExpected);
+        assertInitiative(initiativeStartInterval, resultTest);
+        assertInitiative(initiativeBetweenInterval, resultTest);
+    }
 
-        List<InitiativeConfig> initiativeBetweenExpected = initiativeBetweenInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
-        Assertions.assertTrue(result.containsAll(initiativeBetweenExpected), "result list" + result+ " elements expected" + initiativeBetweenExpected);
+    private void assertInitiative(List<InitiativeConfig> typeList, List<String> resultTest) {
+        typeList.stream()
+                .filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END))
+                .forEach(i -> Assertions.assertTrue(resultTest.contains(i.getInitiativeId()), "Not found in result the initiative " + i.getInitiativeId()));
     }
 
     private List<InitiativeConfig> buildInitiative(int bias, int n, LocalDate rankingEndDate){

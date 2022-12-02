@@ -5,7 +5,7 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
 import com.azure.messaging.servicebus.administration.models.QueueRuntimeProperties;
-import it.gov.pagopa.ranking.dto.initiative.filter.OnboardingRequestPendingDTO;
+import it.gov.pagopa.ranking.dto.initiative.OnboardingRequestPendingDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
