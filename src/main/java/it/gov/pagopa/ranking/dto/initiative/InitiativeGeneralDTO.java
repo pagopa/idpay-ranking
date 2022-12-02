@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class InitiativeGeneralDTO {
-    @JsonProperty("name")
-    private String name;
-
     @JsonProperty("budget")
     private BigDecimal budget;
 
@@ -36,6 +33,6 @@ public class InitiativeGeneralDTO {
     private LocalDate rankingEndDate;
 
     @JsonProperty("rankingEnabled")
-    private Boolean rankingEnabled;
+    private boolean rankingEnabled;
 
 }

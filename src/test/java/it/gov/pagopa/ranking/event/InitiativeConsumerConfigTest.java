@@ -3,6 +3,7 @@ package it.gov.pagopa.ranking.event;
 import com.mongodb.MongoException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -171,9 +172,14 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
             //useCase 5: not ranking initiative
             Pair.of(
-                    i -> Initiative2BuildDTOFaker.mockInstanceBuilder(i)
-                                .beneficiaryRanking(false)
-                                .build(),
+                    i -> {
+                        InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstanceBuilder(i)
+                                .build();
+                        InitiativeGeneralDTO general = initiativeBuildDTO.getGeneral();
+                        general.setRankingEnabled(false);
+                        initiativeBuildDTO.setGeneral(general);
+                        return initiativeBuildDTO;
+                    },
                     initiativeConfig -> Assertions.assertTrue("INITIATIVE_NOT_RANKING".contains(initiativeConfig.getInitiativeId()), "Initiative not ranking type")
             )
     );

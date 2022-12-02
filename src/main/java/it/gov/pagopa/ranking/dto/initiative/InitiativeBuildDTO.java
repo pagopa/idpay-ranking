@@ -23,9 +23,6 @@ public class InitiativeBuildDTO {
     @JsonProperty("status")
     private String status;
 
-    @JsonProperty("beneficiaryRanking")
-    private boolean beneficiaryRanking;
-
     @JsonProperty("general")
     private InitiativeGeneralDTO general;
     @JsonProperty("beneficiaryRule")

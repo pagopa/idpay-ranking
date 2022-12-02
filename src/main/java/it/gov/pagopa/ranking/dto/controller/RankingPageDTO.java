@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.dto;
+package it.gov.pagopa.ranking.dto.controller;
 
 import it.gov.pagopa.ranking.model.RankingStatus;
 import lombok.AllArgsConstructor;

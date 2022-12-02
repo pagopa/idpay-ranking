@@ -1,7 +1,8 @@
 package it.gov.pagopa.ranking.controller;
 
-import it.gov.pagopa.ranking.dto.RankingPageDTO;
-import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -38,7 +39,7 @@ class RankingApiControllerImplTest {
         dto.setAdmissibilityCheckDate(LocalDateTime.of(2022,11,1,0,0));
         dto.setCriteriaConsensusTimestamp(LocalDateTime.of(2022,11,1,1,0));
 
-        Mockito.when(service.findByInitiativeId(dto.getOrganizationId(), dto.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeId(dto.getOrganizationId(), dto.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(List.of(dto));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -62,13 +63,15 @@ class RankingApiControllerImplTest {
         RankingRequestsApiDTO dto3 = RankingRequestsApiDTOFaker.mockInstance(1);
         dto3.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
-        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK))
+        RankingRequestFilter rankingRequestFilter = RankingRequestFilter.builder().beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK).userId(dto1.getUserId()).build();
+        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, rankingRequestFilter))
                 .thenReturn(List.of(dto1));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                                         dto1.getOrganizationId(), dto1.getInitiativeId())
                         .param("beneficiaryRankingStatus", "ELIGIBLE_OK")
+                        .param("userId", "userId_1")
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -81,7 +84,7 @@ class RankingApiControllerImplTest {
     @Test
     void testNotFound() throws Exception {
 
-        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, null))
+        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
                 .thenReturn(null);
 
         mvc.perform(MockMvcRequestBuilders
@@ -119,7 +122,7 @@ class RankingApiControllerImplTest {
                 .totalOnboardingKo(0)
                 .build();
 
-        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(rankingPageDTO);
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -166,7 +169,7 @@ class RankingApiControllerImplTest {
                 .totalEligibleKo(0)
                 .build();
 
-        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(rankingPageDTO);
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -183,7 +186,7 @@ class RankingApiControllerImplTest {
     @Test
     void testPagedNotFound() throws Exception {
 
-        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, null))
+        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
                 .thenReturn(null);
 
         mvc.perform(MockMvcRequestBuilders
