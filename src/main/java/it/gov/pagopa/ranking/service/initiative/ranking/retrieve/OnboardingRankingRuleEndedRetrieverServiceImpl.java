@@ -45,14 +45,14 @@ public class OnboardingRankingRuleEndedRetrieverServiceImpl implements Onboardin
     }
 
     private boolean checkPendingOnboardingRequests(String initiativeId) {
-        log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Start check if there any pending onboarding request for initiative: {}", initiativeId);
+        log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Start check if there are any pending onboarding request for ended initiative: {}", initiativeId);
         int messageInQueue = countMessageInQueue();
         try (ServiceBusReceiverClient receiverClient = getReceiverClient()){
             ServiceBusReceivedMessage serviceBusReceivedMessage;
             for(int count=1; (serviceBusReceivedMessage=receiverClient.peekMessage()) != null && count<=messageInQueue; count++){
                 OnboardingRequestPendingDTO body = serviceBusReceivedMessage.getBody().toObject(OnboardingRequestPendingDTO.class);
                 if(body.getInitiativeId() != null && body.getInitiativeId().equals(initiativeId)){
-                    log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] The user {} waiting for onboarding in initiative {}", body.getUserId(), body.getInitiativeId());
+                    log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Found at least one user ({}) having a pending onboarding request onto initiative {}", body.getUserId(), body.getInitiativeId());
                     return false;
                 }
             }

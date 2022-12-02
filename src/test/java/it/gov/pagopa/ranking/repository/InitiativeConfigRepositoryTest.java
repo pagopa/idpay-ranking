@@ -69,9 +69,11 @@ class InitiativeConfigRepositoryTest extends BaseIntegrationTest {
         Assertions.assertEquals((initiativeEqualsStartDate / 2) + (initiativeBetweenStartAndEndDate / 2), resultTest.size());
 
         List<InitiativeConfig> initiativeStartExpected = initiativeStartInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
-        Assertions.assertTrue(result.containsAll(initiativeStartExpected));
+        initiativeStartExpected.forEach(System.out::println);
+        Assertions.assertTrue(result.containsAll(initiativeStartExpected), "result list" + result+ " elements expected" + initiativeStartExpected);
+
         List<InitiativeConfig> initiativeBetweenExpected = initiativeBetweenInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
-        Assertions.assertTrue(result.containsAll(initiativeBetweenExpected));
+        Assertions.assertTrue(result.containsAll(initiativeBetweenExpected), "result list" + result+ " elements expected" + initiativeBetweenExpected);
     }
 
     private List<InitiativeConfig> buildInitiative(int bias, int n, LocalDate rankingEndDate){
