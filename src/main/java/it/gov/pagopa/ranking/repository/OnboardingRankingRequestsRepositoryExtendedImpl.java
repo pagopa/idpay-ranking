@@ -58,7 +58,7 @@ public class OnboardingRankingRequestsRepositoryExtendedImpl implements Onboardi
             }
             // userId
             if (filters.getUserId() != null) {
-                criteriaList.add(Criteria.where(OnboardingRankingRequests.Fields.userId).gte(filters.getUserId()));
+                criteriaList.add(Criteria.where(OnboardingRankingRequests.Fields.userId).is(filters.getUserId()));
             }
 
             //add all criteria
