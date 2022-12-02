@@ -16,40 +16,58 @@ import java.util.stream.IntStream;
 
 class InitiativeConfigRepositoryTest extends BaseIntegrationTest {
     private final String initiativeId = "initiativeid_test_%d";
-    int initiativeBeforeDate = 10;
-    int initiativeEqualsDate = 15;
-    int initiativeAfterDate = 20;
+    private final int initiativeBeforeStartInterval = 10;
+    private final int initiativeEqualsStartDate = 20;
+    private final int initiativeBetweenStartAndEndDate = 30;
+    private final int initiativeEqualsEndDate = 40;
+    private final int initiativeAfterEndInterval = 50;
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
 
     @AfterEach
     void clearData(){
-        IntStream.range(0, initiativeBeforeDate+initiativeEqualsDate+initiativeAfterDate)
+        IntStream.range(0, initiativeBeforeStartInterval + initiativeEqualsStartDate + initiativeBetweenStartAndEndDate + initiativeEqualsEndDate + initiativeAfterEndInterval)
                 .forEach(i -> initiativeConfigRepository.deleteById(initiativeId.formatted(i)));
     }
 
     @Test
     void findByRankingEndDateBefore() {
         // Given
+        int dayBefore = 7;
         LocalDate nowDate = LocalDate.now();
 
-        List<InitiativeConfig> initiativeConfigList = new ArrayList<>(initiativeBeforeDate + initiativeEqualsDate + initiativeAfterDate);
-        List<InitiativeConfig> initiativeBeforeDateList  = buildInitiative(0, initiativeBeforeDate, nowDate.minusDays(9L));
+        List<InitiativeConfig> initiativeConfigList = new ArrayList<>(initiativeBeforeStartInterval + initiativeEqualsStartDate + initiativeBetweenStartAndEndDate + initiativeEqualsEndDate + initiativeAfterEndInterval);
+        // initiative rankingEndDate before start interval
+        initiativeConfigList.addAll(buildInitiative(0, initiativeBeforeStartInterval, nowDate.minusDays(9L)));
 
-        initiativeConfigList.addAll(initiativeBeforeDateList);
-        initiativeConfigList.addAll(buildInitiative(initiativeBeforeDate, initiativeEqualsDate, nowDate));
-        initiativeConfigList.addAll(buildInitiative(initiativeBeforeDate+initiativeEqualsDate, initiativeAfterDate, nowDate.plusDays(2L)));
+        // initiative rankingEndDate equals start interval
+        List<InitiativeConfig> initiativeStartInterval = buildInitiative(initiativeBeforeStartInterval, initiativeEqualsStartDate, nowDate.minusDays(dayBefore));
+        initiativeConfigList.addAll(initiativeStartInterval);
+
+        // initiative rankingEndDate initiativeBetweenStartAndEndDate interval
+        List<InitiativeConfig> initiativeBetweenInterval = buildInitiative(initiativeBeforeStartInterval + initiativeEqualsStartDate, initiativeBetweenStartAndEndDate, nowDate.minusDays(3L));
+        initiativeConfigList.addAll(initiativeBetweenInterval);
+
+        // initiative rankingEndDate equals end interval
+        initiativeConfigList.addAll(buildInitiative(initiativeBeforeStartInterval + initiativeEqualsStartDate + initiativeBetweenStartAndEndDate, initiativeEqualsEndDate, nowDate));
+
+        // initiative rankingEndDate after end interval
+        initiativeConfigList.addAll(buildInitiative(initiativeBeforeStartInterval + initiativeEqualsStartDate + initiativeBetweenStartAndEndDate + initiativeEqualsEndDate, initiativeAfterEndInterval, nowDate.plusDays(2L)));
 
         List<InitiativeConfig> initiativeConfigListSaved = initiativeConfigRepository.saveAll(initiativeConfigList);
-        Assertions.assertEquals(initiativeBeforeDate + initiativeEqualsDate + initiativeAfterDate,initiativeConfigListSaved.size());
+        Assertions.assertEquals(initiativeBeforeStartInterval + initiativeEqualsStartDate + initiativeBetweenStartAndEndDate + initiativeEqualsEndDate + initiativeAfterEndInterval, initiativeConfigListSaved.size());
 
         // When
-        List<InitiativeConfig> result = initiativeConfigRepository.findByRankingEndDateBeforeAndRankingStatus(nowDate, RankingStatus.WAITING_END);
+        List<InitiativeConfig> result = initiativeConfigRepository.findByRankingStatusAndRankingEndDateBetween(RankingStatus.WAITING_END, nowDate.minusDays(dayBefore +1),nowDate);
 
         //Then
-        Assertions.assertEquals(initiativeBeforeDate/2, result.size());
-        List<InitiativeConfig> initiativeListExpected = initiativeBeforeDateList.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
-        Assertions.assertEquals(initiativeListExpected, result);
+        List<InitiativeConfig> resultTest = result.stream().filter(initiativeConfig -> initiativeConfig.getInitiativeId().matches("initiativeid_test_[0-9]+")).toList();
+        Assertions.assertEquals((initiativeEqualsStartDate / 2) + (initiativeBetweenStartAndEndDate / 2), resultTest.size());
+
+        List<InitiativeConfig> initiativeStartExpected = initiativeStartInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
+        Assertions.assertTrue(result.containsAll(initiativeStartExpected));
+        List<InitiativeConfig> initiativeBetweenExpected = initiativeBetweenInterval.stream().filter(i -> i.getRankingStatus().equals(RankingStatus.WAITING_END)).toList();
+        Assertions.assertTrue(result.containsAll(initiativeBetweenExpected));
     }
 
     private List<InitiativeConfig> buildInitiative(int bias, int n, LocalDate rankingEndDate){

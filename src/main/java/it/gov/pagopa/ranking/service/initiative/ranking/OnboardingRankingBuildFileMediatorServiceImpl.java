@@ -10,10 +10,10 @@ import java.util.List;
 @Service
 @Slf4j
 public class OnboardingRankingBuildFileMediatorServiceImpl implements OnboardingRankingBuildFileMediatorService{
-    private final InitiativeOnboardingRankingEndingService initiativeOnboardingRankingEndingService;
+    private final OnboardingRankingRuleEndedRetrieverService onboardingRankingRuleEndedRetrieverService;
 
-    public OnboardingRankingBuildFileMediatorServiceImpl(InitiativeOnboardingRankingEndingService initiativeOnboardingRankingEndingService) {
-        this.initiativeOnboardingRankingEndingService = initiativeOnboardingRankingEndingService;
+    public OnboardingRankingBuildFileMediatorServiceImpl(OnboardingRankingRuleEndedRetrieverService onboardingRankingRuleEndedRetrieverService) {
+        this.onboardingRankingRuleEndedRetrieverService = onboardingRankingRuleEndedRetrieverService;
     }
 
     @Scheduled(cron = "${app.ranking-build-file.retrieve-initiative.schedule}")
@@ -24,11 +24,13 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
 
     @Override
     public List<InitiativeConfig> execute() {
-        List<InitiativeConfig> initiativeEndOnboardingDate = initiativeOnboardingRankingEndingService.retrieve();
+        List<InitiativeConfig> initiativeEndOnboardingDate = onboardingRankingRuleEndedRetrieverService.retrieve();
 
         if(!initiativeEndOnboardingDate.isEmpty()){
             log.info("[RANKING_BUILD_ONBOARDING_RANKING_FILE] Starting build onboarding ranking files");
             //TODO generate ranking file for each element into initiativeEndOnboardingDateList
+        }else{
+            log.debug("[RANKING_BUILD_ONBOARDING_RANKING_FILE] There aren't ended initiatives");
         }
 
         return initiativeEndOnboardingDate;

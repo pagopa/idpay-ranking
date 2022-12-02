@@ -8,5 +8,5 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface InitiativeConfigRepository extends MongoRepository<InitiativeConfig, String> {
-    List<InitiativeConfig> findByRankingEndDateBeforeAndRankingStatus(LocalDate date, RankingStatus rankingStatus);
+    List<InitiativeConfig> findByRankingStatusAndRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive);
 }

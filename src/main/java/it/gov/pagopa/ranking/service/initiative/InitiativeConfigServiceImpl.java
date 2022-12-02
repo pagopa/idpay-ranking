@@ -28,7 +28,7 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
     }
 
     @Override
-    public List<InitiativeConfig> findByRankingEndDateBeforeAndRankingStatus(LocalDate date, RankingStatus rankingStatus) {
-        return initiativeConfigRepository.findByRankingEndDateBeforeAndRankingStatus(date, rankingStatus);
+    public List<InitiativeConfig> findByRankingStatusRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive) {
+        return initiativeConfigRepository.findByRankingStatusAndRankingEndDateBetween(rankingStatus, startIntervalExclusive, endIntervalExclusive);
     }
 }

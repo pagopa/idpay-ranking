@@ -9,5 +9,5 @@ import java.util.List;
 public interface InitiativeConfigService {
     InitiativeConfig save(InitiativeConfig initiativeConfig);
     InitiativeConfig findById(String initiativeId);
-    List<InitiativeConfig> findByRankingEndDateBeforeAndRankingStatus(LocalDate date, RankingStatus rankingStatus);
+    List<InitiativeConfig> findByRankingStatusRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive);
 }
