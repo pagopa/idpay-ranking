@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service.initiative.ranking;
+package it.gov.pagopa.ranking.service.initiative.ranking.retrieve;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 

@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service.initiative.ranking;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
+import it.gov.pagopa.ranking.service.initiative.ranking.retrieve.OnboardingRankingRuleEndedRetrieverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

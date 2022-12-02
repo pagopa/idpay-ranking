@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service.initiative.ranking;
+package it.gov.pagopa.ranking.service.initiative.ranking.retrieve;
 
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
