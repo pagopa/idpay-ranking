@@ -51,10 +51,8 @@ public class Initiative2BuildDTOFaker {
         out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
         out.organizationId(bias!=null? "organizationId_%d".formatted(bias) : "?????");
         out.status(bias!=null? "status_%d".formatted(bias) : "?????");
-        out.beneficiaryRanking(true);
 
         InitiativeGeneralDTO initiativeGeneralDTO = InitiativeGeneralDTO.builder()
-                .name(bias!=null? "name_%d".formatted(bias) : "?????")
                 .budget(BigDecimal.TEN)
                 .beneficiaryBudget(BigDecimal.ONE)
                 .rankingStartDate(nowDate)

@@ -3,6 +3,7 @@ package it.gov.pagopa.ranking.exception;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.controller.RankingApiController;
 import it.gov.pagopa.ranking.dto.ErrorDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,7 +25,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
     @Test
     void handleExceptionClientExceptionNoBody() throws Exception {
 
-        Mockito.when(controller.rankingRequests("ClientExceptionNoBody", "INITIATIVE_ID", 0, 10, null))
+        Mockito.when(controller.rankingRequests("ClientExceptionNoBody", "INITIATIVE_ID", 0, 10, new RankingRequestFilter()))
                 .thenThrow(new ClientExceptionNoBody(HttpStatus.NOT_FOUND));
 
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
@@ -35,7 +36,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
     @Test
     void handleExceptionClientExceptionWithBody() throws Exception {
 
-        Mockito.when(controller.rankingRequests("ClientExceptionWithBody", "INITIATIVE_ID", 0, 10, null))
+        Mockito.when(controller.rankingRequests("ClientExceptionWithBody", "INITIATIVE_ID", 0, 10, new RankingRequestFilter()))
                 .thenThrow(new ClientExceptionWithBody(HttpStatus.BAD_REQUEST, "Error","Error ClientExceptionWithBody"));
         ErrorDTO errorClientExceptionWithBody= new ErrorDTO("Error","Error ClientExceptionWithBody");
 
@@ -48,7 +49,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
                                 r.getResponse().getContentAsString()
                         ));
 
-        Mockito.when(controller.rankingRequests("ClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable", "INITIATIVE_ID", 0,10, null))
+        Mockito.when(controller.rankingRequests("ClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable", "INITIATIVE_ID", 0,10, new RankingRequestFilter()))
                 .thenThrow(new ClientExceptionWithBody(HttpStatus.BAD_REQUEST, "Error","Error ClientExceptionWithBody", new Throwable()));
         ErrorDTO errorClientExceptionWithBodyWithStatusAndTitleAndMessageAndThrowable = new ErrorDTO("Error","Error ClientExceptionWithBody");
 
@@ -65,14 +66,14 @@ class ErrorManagerTest extends BaseIntegrationTest {
     @Test
     void handleExceptionClientExceptionTest() throws Exception {
 
-        Mockito.when(controller.rankingRequests("ClientException", "INITIATIVE_ID", 0,10, null))
+        Mockito.when(controller.rankingRequests("ClientException", "INITIATIVE_ID", 0,10, new RankingRequestFilter()))
                 .thenThrow(ClientException.class);
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                                 "ClientException", "INITIATIVE_ID"))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
 
-        Mockito.when(controller.rankingRequests("ClientExceptionStatusAndMessage", "INITIATIVE_ID", 0,10, null))
+        Mockito.when(controller.rankingRequests("ClientExceptionStatusAndMessage", "INITIATIVE_ID", 0,10, new RankingRequestFilter()))
                 .thenThrow(new ClientException(HttpStatus.BAD_REQUEST, "ClientException with httpStatus and message"));
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "ClientExceptionStatusAndMessage", "INITIATIVE_ID"))
@@ -82,7 +83,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
                         r.getResponse().getContentAsString()
                 ));
 
-        Mockito.when(controller.rankingRequests("ClientExceptionStatusAndMessageAndThrowable", "INITIATIVE_ID", 0,10, null))
+        Mockito.when(controller.rankingRequests("ClientExceptionStatusAndMessageAndThrowable", "INITIATIVE_ID", 0,10, new RankingRequestFilter()))
                 .thenThrow(new ClientException(HttpStatus.BAD_REQUEST, "ClientException with httpStatus, message and throwable", new Throwable()));
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "ClientExceptionStatusAndMessageAndThrowable", "INITIATIVE_ID"))
@@ -96,7 +97,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
     @Test
     void handleExceptionRuntimeException() throws Exception {
 
-        Mockito.when(controller.rankingRequests("RuntimeException", "INITIATIVE_ID", 0,10, null))
+        Mockito.when(controller.rankingRequests("RuntimeException", "INITIATIVE_ID", 0,10, new RankingRequestFilter()))
                 .thenThrow(RuntimeException.class);
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "RuntimeException", "INITIATIVE_ID"))
