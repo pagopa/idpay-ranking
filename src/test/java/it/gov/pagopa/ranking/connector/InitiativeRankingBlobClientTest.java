@@ -11,9 +11,9 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
-class OnboardingRankingBlobClientTest extends BaseAzureBlobClientTest {
+class InitiativeRankingBlobClientTest extends BaseAzureBlobClientTest {
     protected AzureBlobClient builtBlobInstance() throws URISyntaxException, InvalidKeyException, StorageException {
-        return new OnboardingRankingBlobClientImpl("UseDevelopmentStorage=true;", "test");
+        return new InitiativeRankingBlobClientImpl("UseDevelopmentStorage=true;", "test");
     }
 
     @Test

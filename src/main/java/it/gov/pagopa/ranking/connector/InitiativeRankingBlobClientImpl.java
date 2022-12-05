@@ -10,9 +10,9 @@ import java.security.InvalidKeyException;
 
 @Slf4j
 @Service
-public class OnboardingRankingBlobClientImpl extends BaseAzureBlobClientImpl implements OnboardingRankingBlobClient {
+public class InitiativeRankingBlobClientImpl extends BaseAzureBlobClientImpl implements InitiativeRankingBlobClient {
 
-    public OnboardingRankingBlobClientImpl(
+    public InitiativeRankingBlobClientImpl(
             @Value("${app.ranking-build-file.retrieve-initiative.blob-storage.string-connection}") String storageConnectionString,
             @Value("${app.ranking-build-file.retrieve-initiative.blob-storage.blob-container-name}") String blobContainerName)
             throws URISyntaxException, InvalidKeyException, StorageException {

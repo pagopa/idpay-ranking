@@ -45,24 +45,24 @@ abstract class BaseAzureBlobClientTest {
 
     protected void mockClient(String destination, boolean isKO) throws URISyntaxException, StorageException, IllegalAccessException {
 
-        Field clientField = ReflectionUtils.findField(OnboardingRankingBlobClientImpl.class, "blobContainer");
-        Assertions.assertNotNull(clientField);
-        clientField.setAccessible(true);
+        Field clientContainerField = ReflectionUtils.findField(InitiativeRankingBlobClientImpl.class, "blobContainer");
+        Assertions.assertNotNull(clientContainerField);
+        clientContainerField.setAccessible(true);
 
-        CloudBlobContainer clientMock = Mockito.mock(CloudBlobContainer.class, Mockito.RETURNS_DEEP_STUBS);
+        CloudBlobContainer clientContainerMock = Mockito.mock(CloudBlobContainer.class, Mockito.RETURNS_DEEP_STUBS);
 
-        mockUploadFileOperation(destination, clientMock, isKO);
-        clientField.set(blobClient, clientMock);
+        mockUploadFileOperation(destination, clientContainerMock, isKO);
+        clientContainerField.set(blobClient, clientContainerMock);
     }
 
-    protected static void mockUploadFileOperation(String destination, CloudBlobContainer clientMock, boolean isKO) throws URISyntaxException, StorageException {
+    protected static void mockUploadFileOperation(String destination, CloudBlobContainer clientContainerMock, boolean isKO) throws URISyntaxException, StorageException {
 
         CloudBlockBlob blockBlobMock = Mockito.mock(CloudBlockBlob.class, Mockito.RETURNS_DEEP_STUBS);
 
         if (isKO) {
-            Mockito.when(clientMock.getBlockBlobReference(destination)).thenThrow(StorageException.class);
+            Mockito.when(clientContainerMock.getBlockBlobReference(destination)).thenThrow(StorageException.class);
         } else {
-            Mockito.when(clientMock.getBlockBlobReference(destination)).thenReturn(blockBlobMock);
+            Mockito.when(clientContainerMock.getBlockBlobReference(destination)).thenReturn(blockBlobMock);
             Mockito.when(blockBlobMock.getProperties()).thenReturn(new BlobProperties());
         }
     }

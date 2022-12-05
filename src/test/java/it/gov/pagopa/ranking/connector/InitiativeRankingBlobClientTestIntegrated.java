@@ -10,10 +10,10 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.Properties;
 
-public class OnboardingRankingBlobClientTestIntegrated extends BaseAzureBlobClientTest {
+public class InitiativeRankingBlobClientTestIntegrated extends BaseAzureBlobClientTest {
     private final String connectionString;
 
-    public OnboardingRankingBlobClientTestIntegrated() throws IOException {
+    public InitiativeRankingBlobClientTestIntegrated() throws IOException {
         try(InputStream storageAccountPropertiesIS = new BufferedInputStream(new FileInputStream("src/test/resources/secrets/storageAccount.properties"))){
             Properties props = new Properties();
             props.load(storageAccountPropertiesIS);
@@ -23,7 +23,7 @@ public class OnboardingRankingBlobClientTestIntegrated extends BaseAzureBlobClie
 
     @Override
     protected AzureBlobClient builtBlobInstance() throws URISyntaxException, InvalidKeyException, StorageException {
-        return new OnboardingRankingBlobClientImpl(connectionString, "ranking");
+        return new InitiativeRankingBlobClientImpl(connectionString, "ranking");
     }
 
     @Override
