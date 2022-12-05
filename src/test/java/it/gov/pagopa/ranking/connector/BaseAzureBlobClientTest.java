@@ -34,40 +34,36 @@ abstract class BaseAzureBlobClientTest {
             InputStream testFile = new FileInputStream("README.md");
             String destination = "baseAzureBlobClientTest/README.md";
 
-            mockClient(destination);
+            mockClient(destination, false);
 
-            // When Upload
+            // When
             blobClient.uploadFile(testFile, destination, "text");
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | URISyntaxException | StorageException | IllegalAccessException e) {
+            Assertions.fail();
         }
     }
 
-    protected void mockClient(String destination) {
-        try {
-            Field clientField = ReflectionUtils.findField(OnboardingRankingBlobClientImpl.class, "blobContainer");
-            Assertions.assertNotNull(clientField);
-            clientField.setAccessible(true);
+    protected void mockClient(String destination, boolean isKO) throws URISyntaxException, StorageException, IllegalAccessException {
 
-            CloudBlobContainer clientMock = Mockito.mock(CloudBlobContainer.class, Mockito.RETURNS_DEEP_STUBS);
+        Field clientField = ReflectionUtils.findField(OnboardingRankingBlobClientImpl.class, "blobContainer");
+        Assertions.assertNotNull(clientField);
+        clientField.setAccessible(true);
 
-            mockUploadFileOperation(destination, clientMock);
-            clientField.set(blobClient, clientMock);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        CloudBlobContainer clientMock = Mockito.mock(CloudBlobContainer.class, Mockito.RETURNS_DEEP_STUBS);
+
+        mockUploadFileOperation(destination, clientMock, isKO);
+        clientField.set(blobClient, clientMock);
     }
 
-    protected static void mockUploadFileOperation(String destination, CloudBlobContainer clientMock) {
-        try {
-            CloudBlockBlob blockBlobMock = Mockito.mock(CloudBlockBlob.class, Mockito.RETURNS_DEEP_STUBS);
+    protected static void mockUploadFileOperation(String destination, CloudBlobContainer clientMock, boolean isKO) throws URISyntaxException, StorageException {
 
+        CloudBlockBlob blockBlobMock = Mockito.mock(CloudBlockBlob.class, Mockito.RETURNS_DEEP_STUBS);
+
+        if (isKO) {
+            Mockito.when(clientMock.getBlockBlobReference(destination)).thenThrow(StorageException.class);
+        } else {
             Mockito.when(clientMock.getBlockBlobReference(destination)).thenReturn(blockBlobMock);
             Mockito.when(blockBlobMock.getProperties()).thenReturn(new BlobProperties());
-
-        } catch (URISyntaxException | StorageException e) {
-            throw new RuntimeException(e);
         }
     }
 }

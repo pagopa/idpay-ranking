@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.Properties;
 
-public class OnboardingRankingBlobClientTestIntegrated extends OnboardingRankingBlobClientTest {
+public class OnboardingRankingBlobClientTestIntegrated extends BaseAzureBlobClientTest {
     private final String connectionString;
 
     public OnboardingRankingBlobClientTestIntegrated() throws IOException {
@@ -27,7 +27,7 @@ public class OnboardingRankingBlobClientTestIntegrated extends OnboardingRanking
     }
 
     @Override
-    protected void mockClient(String destination){
+    protected void mockClient(String destination, boolean isKO){
         // Do Nothing
     }
 }
