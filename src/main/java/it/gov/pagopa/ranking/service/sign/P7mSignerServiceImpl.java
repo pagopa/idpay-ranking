@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableFile;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSSignedDataStreamGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
@@ -33,14 +32,14 @@ import java.util.List;
 @Slf4j
 public class P7mSignerServiceImpl implements P7mSignerService {
 
-    private final CMSSignedDataGenerator cmsGenerator;
+    private final CMSSignedDataStreamGenerator cmsGenerator;
 
     public P7mSignerServiceImpl(
             @Value("${app.ranking-build-file.p7m.cert}") String cert,
             @Value("${app.ranking-build-file.p7m.key}") String privateKeyPem) {
         try {
             Security.addProvider(new BouncyCastleProvider());
-            CertificateFactory certFactory= CertificateFactory
+            CertificateFactory certFactory = CertificateFactory
                     .getInstance("X.509", "BC");
 
             X509Certificate p7mCertificate = (X509Certificate) certFactory
@@ -56,7 +55,7 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             final KeyFactory factory = KeyFactory.getInstance("RSA");
             final PrivateKey key = factory.generatePrivate(spec);
 
-            cmsGenerator = new CMSSignedDataGenerator();
+            cmsGenerator = new CMSSignedDataStreamGenerator();
 
             ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256withRSA").build(key);
             cmsGenerator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()).build(contentSigner, p7mCertificate));
@@ -72,9 +71,9 @@ public class P7mSignerServiceImpl implements P7mSignerService {
         CMSProcessableFile msg = new CMSProcessableFile(file.toFile());
 
         Path output = file.getParent().resolve("%s.p7m".formatted(file.getFileName().toString()));
-        try (OutputStream outStream = new BufferedOutputStream(new FileOutputStream(output.toFile()))) {
-            CMSSignedData cmsSignedData = cmsGenerator.generate(msg, true);
-            outStream.write(cmsSignedData.getEncoded());
+        try (InputStream is = msg.getInputStream();
+             OutputStream os = cmsGenerator.open(new FileOutputStream(output.toFile()))) {
+            is.transferTo(os);
         } catch (IOException | CMSException e) {
             throw new IllegalStateException("Cannot build p7m file for input file %s".formatted(file), e);
         }
