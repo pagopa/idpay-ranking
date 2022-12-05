@@ -1,10 +1,7 @@
 package it.gov.pagopa.ranking.service.sign;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSEnvelopedDataStreamGenerator;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessableFile;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -15,8 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -25,7 +21,7 @@ import java.security.cert.X509Certificate;
 @Slf4j
 public class P7mSignerServiceImpl implements P7mSignerService {
 
-    private final CMSEnvelopedDataStreamGenerator cmsEnvelopedDataGenerator;
+    private final CMSEnvelopedDataGenerator cmsEnvelopedDataGenerator;
     private final OutputEncryptor encryptor;
 
     public P7mSignerServiceImpl(
@@ -37,9 +33,17 @@ public class P7mSignerServiceImpl implements P7mSignerService {
                     .getInstance("X.509", "BC");
 
             X509Certificate p7mCertificate = (X509Certificate) certFactory
-                    .generateCertificate(new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8)));
+//                    .generateCertificate(new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8)));
+                    .generateCertificate(new FileInputStream("target/Baeldung.cer"));
 
-            cmsEnvelopedDataGenerator = new CMSEnvelopedDataStreamGenerator();
+            char[] keystorePassword = "password".toCharArray();
+            char[] keyPassword = "password".toCharArray();
+
+            KeyStore keystore = KeyStore.getInstance("PKCS12");
+            keystore.load(new FileInputStream("target/Baeldung.p12"), keystorePassword);
+            PrivateKey key = (PrivateKey) keystore.getKey("baeldung", keyPassword);
+
+            cmsEnvelopedDataGenerator = new CMSEnvelopedDataGenerator();
 
             JceKeyTransRecipientInfoGenerator jceKey = new JceKeyTransRecipientInfoGenerator(p7mCertificate);
             cmsEnvelopedDataGenerator.addRecipientInfoGenerator(jceKey);
@@ -47,6 +51,16 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_CBC).setProvider("BC").build();
         } catch (CMSException | CertificateException | NoSuchProviderException e) {
             throw new IllegalStateException("Cannot build p7m encryptor", e);
+        } catch (UnrecoverableKeyException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -55,11 +69,9 @@ public class P7mSignerServiceImpl implements P7mSignerService {
         CMSProcessableFile msg = new CMSProcessableFile(file.toFile());
 
         Path output = file.getParent().resolve("%s.p7m".formatted(file.getFileName().toString()));
-        try (
-                OutputStream cmsEnvelopedData = cmsEnvelopedDataGenerator.open(
-                new BufferedOutputStream(new FileOutputStream(output.toFile())), encryptor);
-                InputStream is = msg.getInputStream()) {
-            is.transferTo(cmsEnvelopedData);
+        try (OutputStream outStream = new BufferedOutputStream(new FileOutputStream(output.toFile()))) {
+            CMSEnvelopedData cmsEnvelopedData = cmsEnvelopedDataGenerator.generate(msg,encryptor);
+            outStream.write(cmsEnvelopedData.getEncoded());
         } catch (IOException | CMSException e) {
             throw new IllegalStateException("Cannot build p7m file for input file %s".formatted(file), e);
         }
