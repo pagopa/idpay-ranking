@@ -146,8 +146,8 @@ app:
       # days before current to search initiative
       day-before: ${RETRIEVE_INITIATIVE_DAY_BEFORE:7}
       blob-storage:
-        string-connection: ${BLOB_STORAGE_CONNECTION_STRING:}
-        blob-container-name: ${BLOB_STORAGE_CONTAINER_NAME_STRING:}
+        string-connection: ${INITIATIVE_BLOB_STORAGE_CONNECTION_STRING:UseDevelopmentStorage=true;}
+        blob-container-name: ${INITIATIVE_BLOB_STORAGE_CONTAINER_NAME_STRING:ranking}
   service-bus:
     namespace:
       string-connection: ${SERVICEBUS_NAMESPACE_ONBOARDING_CONNECTION_STRING:}
