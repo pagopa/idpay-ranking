@@ -1,11 +1,18 @@
 package it.gov.pagopa.ranking.service.sign;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.*;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.bouncycastle.util.Store;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +23,14 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
 public class P7mSignerServiceImpl implements P7mSignerService {
 
-    private final CMSEnvelopedDataGenerator cmsEnvelopedDataGenerator;
+    private final CMSSignedDataGenerator cmsGenerator;
     private final OutputEncryptor encryptor;
 
     public P7mSignerServiceImpl(
@@ -36,6 +45,10 @@ public class P7mSignerServiceImpl implements P7mSignerService {
 //                    .generateCertificate(new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8)));
                     .generateCertificate(new FileInputStream("target/Baeldung.cer"));
 
+            List<X509Certificate> certList = new ArrayList<>();
+            certList.add(p7mCertificate);
+            Store certs = new JcaCertStore(certList);
+
             char[] keystorePassword = "password".toCharArray();
             char[] keyPassword = "password".toCharArray();
 
@@ -43,10 +56,11 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             keystore.load(new FileInputStream("target/Baeldung.p12"), keystorePassword);
             PrivateKey key = (PrivateKey) keystore.getKey("baeldung", keyPassword);
 
-            cmsEnvelopedDataGenerator = new CMSEnvelopedDataGenerator();
+            cmsGenerator = new CMSSignedDataGenerator();
 
-            JceKeyTransRecipientInfoGenerator jceKey = new JceKeyTransRecipientInfoGenerator(p7mCertificate);
-            cmsEnvelopedDataGenerator.addRecipientInfoGenerator(jceKey);
+            ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256withRSA").build(key);
+            cmsGenerator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()).build(contentSigner, p7mCertificate));
+            cmsGenerator.addCertificates(certs);
 
             encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_CBC).setProvider("BC").build();
         } catch (CMSException | CertificateException | NoSuchProviderException e) {
@@ -61,6 +75,8 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             throw new RuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
+        } catch (OperatorCreationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -70,8 +86,8 @@ public class P7mSignerServiceImpl implements P7mSignerService {
 
         Path output = file.getParent().resolve("%s.p7m".formatted(file.getFileName().toString()));
         try (OutputStream outStream = new BufferedOutputStream(new FileOutputStream(output.toFile()))) {
-            CMSEnvelopedData cmsEnvelopedData = cmsEnvelopedDataGenerator.generate(msg,encryptor);
-            outStream.write(cmsEnvelopedData.getEncoded());
+            CMSSignedData cmsSignedData = cmsGenerator.generate(msg, true);
+            outStream.write(cmsSignedData.getEncoded());
         } catch (IOException | CMSException e) {
             throw new IllegalStateException("Cannot build p7m file for input file %s".formatted(file), e);
         }
