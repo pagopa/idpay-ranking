@@ -33,15 +33,7 @@ public class P7mSignerServiceImpl implements P7mSignerService {
                     .getInstance("X.509", "BC");
 
             X509Certificate p7mCertificate = (X509Certificate) certFactory
-//                    .generateCertificate(new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8)));
-                    .generateCertificate(new FileInputStream("target/Baeldung.cer"));
-
-            char[] keystorePassword = "password".toCharArray();
-            char[] keyPassword = "password".toCharArray();
-
-            KeyStore keystore = KeyStore.getInstance("PKCS12");
-            keystore.load(new FileInputStream("target/Baeldung.p12"), keystorePassword);
-            PrivateKey key = (PrivateKey) keystore.getKey("baeldung", keyPassword);
+                    .generateCertificate(new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8)));
 
             cmsEnvelopedDataGenerator = new CMSEnvelopedDataGenerator();
 
@@ -51,16 +43,6 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             encryptor = new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_CBC).setProvider("BC").build();
         } catch (CMSException | CertificateException | NoSuchProviderException e) {
             throw new IllegalStateException("Cannot build p7m encryptor", e);
-        } catch (UnrecoverableKeyException e) {
-            throw new RuntimeException(e);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
         }
     }
 
