@@ -152,6 +152,6 @@ app:
         string-connection: ${SERVICEBUS_ONBOARDING_CONNECTION_STRING:}
         destination: ${KAFKA_ONBOARDING_REQUEST_PENDING_TOPIC:idpay-onboarding-request}
   ranking:
-    query-page-size: ${RANKING_QUERY_PAGE_SIZE:1000}
+    query-page-size: ${RANKING_QUERY_PAGE_SIZE:500000}
     csv:
       separator: ${RANKING_CSV_SEPARATOR:${CSV_SEPARATOR:;}}
