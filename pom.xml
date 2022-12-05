@@ -66,6 +66,11 @@
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.6.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15to18</artifactId>
+			<version>1.72</version>
+		</dependency>
 
 		<!--TEST-->
 		<dependency>
