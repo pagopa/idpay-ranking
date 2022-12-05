@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
-import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import org.springframework.stereotype.Service;
 

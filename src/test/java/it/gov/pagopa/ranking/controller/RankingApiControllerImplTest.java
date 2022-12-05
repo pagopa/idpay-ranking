@@ -1,7 +1,8 @@
 package it.gov.pagopa.ranking.controller;
 
-import it.gov.pagopa.ranking.dto.RankingPageDTO;
-import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -38,7 +39,7 @@ class RankingApiControllerImplTest {
         dto.setAdmissibilityCheckDate(LocalDateTime.of(2022,11,1,0,0));
         dto.setCriteriaConsensusTimestamp(LocalDateTime.of(2022,11,1,1,0));
 
-        Mockito.when(service.findByInitiativeId(dto.getOrganizationId(), dto.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeId(dto.getOrganizationId(), dto.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(List.of(dto));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -62,13 +63,15 @@ class RankingApiControllerImplTest {
         RankingRequestsApiDTO dto3 = RankingRequestsApiDTOFaker.mockInstance(1);
         dto3.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
-        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK))
+        RankingRequestFilter rankingRequestFilter = RankingRequestFilter.builder().beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK).userId(dto1.getUserId()).build();
+        Mockito.when(service.findByInitiativeId(dto1.getOrganizationId(), dto1.getInitiativeId(), 0, 10, rankingRequestFilter))
                 .thenReturn(List.of(dto1));
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                                         dto1.getOrganizationId(), dto1.getInitiativeId())
                         .param("beneficiaryRankingStatus", "ELIGIBLE_OK")
+                        .param("userId", "userId_1")
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -81,7 +84,7 @@ class RankingApiControllerImplTest {
     @Test
     void testNotFound() throws Exception {
 
-        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, null))
+        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
                 .thenReturn(null);
 
         mvc.perform(MockMvcRequestBuilders
@@ -96,8 +99,8 @@ class RankingApiControllerImplTest {
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
         initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
-        initiativeConfig.setRankingPublishedTimeStamp(date);
-        initiativeConfig.setRankingGeneratedTimeStamp(date);
+        initiativeConfig.setRankingPublishedTimestamp(date);
+        initiativeConfig.setRankingGeneratedTimestamp(date);
 
         List<RankingRequestsApiDTO> dtoList = List.of(RankingRequestsApiDTOFaker.mockInstanceBuilder(1)
                 .admissibilityCheckDate(date)
@@ -112,14 +115,14 @@ class RankingApiControllerImplTest {
                 .totalElements(1)
                 .totalPages(1)
                 .rankingStatus(RankingStatus.COMPLETED)
-                .rankingPublishedTimeStamp(initiativeConfig.getRankingPublishedTimeStamp())
-                .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
+                .rankingPublishedTimestamp(initiativeConfig.getRankingPublishedTimestamp())
+                .rankingGeneratedTimestamp(initiativeConfig.getRankingGeneratedTimestamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
                 .totalOnboardingKo(0)
                 .build();
 
-        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(rankingPageDTO);
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -129,7 +132,7 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimestamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimestamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
@@ -139,8 +142,8 @@ class RankingApiControllerImplTest {
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
         initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
-        initiativeConfig.setRankingPublishedTimeStamp(date);
-        initiativeConfig.setRankingGeneratedTimeStamp(date);
+        initiativeConfig.setRankingPublishedTimestamp(date);
+        initiativeConfig.setRankingGeneratedTimestamp(date);
 
         RankingRequestsApiDTO dto1 = RankingRequestsApiDTOFaker.mockInstanceBuilder(1)
                 .admissibilityCheckDate(date)
@@ -160,13 +163,13 @@ class RankingApiControllerImplTest {
                 .totalElements(1)
                 .totalPages(1)
                 .rankingStatus(RankingStatus.COMPLETED)
-                .rankingPublishedTimeStamp(initiativeConfig.getRankingPublishedTimeStamp())
-                .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
+                .rankingPublishedTimestamp(initiativeConfig.getRankingPublishedTimestamp())
+                .rankingGeneratedTimestamp(initiativeConfig.getRankingGeneratedTimestamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
                 .build();
 
-        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null))
+        Mockito.when(service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter()))
                 .thenReturn(rankingPageDTO);
 
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -176,14 +179,14 @@ class RankingApiControllerImplTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
 
-        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimeStamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimeStamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
+        String expected = "{\"content\":[{\"userId\":\"userId_1\",\"initiativeId\":\"initiativeId_1\",\"organizationId\":\"organizationId_1\",\"admissibilityCheckDate\":\"2022-11-01T00:00:00\",\"criteriaConsensusTimestamp\":\"2022-11-01T00:00:00\",\"rankingValue\":1155869325,\"ranking\":1,\"beneficiaryRankingStatus\":\"ELIGIBLE_OK\"}],\"pageNumber\":0,\"pageSize\":1,\"totalElements\":1,\"totalPages\":1,\"rankingStatus\":\"COMPLETED\",\"rankingPublishedTimestamp\":\"2022-11-01T00:00:00\",\"rankingGeneratedTimestamp\":\"2022-11-01T00:00:00\",\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
         Assertions.assertEquals(expected, result.getResponse().getContentAsString());
     }
 
     @Test
     void testPagedNotFound() throws Exception {
 
-        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, null))
+        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
                 .thenReturn(null);
 
         mvc.perform(MockMvcRequestBuilders

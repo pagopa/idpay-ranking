@@ -1,7 +1,8 @@
 package it.gov.pagopa.ranking.service;
 
-import it.gov.pagopa.ranking.dto.RankingPageDTO;
-import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
@@ -53,11 +54,11 @@ class RankingRequestsApiServiceImplTest {
 
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
         Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
-        Mockito.when(requestsRepositoryMock.findByInitiativeId(initiativeConfig.getInitiativeId(), pageable))
+        Mockito.when(requestsRepositoryMock.findAllBy(initiativeConfig.getInitiativeId(), new RankingRequestFilter(), pageable))
                 .thenReturn(new PageImpl<>(List.of(request)));
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null);
+        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertFalse(results.isEmpty());
@@ -81,11 +82,12 @@ class RankingRequestsApiServiceImplTest {
         request1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
         Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
-        Mockito.when(requestsRepositoryMock.findByInitiativeIdAndBeneficiaryRankingStatus(initiativeConfig.getInitiativeId(), BeneficiaryRankingStatus.ELIGIBLE_OK, pageable))
+        RankingRequestFilter rankingRequestFilter = RankingRequestFilter.builder().beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK).userId(request1.getUserId()).build();
+        Mockito.when(requestsRepositoryMock.findAllBy(initiativeConfig.getInitiativeId(), rankingRequestFilter, pageable))
                 .thenReturn(new PageImpl<>(List.of(request1, request2, request3)));
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, BeneficiaryRankingStatus.ELIGIBLE_OK);
+        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, rankingRequestFilter);
 
         // Then
         Assertions.assertFalse(results.isEmpty());
@@ -105,7 +107,7 @@ class RankingRequestsApiServiceImplTest {
                 .thenReturn(initiativeConfig);
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null);
+        List<RankingRequestsApiDTO> results = service.findByInitiativeId(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertTrue(results.isEmpty());
@@ -119,7 +121,7 @@ class RankingRequestsApiServiceImplTest {
                 .thenReturn(null);
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId("orgId", "initiativeId", 0, 10, null);
+        List<RankingRequestsApiDTO> results = service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertNull(results);
@@ -132,8 +134,8 @@ class RankingRequestsApiServiceImplTest {
 
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
         initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
-        initiativeConfig.setRankingPublishedTimeStamp(date);
-        initiativeConfig.setRankingGeneratedTimeStamp(date);
+        initiativeConfig.setRankingPublishedTimestamp(date);
+        initiativeConfig.setRankingGeneratedTimestamp(date);
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(initiativeConfig.getInitiativeId(), initiativeConfig.getOrganizationId()))
                 .thenReturn(initiativeConfig);
 
@@ -143,7 +145,7 @@ class RankingRequestsApiServiceImplTest {
                 .beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK)
                 .build();
         Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
-        Mockito.when(requestsRepositoryMock.findByInitiativeId(initiativeConfig.getInitiativeId(), pageable))
+        Mockito.when(requestsRepositoryMock.findAllBy(initiativeConfig.getInitiativeId(), new RankingRequestFilter(), pageable))
                 .thenReturn(new PageImpl<>(List.of(request)));
 
         List<RankingRequestsApiDTO> dtoList = List.of(RankingRequestsApiDTOFaker.mockInstanceBuilder(1)
@@ -159,15 +161,15 @@ class RankingRequestsApiServiceImplTest {
                 .totalElements(1)
                 .totalPages(1)
                 .rankingStatus(RankingStatus.COMPLETED)
-                .rankingPublishedTimeStamp(initiativeConfig.getRankingPublishedTimeStamp())
-                .rankingGeneratedTimeStamp(initiativeConfig.getRankingGeneratedTimeStamp())
+                .rankingPublishedTimestamp(initiativeConfig.getRankingPublishedTimestamp())
+                .rankingGeneratedTimestamp(initiativeConfig.getRankingGeneratedTimestamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
                 .totalOnboardingKo(0)
                 .build();
 
         // When
-        RankingPageDTO result = service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null);
+        RankingPageDTO result = service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertNotNull(result);
@@ -185,7 +187,7 @@ class RankingRequestsApiServiceImplTest {
                 .thenReturn(initiativeConfig);
 
         // When
-        RankingPageDTO result = service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, null);
+        RankingPageDTO result = service.findByInitiativeIdPaged(initiativeConfig.getOrganizationId(), initiativeConfig.getInitiativeId(), 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertTrue(result.getContent().isEmpty());
@@ -199,7 +201,7 @@ class RankingRequestsApiServiceImplTest {
                 .thenReturn(null);
 
         // When
-        RankingPageDTO result = service.findByInitiativeIdPaged("orgId", "initiativeId", 0, 10, null);
+        RankingPageDTO result = service.findByInitiativeIdPaged("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
 
         // Then
         Assertions.assertNull(result);

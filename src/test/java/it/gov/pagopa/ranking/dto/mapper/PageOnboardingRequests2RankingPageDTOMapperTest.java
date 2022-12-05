@@ -1,7 +1,7 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
-import it.gov.pagopa.ranking.dto.RankingPageDTO;
-import it.gov.pagopa.ranking.dto.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
+import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -28,7 +28,7 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         List<RankingRequestsApiDTO> dtoList = List.of(RankingRequestsApiDTOFaker.mockInstance(1));
         InitiativeConfig initiative = InitiativeConfigFaker.mockInstance(1);
         initiative.setRankingStatus(RankingStatus.COMPLETED);
-        initiative.setRankingPathFile("test.zip");
+        initiative.setRankingFilePath("test.zip");
 
         RankingPageDTO expected = RankingPageDTO.builder()
                 .content(dtoList)
@@ -37,8 +37,8 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
                 .totalElements(1)
                 .totalPages(1)
                 .rankingStatus(RankingStatus.COMPLETED)
-                .rankingPublishedTimeStamp(initiative.getRankingPublishedTimeStamp())
-                .rankingGeneratedTimeStamp(initiative.getRankingGeneratedTimeStamp())
+                .rankingPublishedTimestamp(initiative.getRankingPublishedTimestamp())
+                .rankingGeneratedTimestamp(initiative.getRankingGeneratedTimestamp())
                 .totalEligibleOk(0)
                 .totalEligibleKo(0)
                 .totalOnboardingKo(0)
@@ -62,8 +62,8 @@ class PageOnboardingRequests2RankingPageDTOMapperTest {
         Assertions.assertEquals(expected.getTotalElements(), result.getTotalElements());
         Assertions.assertEquals(expected.getTotalPages(), result.getTotalPages());
         Assertions.assertEquals(expected.getRankingStatus(), result.getRankingStatus());
-        Assertions.assertEquals(expected.getRankingPublishedTimeStamp(), result.getRankingPublishedTimeStamp());
-        Assertions.assertEquals(expected.getRankingGeneratedTimeStamp(), result.getRankingGeneratedTimeStamp());
+        Assertions.assertEquals(expected.getRankingPublishedTimestamp(), result.getRankingPublishedTimestamp());
+        Assertions.assertEquals(expected.getRankingGeneratedTimestamp(), result.getRankingGeneratedTimestamp());
         Assertions.assertEquals(expected.getTotalEligibleOk(), result.getTotalEligibleOk());
         Assertions.assertEquals(expected.getTotalEligibleKo(), result.getTotalEligibleKo());
         Assertions.assertEquals(expected.getTotalOnboardingKo(), result.getTotalOnboardingKo());

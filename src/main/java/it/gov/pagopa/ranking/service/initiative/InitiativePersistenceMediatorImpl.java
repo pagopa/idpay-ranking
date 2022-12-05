@@ -54,7 +54,7 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
     @Override
     protected void execute(InitiativeBuildDTO payload, Message<String> message) {
-        if(payload.isBeneficiaryRanking()) {
+        if(payload.getGeneral() != null && payload.getGeneral().isRankingEnabled()) {
             try {
                 InitiativeConfig initiativeRetrieved = initiativeConfigService.findById(payload.getInitiativeId());
                 if(initiativeRetrieved == null
