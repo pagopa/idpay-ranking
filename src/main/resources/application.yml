@@ -138,3 +138,9 @@ logging:
     javax.persistence: ${LOG_LEVEL_JAVAX_PERSISTENCE:INFO}
     org.hibernate: ${LOG_LEVEL_ORG_HIBERNATE:INFO}
     org.mongodb.driver: ${LOG_LEVEL_MONGODB_DRIVER:WARN}
+
+app:
+  ranking:
+    query-page-size: ${RANKING_QUERY_PAGE_SIZE:1000}
+    csv:
+      separator: ${RANKING_CSV_SEPARATOR:${CSV_SEPARATOR:;}}
