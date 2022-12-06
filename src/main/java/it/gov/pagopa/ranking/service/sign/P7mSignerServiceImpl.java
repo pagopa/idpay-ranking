@@ -72,7 +72,7 @@ public class P7mSignerServiceImpl implements P7mSignerService {
 
         Path output = file.getParent().resolve("%s.p7m".formatted(file.getFileName().toString()));
         try (InputStream is = msg.getInputStream();
-             OutputStream os = cmsGenerator.open(new FileOutputStream(output.toFile()))) {
+             OutputStream os = cmsGenerator.open(new FileOutputStream(output.toFile()), true)) {
             is.transferTo(os);
         } catch (IOException | CMSException e) {
             throw new IllegalStateException("Cannot build p7m file for input file %s".formatted(file), e);
