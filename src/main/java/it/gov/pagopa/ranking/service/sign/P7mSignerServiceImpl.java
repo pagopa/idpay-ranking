@@ -106,6 +106,13 @@ public class P7mSignerServiceImpl implements P7mSignerService {
             Store<X509CertificateHolder> certs = s.getCertificates();
             SignerInformationStore signers = s.getSignerInfos();
             Collection<SignerInformation> c = signers.getSigners();
+
+            if(c.isEmpty()){
+                log.info("The inputStream has not sign");
+                return false;
+            }
+
+            log.debug("Found {} signs in inputStream", c.size());
             for(SignerInformation signer : c) {
                 @SuppressWarnings("unchecked")
                 Collection<X509CertificateHolder> certCollection = certs.getMatches(signer.getSID());
