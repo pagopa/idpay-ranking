@@ -156,6 +156,6 @@ class P7mSignerServiceTest {
         Assertions.assertTrue(Files.exists(signedFile));
         Assertions.assertNotEquals(0, Files.size(signedFile));
 
-        Assertions.assertTrue(service.verifySign(signedFile));
+        Assertions.assertTrue(service.verifySign(signedFile), "Sign validation failed! maybe is test certificate expired?");
     }
 }
