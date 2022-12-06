@@ -42,7 +42,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
     @Override
     public String materialize(InitiativeConfig initiativeConfig) {
 
-        try (FileWriter outputCsvWriter = new FileWriter("tmp")) {
+        try (FileWriter outputCsvWriter = new FileWriter("tmp")) { // TODO define fileName
             String initiativeId = initiativeConfig.getInitiativeId();
             long totalEligibleOk = initiativeConfig.getTotalEligibleOk();
             long totalEligibleKo = initiativeConfig.getTotalEligibleKo();
@@ -50,12 +50,10 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             int page = 0;
             int rank = 1;
             List<OnboardingRankingRequests> pageContent;
-            while (true) {
-                pageContent = onboardingRankingRequestsRepository.findAllByInitiativeId(
-                        initiativeId,
-                        PageRequest.of(page++, size, getSorting(initiativeConfig))
-                );
-                if (!(pageContent).isEmpty()) break;
+            while (!(pageContent = onboardingRankingRequestsRepository.findAllByInitiativeId(
+                    initiativeId,
+                    PageRequest.of(page++, size, getSorting(initiativeConfig))
+            )).isEmpty()) {
 
                 log.info("[RANKING_MATERIALIZER] Reading page number {} of initiative with id {}", page, initiativeId);
                 for (OnboardingRankingRequests r : pageContent) {
