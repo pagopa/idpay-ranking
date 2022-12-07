@@ -24,9 +24,12 @@ class P7mSignerServiceTest {
     @Test
     void testPkcs1PrivateKey() throws IOException {
         /*
-         * generated through the following commands:
-         *    openssl genrsa 2048 > ca-key.pem
+         * generated through the following command:
+         *    openssl genrsa 2048 -traditional > ca-key.pem
          *    openssl req -new -x509 -nodes -days 3600 -key ca-key.pem -out ca.pem
+         *
+         * If you want to transform a pkcs8 into pkcs1 execute the following command
+         *    openssl rsa -in privateKey.key -traditional
          */
         String pkcs1cert = """
                 -----BEGIN CERTIFICATE-----
@@ -85,57 +88,60 @@ class P7mSignerServiceTest {
     void testPkcs8PrivateKey() throws IOException {
         /*
          * generated through the following command executed considering the ca-key.pem generated with the commands described in testPkcs1PrivateKey:
+         *    openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.crt -subj "/CN=User1" -addext extendedKeyUsage=codeSigning -addext keyUsage=digitalSignature
+         *
+         * If you want to transform a pkcs1 into pkcs8 execute the following command
          *    openssl pkcs8 -topk8 -inform pem -in ca-key.pem -outform pem -nocrypt
          */
         String pkcs8cert = """
                 -----BEGIN CERTIFICATE-----
-                MIIDIDCCAggCCQDfvekeOeeawzANBgkqhkiG9w0BAQQFADBSMRMwEQYDVQQKEwpN
-                eSBDb21wYW55MRAwDgYDVQQHEwdNeSBUb3duMRwwGgYDVQQIExNTdGF0ZSBvciBQ
-                cm92aWRlbmNlMQswCQYDVQQGEwJVUzAeFw0yMjEyMDcxNjI4MTRaFw0zMjEwMTUx
-                NjI4MTRaMFIxEzARBgNVBAoTCk15IENvbXBhbnkxEDAOBgNVBAcTB015IFRvd24x
-                HDAaBgNVBAgTE1N0YXRlIG9yIFByb3ZpZGVuY2UxCzAJBgNVBAYTAlVTMIIBIjAN
-                BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxMj9ISyb8s7vUed/NGTspsOMzlFN
-                U1dUcxs5q9rx75iIlRSVzqLUBAzJx4oiHiU8xknKejkAtIyGzSjJ0Wba7I65RxCF
-                evPZ+19aPGunnqQfBG1M1iu4M7Ur8qKV5oJnPFLldTj8h157b766m6kLYfLrT2e8
-                CzHdO+49Iy/GpaeTWAcB2Y7lRCQE7BzgWo73H0xcvcQExpHfX1U6wX2ypkj8n8q+
-                hZVcUACLP4hlFbhT9v3xYzRdKq+KWSPNz9xqwY6MU6bK5E/y70Ws8FNk6m5Wnxvf
-                RKriA4NeHCrN4p1Tl5dKzVgCh55qXTB07wEhqJPS4Cugp/oJsvDoTHUFkQIDAQAB
-                MA0GCSqGSIb3DQEBBAUAA4IBAQABqSAp4fhsMq5D0e0YjktPN9urmAZCkyhrTczB
-                SIqARe+JT9prs9B1damOh+N80Vf4fI47c5TLAVrHt6aXfwJpLAVR+1wVPB9n190v
-                77Eq6T+KPKRlTvCwv2IzPe5nB3KNMHvW4KmUZgQTej9UCZUBXkSpibTyxplUm9Jt
-                usGEnKzaz0QiqTtyNLpKG0Yl7ErOexSy5RXvkLbriP2xZJXUhkNjeMW1Sk2tWhbi
-                UXppabHommx4yEiPDi69k0Wibh0kdKNbApsGDkA3JKmzCP5HZx4OvAGARFrao0+/
-                KqWbTiXjp9UZa7RxKKvKvLAaWX40qLjt/DoPj39/czjE5e9g
+                MIIDIzCCAgugAwIBAgIUZ0wvLaDDvte7Wg8FzD/INK03PfkwDQYJKoZIhvcNAQEL
+                BQAwEDEOMAwGA1UEAwwFVXNlcjEwHhcNMjIxMjA3MTgxMTI2WhcNMjMxMjA3MTgx
+                MTI2WjAQMQ4wDAYDVQQDDAVVc2VyMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+                AQoCggEBAMBIMugJZJScReW54lywzoL6VPCuWUBmDlW+1/CRbPky0fnSaTxjRv4d
+                GTpJj0knUAYFabrL1KXRtri0rjH3QXdMtlHutUMqD5Vlf+l3eJeiYk1HdKRy2PHL
+                0NPpkAB0bwCFlaSMmR5MiGNr3jE9Kbir3yWAoRa0Xh2mD/vuO9Yd0jMLC5eNzQ8k
+                duT2HZRyVsBUF0ahdt4iTgk/qOsZbnZhgQTS/gCZu39R0DxDh+MKrdYqWvDT8fac
+                ci2GKYf+OQ3pO4ANKQgsfNtZn+e5dyREQcpW+6ehwnpwutO+HcPGnqBxGy/zn+so
+                RQ3vPpoA6wpHpG8gnRqq0eRqWfcWOfUCAwEAAaN1MHMwHQYDVR0OBBYEFKzHn9uw
+                GMuLTzMUOO3eJj4JAM+JMB8GA1UdIwQYMBaAFKzHn9uwGMuLTzMUOO3eJj4JAM+J
+                MA8GA1UdEwEB/wQFMAMBAf8wEwYDVR0lBAwwCgYIKwYBBQUHAwMwCwYDVR0PBAQD
+                AgeAMA0GCSqGSIb3DQEBCwUAA4IBAQC6GAtCnpKrPjKNzTUNQIOXCZO8CIA/B7s1
+                rn/rVufHIM6CwJcHcNRpVUgKsUB0N7x4HKUB6IjJdmsqV1QMd/gzdxdIFF++1Ror
+                EgclqEFFVVF+BwLVyXH3cTANut8UJPydY8Ww75jGz07Qd9UvxYBB05II6C93Eae8
+                PabZXDMeV/Y9nQgw6SEhUsYawSRWBpIGtbZm3fb0Ycz3FMSHwdakh7s+fgNIJVNx
+                NjUQWbaF5pD9NcUPPe6/34qUmjuIj1sSX3EehbfgQ7N29JWAlKp7ZvKOWmYgiVUl
+                qqeCE00xKwa/EN/GnN03AibJ+LYaleSPmf/QglTLKAUmhxU7oBGX
                 -----END CERTIFICATE-----
                 """;
         String pkcs8key = """
                 -----BEGIN PRIVATE KEY-----
-                MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEyP0hLJvyzu9R
-                5380ZOymw4zOUU1TV1RzGzmr2vHvmIiVFJXOotQEDMnHiiIeJTzGScp6OQC0jIbN
-                KMnRZtrsjrlHEIV689n7X1o8a6eepB8EbUzWK7gztSvyopXmgmc8UuV1OPyHXntv
-                vrqbqQth8utPZ7wLMd077j0jL8alp5NYBwHZjuVEJATsHOBajvcfTFy9xATGkd9f
-                VTrBfbKmSPyfyr6FlVxQAIs/iGUVuFP2/fFjNF0qr4pZI83P3GrBjoxTpsrkT/Lv
-                RazwU2TqblafG99EquIDg14cKs3inVOXl0rNWAKHnmpdMHTvASGok9LgK6Cn+gmy
-                8OhMdQWRAgMBAAECggEAdYVe/sfoXorNDAoHwt+fITzZw4F0f5hA+/k/aO353NAo
-                iXfgu6YsnjqQ6tUI6R3t/LGm9XVDgZAHFVENrjwR9IKMDe/E95fYD7JzbnAQi8KS
-                L4+i+qjjeiXxmBcXFLG+O516IZal4aZAa4zpXvsGrDlp5GMcP0dJS3hNFM18ggLS
-                7QOUYIrRrLHRVput+tBV3+myja/LVGH36/8pLzqyd2S3mtSTXL5/rp1pluG9RSjU
-                /usQOb0mVcK6wSMA3dxsrk3z8pMq4zskI/Ng1cbUtSlaeELvsiwimv8gnP+2Ekce
-                QrRMfwBOIh90OI5Sjn/zm+48dL7Ja55PhTmkgKo6UQKBgQD+APolengZ1zW3UFJU
-                G872txxmUrDvUmblrwz8z/JU/5FrM1gwy1Pr/HxGEojXMVIPF7F6XdA3M5HKG8ru
-                0paC2gvHsYEnYNqz4LVV6CEqfXjg8FGVUpKoPZUvXUx1KWppPkgFANB2V71w61NR
-                uPQcCl87ABKMiNLW1q7fO/DdZQKBgQDGVOUfeqnqS3BVd8IDybUAhDywGiz/kS/6
-                IIc1fy+dFU67dtidZ1vJ8Nx/Ywrr0Y+0NGaJG440gY03OVoxOJbvqdppvTZJ3o7U
-                2n08WDY9uOP1fgn9aUMsiKNuMmwtNtOc0nECPLY9zlGu3C5J1EGVQSg8NNG5Wjzj
-                FC/rUKMqvQKBgCIFa3vdnXyIkM9O2NgfKWduO0WRSdWkSdf1zF2IVMMBwC6FoAhZ
-                E5KGLPcNwHpiRsVyvPjQ2/So2ZwigNngJvy7y9whcFUf6esx69fn0ZlpWOl4BtVj
-                S/Vw2iyP6I/AzlnuV6Mj6sgPFHatbmmBxmCDGyJB7joYkXTpKF8KHkbpAoGBALpd
-                pdvZuPbXopw9Z4uFq9bra9eTETupo2qnzEXh2M0D67LOb6ghKqhs89WkLOwBRMby
-                AnPN9+ew4RDGjND5uyND+WApE22Ae7jaApqEzZtcNKFHqX19v0iGsQPoz6wA/AI9
-                4UFX6WvUhv8IGVr44BOvYW6Jt5UzjUlYe9rkMB8FAoGAPhPp4oGgctZ5gPI6C86W
-                Q7z7ANtyXSf8D/9XiRSxsrYENky/xKH9xSSqcN23ZFGSCBudtOGNERxuw1a3I/JW
-                GV8nCPAI34rbnsuwaKYWTfanSRtVd0lfgRxo9EULZ3wJQTBp9X44cEcXOUWVkifa
-                OQNHeC4vwV8R3ww/Db0iZbM=
+                MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDASDLoCWSUnEXl
+                ueJcsM6C+lTwrllAZg5VvtfwkWz5MtH50mk8Y0b+HRk6SY9JJ1AGBWm6y9Sl0ba4
+                tK4x90F3TLZR7rVDKg+VZX/pd3iXomJNR3Skctjxy9DT6ZAAdG8AhZWkjJkeTIhj
+                a94xPSm4q98lgKEWtF4dpg/77jvWHdIzCwuXjc0PJHbk9h2UclbAVBdGoXbeIk4J
+                P6jrGW52YYEE0v4Ambt/UdA8Q4fjCq3WKlrw0/H2nHIthimH/jkN6TuADSkILHzb
+                WZ/nuXckREHKVvunocJ6cLrTvh3Dxp6gcRsv85/rKEUN7z6aAOsKR6RvIJ0aqtHk
+                aln3Fjn1AgMBAAECggEATJzXz7ViYoYroX9hjn4SIoTc0DMfs7WWM5sBTkSbb2VM
+                3aX1MU77K+frM9q4YTTtQSDqAjgR5+n5zHmNSLJUXtTtdhLPHU5GfEe/YgYswfo9
+                Ab6dXqK2Bw2nDLBspIm/6qzPNYuhvL1QwJBrrSHKHF8636XzSWkfcN/IUaCYLdTt
+                6VSJLUU1v69fiy6bZ2z2ySRK23LRDfnJLJkOYGlRJCFAx0KXg1ta3AjvhmQf/hoG
+                rK7yeYCHzdbH28vbdC5P0s5E1qVE+JTbPF9EnZqit0kMcMEqsYZBz0WLc059pVGH
+                +r85hqUnrDQ4Ex6A7/4HNMk7J8sT61ZOI9QorliTNwKBgQDqU+Gp9HwaXaL7y1GN
+                z46laUj7O5AKCoyu9tZXfSEpxP47KHNqJEqebLu/ptsmjU+7Ta52jw0DR0xmUJIa
+                FQ+w/d3JocQo2iW9FdZAWHSas0Wa9dDgZzCUm2vY7tgWHgSs1xFILzsfp0xS9PgS
+                qU1xc4k0pydMg/5F+Ks+r/dPawKBgQDSENAsGIYcvcxolxXDtD00Iq+P8g1YwqKn
+                aoFn9rmfOJtYo8cVLV9ccy3y03qF7hSBtvFR11QlseFjwLitOtjObsb74ZaEhtmS
+                BSn0G2kwyyHwITUl0XqhsTPnYXrmaOizW85HvLXe2lZ10TJOpT85qReaKFUeqfSs
+                QJXIod3UHwKBgQCVMekpa9ekdd/yz4ZSc0eQe9OS2l6gdg0SzWi1dZ8q2BlCk0PA
+                3fCApBx6LwOzrR+J0zD0naocX0X+kugjISvHdivDWHLry9FhbcjnWSqM4P29Zyuh
+                5TGiPL7S9Wex1VUGszx2qFPNmJhY7U4Rm6gKRxSh6Jd1+UhpRqXJmQIulwKBgQCB
+                2ZDE4TfthklXkaULf1uh4ZsCcM5dQpsGv+hUGogtavFj/oEujwh2fmA1zRHcvgmB
+                EVPkkiVa07UOU3AU7N5d5M4tnwnKzAyrnXOMiHEijz5gUDapNO8ICiCac4Bj8w98
+                51AAuh72LaLqWzEsuir1+pczXKEZPleXLqkoBx63YwKBgGJiXmbN9mxtf+rqYjpA
+                fYEYcVcm181GKv5y5kdDVlDHvylEye79NWzQeO5fMjBgg4DVllJKv0JPeC/VsIqM
+                BqJfIzCFKBXthV02fm7oacpcsTlgoc/wlOx+mhXOsnDRIOz3Hs6mOMAPjgSNqmE7
+                rsdP7V0364qw8+r0lRZ9NsjU
                 -----END PRIVATE KEY-----
                 """;
         test(pkcs8cert, pkcs8key);
