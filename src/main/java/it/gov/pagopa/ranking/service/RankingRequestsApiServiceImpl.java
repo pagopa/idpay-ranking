@@ -3,13 +3,8 @@ package it.gov.pagopa.ranking.service;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
-import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
-import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
-import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
-import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
-import it.gov.pagopa.ranking.exception.ClientExceptionWithBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -20,14 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j

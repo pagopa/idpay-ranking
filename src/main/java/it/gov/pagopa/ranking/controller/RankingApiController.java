@@ -3,7 +3,6 @@ package it.gov.pagopa.ranking.controller;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
-import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
