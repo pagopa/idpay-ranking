@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -114,6 +115,9 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                 log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
                 onboardingRankingRequests.forEach(onboardingNotifierService::callOnboardingNotifier);
             }
+            initiative.setRankingPublishedTimestamp(LocalDateTime.now());
+            initiative.setRankingStatus(RankingStatus.COMPLETED);
+            initiativeConfigService.save(initiative); //TODO need to send the modification to someone?
         }else {
             genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiative.getRankingStatus());
             log.error(genericExceptionMessage);
