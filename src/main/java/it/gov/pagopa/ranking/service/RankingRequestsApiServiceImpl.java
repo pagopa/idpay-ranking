@@ -3,21 +3,31 @@ package it.gov.pagopa.ranking.service;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
+import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
+import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
+import it.gov.pagopa.ranking.exception.ClientExceptionWithBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -27,12 +37,22 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     private final OnboardingRankingRequest2RankingRequestsApiDTOMapper dtoMapper;
     private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper;
     private final RankingContextHolderService rankingContextHolderService;
+    private final OnboardingNotifierService onboardingNotifierService;
+    private final InitiativeConfigService initiativeConfigService;
 
-    public RankingRequestsApiServiceImpl(OnboardingRankingRequestsRepository onboardingRankingRequestsRepository, OnboardingRankingRequest2RankingRequestsApiDTOMapper rankingRequestsApiDTOMapper, PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper, RankingContextHolderService rankingContextHolderService) {
+    public RankingRequestsApiServiceImpl(
+            OnboardingRankingRequestsRepository onboardingRankingRequestsRepository,
+            OnboardingRankingRequest2RankingRequestsApiDTOMapper rankingRequestsApiDTOMapper,
+            PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper,
+            RankingContextHolderService rankingContextHolderService,
+            OnboardingNotifierService onboardingNotifierService,
+            InitiativeConfigService initiativeConfigService) {
         this.onboardingRankingRequestsRepository = onboardingRankingRequestsRepository;
         this.dtoMapper = rankingRequestsApiDTOMapper;
         this.pageDtoMapper = pageDtoMapper;
         this.rankingContextHolderService = rankingContextHolderService;
+        this.onboardingNotifierService = onboardingNotifierService;
+        this.initiativeConfigService = initiativeConfigService;
     }
 
     @Override
@@ -87,4 +107,27 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             }
         }
     }
+
+    @Override
+    public void notifyCitizenRankings(String organizationId, String initiativeId) {
+        String genericExceptionMessage;
+        InitiativeConfig initiative = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(
+                () -> {
+                    String exceptionMessage = "Initiative not found";
+                    log.error(exceptionMessage);
+                    return new IllegalStateException("[NOTIFY_CITIZEN]-[ENTITY-DOCUMENT]-[Error] - " + exceptionMessage);
+                });
+        if(initiative.getRankingStatus().equals(RankingStatus.PUBLISHING)){
+            List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
+            if(!onboardingRankingRequests.isEmpty()) {
+                log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
+                onboardingRankingRequests.forEach(onboardingNotifierService::callOnboardingNotifier);
+            }
+        }else {
+            genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiative.getRankingStatus());
+            log.error(genericExceptionMessage);
+            throw new IllegalStateException("[NOTIFY_CITIZEN]-[Error] - " + genericExceptionMessage);
+        }
+    }
+
 }
