@@ -9,6 +9,7 @@ import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.service.csv.RankingCsvWriterService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,78 +17,134 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Slf4j
 public class RankingMaterializerServiceImpl implements RankingMaterializerService {
 
+    /** Max size of the list that will be passed to the repository saveAll method */
+    private static final int SAVABLE_ENTITIES_MAX_SIZE = 100;
+
     private final OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
     private final int size;
+    private final String tmpDir;
     private final OnboardingRankingRequests2RankingCsvDTOMapper csvMapper;
     private final RankingCsvWriterService csvWriterService;
 
     public RankingMaterializerServiceImpl(
             OnboardingRankingRequestsRepository onboardingRankingRequestsRepository,
             @Value("${app.ranking.query-page-size}")  int size,
+            @Value("${app.ranking.csv.tmp-dir}") String tmpDir,
             OnboardingRankingRequests2RankingCsvDTOMapper csvMapper,
-            RankingCsvWriterService csvWriterService
-    ) {
+            RankingCsvWriterService csvWriterService) {
         this.onboardingRankingRequestsRepository = onboardingRankingRequestsRepository;
         this.size = size;
+        this.tmpDir = tmpDir;
         this.csvMapper = csvMapper;
         this.csvWriterService = csvWriterService;
     }
 
     @Override
-    public String materialize(InitiativeConfig initiativeConfig) {
+    public Path materialize(InitiativeConfig initiativeConfig) {
+        initiativeConfig.setRankingFilePath(buildRankingFilePath(initiativeConfig).replace(tmpDir+"/",""));
 
-        try (FileWriter outputCsvWriter = new FileWriter("tmp")) { // TODO define fileName
+        String localFileName = "%s/%s".formatted(tmpDir, initiativeConfig.getRankingFilePath());
+        createDirectoryIfNotExists(localFileName);
+
+        try (FileWriter outputCsvWriter = new FileWriter(localFileName)) {
             String initiativeId = initiativeConfig.getInitiativeId();
-            long totalEligibleOk = initiativeConfig.getTotalEligibleOk();
-            long totalEligibleKo = initiativeConfig.getTotalEligibleKo();
+            initiativeConfig.setTotalEligibleOk(0);
+            initiativeConfig.setTotalEligibleKo(0);
+            initiativeConfig.setTotalOnboardingKo(0);
 
             int page = 0;
             int rank = 1;
             List<OnboardingRankingRequests> pageContent;
+            Sort sorting = getSorting(initiativeConfig);
             while (!(pageContent = onboardingRankingRequestsRepository.findAllByInitiativeId(
                     initiativeId,
-                    PageRequest.of(page++, size, getSorting(initiativeConfig))
-            )).isEmpty()) {
-
+                    PageRequest.of(page++, size, sorting))
+            ).isEmpty()) {
                 log.info("[RANKING_MATERIALIZER] Reading page number {} of initiative with id {}", page, initiativeId);
+
+                List<OnboardingRankingRequests> requestsToSave = new ArrayList<>();
                 for (OnboardingRankingRequests r : pageContent) {
                     int actualRank = rank++;
 
                     // updating the entity only if changed
-                    if (r.getRank() != actualRank) {
-                        r.setRank(actualRank);
+                    updateRankingAndStatus(initiativeConfig, requestsToSave, r, actualRank);
 
-                        if (r.getBeneficiaryRankingStatus() != BeneficiaryRankingStatus.ONBOARDING_KO) {
-                            if (r.getRank() <= initiativeConfig.getSize()) {
-                                r.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
-                                ++totalEligibleOk;
-                            } else {
-                                r.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
-                                ++totalEligibleKo;
-                            }
-                        }
+                    updateInitiativeCounters(initiativeConfig, r);
+
+                    if (requestsToSave.size() == SAVABLE_ENTITIES_MAX_SIZE) {
+                        saveRequestsAndWriteInCsv(requestsToSave, outputCsvWriter, page == 1);
                     }
                 }
-                onboardingRankingRequestsRepository.saveAll(pageContent);
 
-                csvWriterService.write(buildCsvLines(pageContent), outputCsvWriter); // TODO this method should write directly into the file
+                if (!requestsToSave.isEmpty()) {
+                    saveRequestsAndWriteInCsv(requestsToSave, outputCsvWriter, page == 1);
+                }
+
             }
-
-            // updating totalEligibleOk and totalEligibleKo fields of InitiativeConfig
-            updateInitiativeStatusCounters(initiativeConfig, totalEligibleOk, totalEligibleKo);
-
-            return null;
-
         } catch (IOException e) {
             throw new IllegalStateException("[RANKING_MATERIALIZER] Failed to create FileWriter", e);
         }
 
+        return Path.of(localFileName);
+    }
+
+    private void updateInitiativeCounters(InitiativeConfig initiativeConfig, OnboardingRankingRequests r) {
+        if (!r.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ONBOARDING_KO)) {
+            if (r.getRank() <= initiativeConfig.getSize()) {
+                initiativeConfig.setTotalEligibleOk(initiativeConfig.getTotalEligibleOk()+1);
+            } else {
+                initiativeConfig.setTotalEligibleKo(initiativeConfig.getTotalEligibleKo()+1);
+            }
+        } else {
+            initiativeConfig.setTotalOnboardingKo(initiativeConfig.getTotalOnboardingKo()+1);
+        }
+    }
+
+    private String buildRankingFilePath(InitiativeConfig initiativeConfig) {
+        return "%s/%s/%s-ranking.csv".formatted(
+                initiativeConfig.getOrganizationId(),
+                initiativeConfig.getInitiativeId(),
+                escapeRuleName(initiativeConfig.getInitiativeName()));
+    }
+
+    private void updateRankingAndStatus(InitiativeConfig initiativeConfig, List<OnboardingRankingRequests> requestsToSave, OnboardingRankingRequests r, int actualRank) {
+        if (r.getRank() != actualRank) {
+            r.setRank(actualRank);
+            requestsToSave.add(r);
+
+            if (!r.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ONBOARDING_KO)) {
+                if (r.getRank() <= initiativeConfig.getSize()) {
+                    r.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
+                } else {
+                    r.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
+                }
+            }
+        }
+    }
+
+    private static void createDirectoryIfNotExists(String localFileName) {
+        Path directory = Paths.get(localFileName).getParent();
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw new IllegalStateException("[REWARD_NOTIFICATION_EXPORT_CSV] Cannot create directory to store csv %s".formatted(localFileName), e);
+            }
+        }
+    }
+
+    private String escapeRuleName(String initiativeName) {
+        return StringUtils.left(initiativeName.replaceAll("\\W", ""), 10);
     }
 
     private Sort getSorting(InitiativeConfig initiativeConfig) {
@@ -106,9 +163,11 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
         }
     }
 
-    private void updateInitiativeStatusCounters(InitiativeConfig initiativeConfig, long totalEligibleOk, long totalEligibleKo) {
-        initiativeConfig.setTotalEligibleOk(totalEligibleOk);
-        initiativeConfig.setTotalEligibleKo(totalEligibleKo);
+    private void saveRequestsAndWriteInCsv(List<OnboardingRankingRequests> requests, FileWriter outputCsvWriter, boolean printHeader) {
+        onboardingRankingRequestsRepository.saveAll(requests);
+        csvWriterService.write(buildCsvLines(requests), outputCsvWriter, printHeader);
+
+        requests.clear();
     }
 
     private List<RankingCsvDTO> buildCsvLines(List<OnboardingRankingRequests> requests) {

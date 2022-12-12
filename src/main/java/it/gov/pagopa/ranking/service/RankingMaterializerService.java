@@ -2,7 +2,9 @@ package it.gov.pagopa.ranking.service;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 
+import java.nio.file.Path;
+
 public interface RankingMaterializerService {
 
-    String materialize(InitiativeConfig initiativeConfig);
+    Path materialize(InitiativeConfig initiativeConfig);
 }

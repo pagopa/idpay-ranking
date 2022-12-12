@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.connector;
+package it.gov.pagopa.ranking.connector.azure.storage;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 

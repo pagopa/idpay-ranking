@@ -5,6 +5,7 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
 import com.azure.messaging.servicebus.administration.models.QueueRuntimeProperties;
+import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.dto.initiative.OnboardingRequestPendingDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -21,20 +22,14 @@ import java.util.List;
 public class OnboardingRankingRuleEndedRetrieverServiceImpl implements OnboardingRankingRuleEndedRetrieverService {
     private final InitiativeConfigService initiativeConfigService;
     private final long beforeDays;
-    private final String connectionString;
-    private final String queueName;
-    private final ServiceBusAdministrationClient adminClient;
+    private final AzureServiceBusClient azureServiceBusClient;
 
     public OnboardingRankingRuleEndedRetrieverServiceImpl(InitiativeConfigService initiativeConfigService,
                                                           @Value("${app.ranking-build-file.retrieve-initiative.day-before}") long beforeDays,
-                                                          @Value("${app.service-bus.onboarding-request-pending.string-connection}") String connectionString,
-                                                          @Value("${app.service-bus.onboarding-request-pending.destination}") String queueName,
-                                                          ServiceBusAdministrationClient adminClient) {
+                                                          AzureServiceBusClient azureServiceBusClient) {
         this.initiativeConfigService = initiativeConfigService;
         this.beforeDays = beforeDays;
-        this.connectionString = connectionString;
-        this.queueName = queueName;
-        this.adminClient = adminClient;
+        this.azureServiceBusClient = azureServiceBusClient;
     }
 
     @Override
@@ -46,8 +41,8 @@ public class OnboardingRankingRuleEndedRetrieverServiceImpl implements Onboardin
 
     private boolean checkPendingOnboardingRequests(String initiativeId) {
         log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Start check if there are any pending onboarding request for ended initiative: {}", initiativeId);
-        int messageInQueue = countMessageInQueue();
-        try (ServiceBusReceiverClient receiverClient = getReceiverClient()){
+        int messageInQueue = azureServiceBusClient.countMessageInOnboardingRequestQueue();
+        try (ServiceBusReceiverClient receiverClient = azureServiceBusClient.getOnboardingRequestReceiverClient()){
             ServiceBusReceivedMessage serviceBusReceivedMessage;
             for(int count=1; (serviceBusReceivedMessage=receiverClient.peekMessage()) != null && count<=messageInQueue; count++){
                 OnboardingRequestPendingDTO body = serviceBusReceivedMessage.getBody().toObject(OnboardingRequestPendingDTO.class);
@@ -58,19 +53,5 @@ public class OnboardingRankingRuleEndedRetrieverServiceImpl implements Onboardin
             }
         }
         return true;
-    }
-
-    private ServiceBusReceiverClient getReceiverClient(){
-        return new ServiceBusClientBuilder()
-                .connectionString(connectionString)
-                .receiver()
-                .queueName(queueName)
-                .disableAutoComplete()
-                .buildClient();
-    }
-
-    private int countMessageInQueue(){
-        QueueRuntimeProperties queueRuntimeProperties = adminClient.getQueueRuntimeProperties(queueName);
-        return  queueRuntimeProperties.getActiveMessageCount() + queueRuntimeProperties.getScheduledMessageCount();
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileWriter;
-import java.nio.file.Path;
 import java.util.List;
 
 @Service
@@ -29,17 +28,15 @@ public class RankingCsvWriterServiceImpl implements RankingCsvWriterService{
     }
 
     @Override
-    public Path write(List<RankingCsvDTO> csvLines, FileWriter writer) {
+    public void write(List<RankingCsvDTO> csvLines, FileWriter writer, boolean printHeader) {
 
         try {
+            // TODO Configure printHeader
             StatefulBeanToCsv<RankingCsvDTO> csvWriter = buildCsvWriter(writer);
             csvWriter.write(csvLines);
         } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
             throw new IllegalStateException("[RANKING_CSV] Cannot create csv writer", e);
         }
-
-        // TODO return file
-        return null;
     }
 
     private StatefulBeanToCsv<RankingCsvDTO> buildCsvWriter(FileWriter writer) {

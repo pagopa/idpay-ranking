@@ -158,3 +158,4 @@ app:
     query-page-size: ${RANKING_QUERY_PAGE_SIZE:500000}
     csv:
       separator: ${RANKING_CSV_SEPARATOR:${CSV_SEPARATOR:;}}
+      tmp-dir: ${CSV_TEMP_DIR:/tmp}
