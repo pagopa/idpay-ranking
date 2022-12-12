@@ -1,6 +1,5 @@
 package it.gov.pagopa.ranking.service.initiative.ranking;
 
-import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
@@ -10,6 +9,7 @@ import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -22,6 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @TestPropertySource(properties = {
@@ -49,7 +50,7 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     @Autowired
     private OnboardingRankingBuildFileMediatorServiceImpl onboardingRankingBuildFileMediatorService;
 
-    private List<OnboardingRankingRequests> testData = new ArrayList<>();
+    private final List<OnboardingRankingRequests> testData = new ArrayList<>();
 
     @BeforeEach
     void storeTestData() {
@@ -104,9 +105,31 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     void test() {
         onboardingRankingBuildFileMediatorService.schedule();
 
-        // TODO verify initiative status and counters
-        // TODO verify other initiative not changed
+        checkRankingMaterializeResult();
         // TODO verify uploaded file
+    }
+
+    private void checkRankingMaterializeResult() {
+        int i=0;
+        for(OnboardingRankingRequests r : testData) {
+            Optional<OnboardingRankingRequests> optional = onboardingRankingRequestsRepository.findById(r.getId());
+            Assertions.assertTrue(optional.isPresent());
+
+            OnboardingRankingRequests entity = optional.get();
+            if (entity.getInitiativeId().equals(INITIATIVE_ID)) {
+                Assertions.assertEquals(++i, entity.getRank());
+                if (i>0 && i<=RANKING_SIZE) {
+                    Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_OK, entity.getBeneficiaryRankingStatus());
+                } else if (i>RANKING_SIZE && i<=RANKING_SIZE+10) {
+                    Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_KO, entity.getBeneficiaryRankingStatus());
+                } else {
+                    Assertions.assertEquals(BeneficiaryRankingStatus.ONBOARDING_KO, entity.getBeneficiaryRankingStatus());
+                }
+            } else {
+                Assertions.assertEquals(0, entity.getRank());
+                Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
+            }
+        }
     }
 
 }

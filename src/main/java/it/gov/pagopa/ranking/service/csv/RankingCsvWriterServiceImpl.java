@@ -18,30 +18,37 @@ import java.util.List;
 public class RankingCsvWriterServiceImpl implements RankingCsvWriterService{
 
     private final char csvSeparator;
-    private final HeaderColumnNameStrategy<RankingCsvDTO> mappingStrategy;
+    private final HeaderColumnNameStrategy<RankingCsvDTO> mappingStrategyWithHeader;
+    private final HeaderColumnNameStrategy<RankingCsvDTO> mappingStrategyNoHeader;
 
     public RankingCsvWriterServiceImpl(
             @Value("${app.ranking.csv.separator}") char csvSeparator
     ) {
         this.csvSeparator = csvSeparator;
-        this.mappingStrategy = new HeaderColumnNameStrategy<>(RankingCsvDTO.class);
+        this.mappingStrategyWithHeader = new HeaderColumnNameStrategy<>(RankingCsvDTO.class, true);
+        this.mappingStrategyNoHeader = new HeaderColumnNameStrategy<>(RankingCsvDTO.class, false);
     }
 
     @Override
-    public void write(List<RankingCsvDTO> csvLines, FileWriter writer, boolean printHeader) {
+    public void write(List<RankingCsvDTO> csvLines, FileWriter writer, boolean useHeader) {
 
         try {
-            // TODO Configure printHeader
-            StatefulBeanToCsv<RankingCsvDTO> csvWriter = buildCsvWriter(writer);
+            StatefulBeanToCsv<RankingCsvDTO> csvWriter = buildCsvWriter(writer, useHeader);
             csvWriter.write(csvLines);
         } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
             throw new IllegalStateException("[RANKING_CSV] Cannot create csv writer", e);
         }
     }
 
-    private StatefulBeanToCsv<RankingCsvDTO> buildCsvWriter(FileWriter writer) {
-        return new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
-                .withMappingStrategy(mappingStrategy)
+    private StatefulBeanToCsv<RankingCsvDTO> buildCsvWriter(FileWriter writer, boolean useHeader) {
+        return useHeader ?
+                new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
+                .withMappingStrategy(mappingStrategyWithHeader)
+                .withSeparator(csvSeparator)
+                .withLineEnd("\n")
+                .build() :
+                new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
+                .withMappingStrategy(mappingStrategyNoHeader)
                 .withSeparator(csvSeparator)
                 .withLineEnd("\n")
                 .build();

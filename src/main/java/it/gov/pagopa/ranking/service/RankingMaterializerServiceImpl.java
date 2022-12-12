@@ -163,9 +163,9 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
         }
     }
 
-    private void saveRequestsAndWriteInCsv(List<OnboardingRankingRequests> requests, FileWriter outputCsvWriter, boolean printHeader) {
+    private void saveRequestsAndWriteInCsv(List<OnboardingRankingRequests> requests, FileWriter outputCsvWriter, boolean useHeader) {
         onboardingRankingRequestsRepository.saveAll(requests);
-        csvWriterService.write(buildCsvLines(requests), outputCsvWriter, printHeader);
+        csvWriterService.write(buildCsvLines(requests), outputCsvWriter, useHeader);
 
         requests.clear();
     }

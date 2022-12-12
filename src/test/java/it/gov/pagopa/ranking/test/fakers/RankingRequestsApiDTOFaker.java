@@ -52,7 +52,7 @@ public class RankingRequestsApiDTOFaker {
                 .criteriaConsensusTimestamp(today)
                 .rankingValue(getRandomPositiveNumber(bias))
                 .beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK)
-                .ranking(1);
+                .ranking(0);
 
     }
 }

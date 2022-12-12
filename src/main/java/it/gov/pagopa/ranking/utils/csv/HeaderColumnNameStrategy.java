@@ -4,7 +4,9 @@ import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.StringReader;
 import java.util.Arrays;
@@ -14,8 +16,10 @@ import java.util.stream.Collectors;
 /** A strategy to build a csv having column ordered as declaration order and columnName as defined using {@link CsvBindByName} annotation*/
 @Slf4j
 public class HeaderColumnNameStrategy<T> extends HeaderColumnNameMappingStrategy<T> {
+    private final boolean useHeader;
 
-    public HeaderColumnNameStrategy(Class<? extends T> clazz) {
+    public HeaderColumnNameStrategy(Class<? extends T> clazz, boolean useHeader) {
+        this.useHeader = useHeader;
         setType(clazz);
 
         // Build the header line which respects the declaration order
@@ -33,5 +37,13 @@ public class HeaderColumnNameStrategy<T> extends HeaderColumnNameMappingStrategy
                     .build();
             sampleCsv.forEach(l -> log.trace("Loading header position: {}", l));
         }
+    }
+
+    @Override
+    public String[] generateHeader(T bean) throws CsvRequiredFieldEmptyException {
+        if (!useHeader) {
+            return ArrayUtils.EMPTY_STRING_ARRAY;
+        }
+        return super.generateHeader(bean);
     }
 }
