@@ -156,6 +156,7 @@ app:
       destination: ${KAFKA_ONBOARDING_REQUEST_PENDING_TOPIC:idpay-onboarding-request}
   ranking:
     query-page-size: ${RANKING_QUERY_PAGE_SIZE:500000}
+    savable-entities-size: ${RANKING_SAVABLE_REQUESTS_SIZE:100}
     csv:
       separator: ${RANKING_CSV_SEPARATOR:${CSV_SEPARATOR:;}}
       tmp-dir: ${CSV_TEMP_DIR:/tmp}

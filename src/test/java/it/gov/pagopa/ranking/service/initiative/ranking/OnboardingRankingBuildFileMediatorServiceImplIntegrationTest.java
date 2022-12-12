@@ -27,7 +27,8 @@ import java.util.stream.IntStream;
 
 @TestPropertySource(properties = {
         "app.ranking.csv.tmp-dir=target/tmp",
-        "app.ranking.query-page-size=10"
+        "app.ranking.query-page-size=10",
+        "app.ranking.savable-entities-size=13"
 })
 class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseIntegrationTest {
 
@@ -88,6 +89,7 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private void buildTestData(int n, String initiativeId, BeneficiaryRankingStatus status) {
         testData.addAll(onboardingRankingRequestsRepository.saveAll(IntStream.range(testData.size(), testData.size()+ n).mapToObj(i -> OnboardingRankingRequestsFaker.mockInstanceBuilder(i)
                 .initiativeId(initiativeId)
+                .rank(1)
                 .rankingValue(i)
                 .beneficiaryRankingStatus(status)
                 .build()
@@ -118,15 +120,18 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
             OnboardingRankingRequests entity = optional.get();
             if (entity.getInitiativeId().equals(INITIATIVE_ID)) {
                 Assertions.assertEquals(++i, entity.getRank());
-                if (i>0 && i<=RANKING_SIZE) {
+                if (i>1 && i<=RANKING_SIZE) {
                     Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_OK, entity.getBeneficiaryRankingStatus());
                 } else if (i>RANKING_SIZE && i<=RANKING_SIZE+10) {
                     Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_KO, entity.getBeneficiaryRankingStatus());
-                } else {
+                } else if (i>RANKING_SIZE+10 && i<=RANKING_SIZE+20){
                     Assertions.assertEquals(BeneficiaryRankingStatus.ONBOARDING_KO, entity.getBeneficiaryRankingStatus());
+                } else {
+                    Assertions.assertEquals(1, entity.getRank());
+                    Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
                 }
             } else {
-                Assertions.assertEquals(0, entity.getRank());
+                Assertions.assertEquals(1, entity.getRank());
                 Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
             }
         }

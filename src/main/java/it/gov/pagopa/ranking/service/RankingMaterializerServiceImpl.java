@@ -5,7 +5,6 @@ import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequests2RankingCsvDTOM
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
-import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.service.csv.RankingCsvWriterService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.List;
 public class RankingMaterializerServiceImpl implements RankingMaterializerService {
 
     /** Max size of the list that will be passed to the repository saveAll method */
-    private static final int SAVABLE_ENTITIES_MAX_SIZE = 100;
+    private final int savableEntitiesMaxSize;
 
     private final OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
     private final int size;
@@ -37,11 +36,13 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
     private final RankingCsvWriterService csvWriterService;
 
     public RankingMaterializerServiceImpl(
+            @Value("${app.ranking.savable-entities-size}") int savableEntitiesMaxSize,
             OnboardingRankingRequestsRepository onboardingRankingRequestsRepository,
             @Value("${app.ranking.query-page-size}")  int size,
             @Value("${app.ranking.csv.tmp-dir}") String tmpDir,
             OnboardingRankingRequests2RankingCsvDTOMapper csvMapper,
             RankingCsvWriterService csvWriterService) {
+        this.savableEntitiesMaxSize = savableEntitiesMaxSize;
         this.onboardingRankingRequestsRepository = onboardingRankingRequestsRepository;
         this.size = size;
         this.tmpDir = tmpDir;
@@ -81,7 +82,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
 
                     updateInitiativeCounters(initiativeConfig, r);
 
-                    if (requestsToSave.size() == SAVABLE_ENTITIES_MAX_SIZE) {
+                    if (requestsToSave.size() == savableEntitiesMaxSize) {
                         saveRequestsAndWriteInCsv(requestsToSave, outputCsvWriter, page == 1);
                     }
                 }

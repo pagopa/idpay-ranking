@@ -41,14 +41,8 @@ public class RankingCsvWriterServiceImpl implements RankingCsvWriterService{
     }
 
     private StatefulBeanToCsv<RankingCsvDTO> buildCsvWriter(FileWriter writer, boolean useHeader) {
-        return useHeader ?
-                new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
-                .withMappingStrategy(mappingStrategyWithHeader)
-                .withSeparator(csvSeparator)
-                .withLineEnd("\n")
-                .build() :
-                new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
-                .withMappingStrategy(mappingStrategyNoHeader)
+        return  new StatefulBeanToCsvBuilder<RankingCsvDTO>(writer)
+                .withMappingStrategy(useHeader? mappingStrategyWithHeader : mappingStrategyNoHeader)
                 .withSeparator(csvSeparator)
                 .withLineEnd("\n")
                 .build();
