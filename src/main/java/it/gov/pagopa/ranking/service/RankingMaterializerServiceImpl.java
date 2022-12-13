@@ -73,8 +73,8 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             ).isEmpty()) {
                 log.info("[RANKING_MATERIALIZER] Reading page number {} of initiative with id {}", page, initiativeId);
 
-                List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>();
-                List<OnboardingRankingRequests> requestsToSave = new ArrayList<>();
+                List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>(savableEntitiesMaxSize);
+                List<OnboardingRankingRequests> requestsToSave = new ArrayList<>(savableEntitiesMaxSize);
                 for (OnboardingRankingRequests r : pageContent) {
                     requestsToWrite.add(r);
 
@@ -86,7 +86,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
 
                     if (requestsToSave.size() == savableEntitiesMaxSize) {
                         saveRequestsAndClearList(requestsToSave);
-                        csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
+                        writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
                     }
                 }
 
@@ -94,13 +94,18 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
                     saveRequestsAndClearList(requestsToSave);
 
                 if (!requestsToWrite.isEmpty())
-                    csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
+                    writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
             }
         } catch (IOException e) {
             throw new IllegalStateException("[RANKING_MATERIALIZER] Failed to create FileWriter", e);
         }
 
         return Path.of(localFileName);
+    }
+
+    private void writeRequestsAndClearList(FileWriter outputCsvWriter, int page, List<OnboardingRankingRequests> requestsToWrite) {
+        csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
+        requestsToWrite.clear();
     }
 
 
