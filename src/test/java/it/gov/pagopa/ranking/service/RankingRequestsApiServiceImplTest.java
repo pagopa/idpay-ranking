@@ -10,6 +10,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.test.fakers.RankingRequestsApiDTOFaker;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,13 +29,17 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class RankingRequestsApiServiceImplTest {
 
     @Mock private OnboardingRankingRequestsRepository requestsRepositoryMock;
     @Mock private RankingContextHolderService contextHolderServiceMock;
+    @Mock private OnboardingNotifierService onboardingNotifierService;
+    @Mock private InitiativeConfigService initiativeConfigService;
     private final OnboardingRankingRequest2RankingRequestsApiDTOMapper mapper = new OnboardingRankingRequest2RankingRequestsApiDTOMapper();
     private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper = new PageOnboardingRequests2RankingPageDTOMapper();
 
@@ -41,7 +47,7 @@ class RankingRequestsApiServiceImplTest {
 
     @BeforeEach
     void init() {
-        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, pageDtoMapper, contextHolderServiceMock);
+        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, pageDtoMapper, contextHolderServiceMock, onboardingNotifierService, initiativeConfigService);
     }
 
     @Test
@@ -205,6 +211,53 @@ class RankingRequestsApiServiceImplTest {
 
         // Then
         Assertions.assertNull(result);
+    }
+
+    @Test
+    void givenInitiativeInPublishingStatus_thenNotifySuccess() {
+        // Given organizationId and initiativeID on DB for Status Publishing
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.PUBLISHING);
+
+        // When
+        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
+                .thenReturn(Optional.of(initiativeConfig));
+        List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
+        OnboardingRankingRequests rankingRequests = new OnboardingRankingRequests();
+        onboardingRankingRequests.add(rankingRequests);
+        Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
+                .thenReturn(onboardingRankingRequests);
+        Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(rankingRequests);
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenInitiativeNOTInPublishingStatus_thenThrowException() {
+        // Given organizationId and initiativeID on DB for Status Publishing
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.WAITING_END);
+
+        // When
+        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
+                .thenReturn(Optional.of(initiativeConfig));
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
+    }
+
+    @Test
+    void testNotifyWithNoInitiative() {
+        // When
+        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
+                .thenReturn(Optional.empty());
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
 }

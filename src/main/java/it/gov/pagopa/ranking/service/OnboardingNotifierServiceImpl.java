@@ -26,11 +26,6 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     @Override
     public void callOnboardingNotifier(OnboardingRankingRequests onboardingRankingRequests) {
         EvaluationDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequests);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         log.info("[NOTIFY_CITIZEN] - notifying onboarding request to onboarding outcome topic: {}", evaluationDTO);
         try {
             if (!onboardingNotifierProducer.notify(evaluationDTO)) {
