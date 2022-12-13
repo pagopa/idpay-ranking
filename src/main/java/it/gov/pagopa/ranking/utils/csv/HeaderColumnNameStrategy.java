@@ -23,7 +23,7 @@ public class HeaderColumnNameStrategy<T> extends HeaderColumnNameMappingStrategy
         // Build the header line which respects the declaration order
         String headerLine = Arrays.stream(clazz.getDeclaredFields())
                 .map(field -> Optional.ofNullable(field.getAnnotation(CsvBindByName.class)).map(CsvBindByName::column)
-                        .or(() -> Optional.ofNullable(field.getAnnotation(CsvDate.class)).map(CsvDate::value))
+                        .or(() -> Optional.ofNullable(field.getAnnotation(CsvCustomBindByName.class)).map(CsvCustomBindByName::column))
                         .orElse(null)
                 )
                 .filter(Objects::nonNull)
