@@ -64,7 +64,7 @@ class RankingRequestsApiServiceImplTest {
         Assertions.assertFalse(results.isEmpty());
         RankingRequestsApiDTO result = results.get(0);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.getRanking());
+        Assertions.assertEquals(0, result.getRanking());
     }
 
     @Test
@@ -93,7 +93,7 @@ class RankingRequestsApiServiceImplTest {
         Assertions.assertFalse(results.isEmpty());
         RankingRequestsApiDTO result = results.get(0);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.getRanking());
+        Assertions.assertEquals(0, result.getRanking());
     }
 
     @Test

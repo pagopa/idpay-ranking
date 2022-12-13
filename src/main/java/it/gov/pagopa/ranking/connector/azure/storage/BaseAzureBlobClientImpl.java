@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.connector;
+package it.gov.pagopa.ranking.connector.azure.storage;
 
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.StorageException;

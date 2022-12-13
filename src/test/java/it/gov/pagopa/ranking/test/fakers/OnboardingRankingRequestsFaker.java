@@ -42,7 +42,7 @@ public class OnboardingRankingRequestsFaker {
 
     public static OnboardingRankingRequests.OnboardingRankingRequestsBuilder mockInstanceBuilder(Integer bias) {
         OnboardingRankingRequests.OnboardingRankingRequestsBuilder out = OnboardingRankingRequests.builder();
-        return out.id("userId_%dinitiativeId_%d")
+        return out.id("userId_%dinitiativeId_%d".formatted(bias,bias))
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
@@ -50,7 +50,7 @@ public class OnboardingRankingRequestsFaker {
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
                 .rankingValue(getRandomPositiveNumber(bias))
                 .beneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY)
-                .rank(bias);
+                .rank(0);
 
     }
 }

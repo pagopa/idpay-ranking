@@ -1,9 +1,11 @@
-package it.gov.pagopa.ranking.connector;
+package it.gov.pagopa.ranking.connector.azure.storage;
 
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.BlobProperties;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
+import it.gov.pagopa.ranking.connector.azure.storage.AzureBlobClient;
+import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClientImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
