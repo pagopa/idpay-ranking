@@ -24,4 +24,5 @@ public class OnboardingRankingRequestDTO {
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
+    private boolean onboardingKo;
 }
