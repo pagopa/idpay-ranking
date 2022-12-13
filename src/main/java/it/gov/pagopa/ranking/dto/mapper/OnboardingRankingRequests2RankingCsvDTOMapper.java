@@ -17,6 +17,7 @@ public class OnboardingRankingRequests2RankingCsvDTOMapper implements Function<O
                 .criteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp())
                 .rankingValue(onboardingRankingRequests.getRankingValue())
                 .rank(onboardingRankingRequests.getRank())
+                .status(onboardingRankingRequests.getBeneficiaryRankingStatus())
                 .build();
     }
 }

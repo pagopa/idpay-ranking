@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +35,10 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
     private static final String INITIATIVE_ID = "INITIATIVE_ID";
     private static final String ORGANIZATION_ID = "ORGANIZATION_ID";
-    private static final int RANKING_SIZE = 50;
-    public static final String OTHER_INITIATIVE_ID = "OTHER_INITIATIVE_ID";
+    private static final int RANKING_SIZE = 51; // must be a multiple of 3
+    private static final String OTHER_INITIATIVE_ID = "OTHER_INITIATIVE_ID";
+    private static final int N = 9; // must be a multiple of 3
+
 
     @Value("${app.ranking-build-file.retrieve-initiative.day-before}")
     private int dayBeforeEndingInitiative;
@@ -74,9 +77,9 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
         // RANKING REQUESTS
         buildTestData(RANKING_SIZE, INITIATIVE_ID, BeneficiaryRankingStatus.TO_NOTIFY);
 
-        buildTestData(10, INITIATIVE_ID, BeneficiaryRankingStatus.TO_NOTIFY);
+        buildTestData(N, INITIATIVE_ID, BeneficiaryRankingStatus.TO_NOTIFY);
 
-        buildTestData(10, INITIATIVE_ID, BeneficiaryRankingStatus.ONBOARDING_KO);
+        buildTestData(N, INITIATIVE_ID, BeneficiaryRankingStatus.ONBOARDING_KO);
 
         buildTestData(RANKING_SIZE, OTHER_INITIATIVE_ID, BeneficiaryRankingStatus.TO_NOTIFY);
 
@@ -90,8 +93,9 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
         testData.addAll(onboardingRankingRequestsRepository.saveAll(IntStream.range(testData.size(), testData.size()+ n).mapToObj(i -> OnboardingRankingRequestsFaker.mockInstanceBuilder(i)
                 .initiativeId(initiativeId)
                 .rank(1)
-                .rankingValue(i)
-                .beneficiaryRankingStatus(status)
+                .rankingValue(i%3==1? i+1 : i)
+                .criteriaConsensusTimestamp(i%3==1? LocalDateTime.now().plusMinutes(1) : LocalDateTime.now())
+                .beneficiaryRankingStatus(i==0? BeneficiaryRankingStatus.ELIGIBLE_OK : status)
                 .build()
         ).toList()));
     }
@@ -119,21 +123,25 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
             OnboardingRankingRequests entity = optional.get();
             if (entity.getInitiativeId().equals(INITIATIVE_ID)) {
-                Assertions.assertEquals(++i, entity.getRank());
-                if (i>1 && i<=RANKING_SIZE) {
+                if (i%3==0) {
+                    Assertions.assertEquals(i+1, entity.getRank());
+                } else if (i%3==1) {
+                    Assertions.assertEquals(i+2, entity.getRank());
+                } else if (i%3==2) {
+                    Assertions.assertEquals(i, entity.getRank());
+                }
+                if (i>=0 && i<RANKING_SIZE) {
                     Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_OK, entity.getBeneficiaryRankingStatus());
-                } else if (i>RANKING_SIZE && i<=RANKING_SIZE+10) {
+                } else if (i>=RANKING_SIZE && i<RANKING_SIZE+N) {
                     Assertions.assertEquals(BeneficiaryRankingStatus.ELIGIBLE_KO, entity.getBeneficiaryRankingStatus());
-                } else if (i>RANKING_SIZE+10 && i<=RANKING_SIZE+20){
+                } else if (i>=RANKING_SIZE+N && i<RANKING_SIZE+(N*2)){
                     Assertions.assertEquals(BeneficiaryRankingStatus.ONBOARDING_KO, entity.getBeneficiaryRankingStatus());
-                } else {
-                    Assertions.assertEquals(1, entity.getRank());
-                    Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
                 }
             } else {
                 Assertions.assertEquals(1, entity.getRank());
                 Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
             }
+            ++i;
         }
     }
 

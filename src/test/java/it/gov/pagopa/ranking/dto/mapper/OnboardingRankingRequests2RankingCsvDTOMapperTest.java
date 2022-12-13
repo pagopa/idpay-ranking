@@ -25,6 +25,7 @@ class OnboardingRankingRequests2RankingCsvDTOMapperTest {
         Assertions.assertEquals(request.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(request.getRankingValue(), result.getRankingValue());
         Assertions.assertEquals(request.getRank(), result.getRank());
+        Assertions.assertEquals(request.getBeneficiaryRankingStatus(), result.getStatus());
     }
 
 }

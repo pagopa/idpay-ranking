@@ -73,24 +73,28 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             ).isEmpty()) {
                 log.info("[RANKING_MATERIALIZER] Reading page number {} of initiative with id {}", page, initiativeId);
 
+                List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>();
                 List<OnboardingRankingRequests> requestsToSave = new ArrayList<>();
                 for (OnboardingRankingRequests r : pageContent) {
+                    requestsToWrite.add(r);
+
                     int actualRank = rank++;
 
                     // updating the entity only if changed
                     updateRankingAndStatus(initiativeConfig, requestsToSave, r, actualRank);
-
                     updateInitiativeCounters(initiativeConfig, r);
 
                     if (requestsToSave.size() == savableEntitiesMaxSize) {
-                        saveRequestsAndWriteInCsv(requestsToSave, outputCsvWriter, page == 1);
+                        saveRequestsAndClearList(requestsToSave);
+                        csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
                     }
                 }
 
-                if (!requestsToSave.isEmpty()) {
-                    saveRequestsAndWriteInCsv(requestsToSave, outputCsvWriter, page == 1);
-                }
+                if (!requestsToSave.isEmpty())
+                    saveRequestsAndClearList(requestsToSave);
 
+                if (!requestsToWrite.isEmpty())
+                    csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
             }
         } catch (IOException e) {
             throw new IllegalStateException("[RANKING_MATERIALIZER] Failed to create FileWriter", e);
@@ -98,6 +102,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
 
         return Path.of(localFileName);
     }
+
 
     private void updateInitiativeCounters(InitiativeConfig initiativeConfig, OnboardingRankingRequests r) {
         if (!r.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ONBOARDING_KO)) {
@@ -149,13 +154,16 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
     }
 
     private Sort getSorting(InitiativeConfig initiativeConfig) {
-
         if (!initiativeConfig.getRankingFields().isEmpty()) {
             Sort.Direction direction;
 
             if (initiativeConfig.getRankingFields().get(0).getFieldCode() != null) {
                 direction = initiativeConfig.getRankingFields().get(0).getDirection();
-                return Sort.by(direction, "rankingValue");
+                List<Sort.Order> orders = List.of(
+                        new Sort.Order(direction, OnboardingRankingRequests.Fields.rankingValue),
+                        new Sort.Order(Sort.Direction.ASC, OnboardingRankingRequests.Fields.criteriaConsensusTimestamp)
+                );
+                return Sort.by(orders);
             } else {
                 throw new IllegalStateException("[RANKING] Cannot find field code in ranking fields of initiative %s".formatted(initiativeConfig.getInitiativeId()));
             }
@@ -164,11 +172,9 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
         }
     }
 
-    private void saveRequestsAndWriteInCsv(List<OnboardingRankingRequests> requests, FileWriter outputCsvWriter, boolean useHeader) {
-        onboardingRankingRequestsRepository.saveAll(requests);
-        csvWriterService.write(buildCsvLines(requests), outputCsvWriter, useHeader);
-
-        requests.clear();
+    private void saveRequestsAndClearList(List<OnboardingRankingRequests> requestsToSave) {
+        onboardingRankingRequestsRepository.saveAll(requestsToSave);
+        requestsToSave.clear();
     }
 
     private List<RankingCsvDTO> buildCsvLines(List<OnboardingRankingRequests> requests) {
