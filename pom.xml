@@ -71,6 +71,11 @@
 			<artifactId>azure-storage</artifactId>
 			<version>8.6.6</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15to18</artifactId>
+			<version>1.72</version>
+		</dependency>
 
 		<!--TEST-->
 		<dependency>
