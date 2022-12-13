@@ -26,6 +26,9 @@ class OnboardingNotifierServiceImplTest {
 
         OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper);
         onboardingNotifierService.callOnboardingNotifier(onboardingRankingRequests);
+
+        Mockito.verify(mapper, Mockito.times(1)).apply(Mockito.any(OnboardingRankingRequests.class));
+        Mockito.verify(onboardingNotifierProducer, Mockito.times(1)).notify(Mockito.any(EvaluationRankingDTO.class));
     }
 
     @Test
@@ -42,5 +45,8 @@ class OnboardingNotifierServiceImplTest {
 
         OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper);
         onboardingNotifierService.callOnboardingNotifier(onboardingRankingRequests);
+
+        Mockito.verify(mapper, Mockito.times(1)).apply(Mockito.any(OnboardingRankingRequests.class));
+        Mockito.verify(onboardingNotifierProducer, Mockito.times(1)).notify(Mockito.any(EvaluationRankingDTO.class));
     }
 }
