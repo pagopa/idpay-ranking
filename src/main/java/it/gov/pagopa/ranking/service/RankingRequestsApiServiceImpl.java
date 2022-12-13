@@ -9,6 +9,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,12 +29,22 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     private final OnboardingRankingRequest2RankingRequestsApiDTOMapper dtoMapper;
     private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper;
     private final RankingContextHolderService rankingContextHolderService;
+    private final OnboardingNotifierService onboardingNotifierService;
+    private final InitiativeConfigService initiativeConfigService;
 
-    public RankingRequestsApiServiceImpl(OnboardingRankingRequestsRepository onboardingRankingRequestsRepository, OnboardingRankingRequest2RankingRequestsApiDTOMapper rankingRequestsApiDTOMapper, PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper, RankingContextHolderService rankingContextHolderService) {
+    public RankingRequestsApiServiceImpl(
+            OnboardingRankingRequestsRepository onboardingRankingRequestsRepository,
+            OnboardingRankingRequest2RankingRequestsApiDTOMapper rankingRequestsApiDTOMapper,
+            PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper,
+            RankingContextHolderService rankingContextHolderService,
+            OnboardingNotifierService onboardingNotifierService,
+            InitiativeConfigService initiativeConfigService) {
         this.onboardingRankingRequestsRepository = onboardingRankingRequestsRepository;
         this.dtoMapper = rankingRequestsApiDTOMapper;
         this.pageDtoMapper = pageDtoMapper;
         this.rankingContextHolderService = rankingContextHolderService;
+        this.onboardingNotifierService = onboardingNotifierService;
+        this.initiativeConfigService = initiativeConfigService;
     }
 
     @Override
@@ -87,4 +99,30 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             }
         }
     }
+
+    @Override
+    public void notifyCitizenRankings(String organizationId, String initiativeId) {
+        String genericExceptionMessage;
+        InitiativeConfig initiative = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(
+                () -> {
+                    String exceptionMessage = "Initiative not found";
+                    log.error(exceptionMessage);
+                    return new IllegalStateException("[NOTIFY_CITIZEN]-[ENTITY-DOCUMENT]-[Error] - " + exceptionMessage);
+                });
+        if(initiative.getRankingStatus().equals(RankingStatus.PUBLISHING)){
+            List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
+            if(!onboardingRankingRequests.isEmpty()) {
+                log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
+                onboardingRankingRequests.forEach(onboardingNotifierService::callOnboardingNotifier);
+            }
+            initiative.setRankingPublishedTimestamp(LocalDateTime.now());
+            initiative.setRankingStatus(RankingStatus.COMPLETED);
+            initiativeConfigService.save(initiative); //TODO need to send the modification to someone?
+        }else {
+            genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiative.getRankingStatus());
+            log.error(genericExceptionMessage);
+            throw new IllegalStateException("[NOTIFY_CITIZEN]-[Error] - " + genericExceptionMessage);
+        }
+    }
+
 }

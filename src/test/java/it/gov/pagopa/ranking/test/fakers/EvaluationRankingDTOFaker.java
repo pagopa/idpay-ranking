@@ -2,15 +2,17 @@ package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
+import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
+import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Random;
 
-public class OnboardingRankingRequestsDTOFaker {
+public class EvaluationRankingDTOFaker {
 
-    private OnboardingRankingRequestsDTOFaker() {
+    private EvaluationRankingDTOFaker() {
     }
     private static final Random randomGenerator = new Random();
 
@@ -33,21 +35,23 @@ public class OnboardingRankingRequestsDTOFaker {
     }
 
     /**
-     * It will return an example of {@link OnboardingRankingRequestDTO}. Providing a bias, it will return a pseudo-casual object
+     * It will return an example of {@link InitiativeConfig}. Providing a bias, it will return a pseudo-casual object
      */
-    public static OnboardingRankingRequestDTO mockInstance(Integer bias) {
+    public static EvaluationDTO mockInstance(Integer bias) {
         return mockInstanceBuilder(bias).build();
     }
 
-    public static OnboardingRankingRequestDTO.OnboardingRankingRequestDTOBuilder mockInstanceBuilder(Integer bias) {
-        OnboardingRankingRequestDTO.OnboardingRankingRequestDTOBuilder out = OnboardingRankingRequestDTO.builder();
-        return out.userId("userId_%d".formatted(bias))
+    public static EvaluationDTO.EvaluationDTOBuilder mockInstanceBuilder(Integer bias) {
+        LocalDateTime today = LocalDateTime.now();
+
+        EvaluationRankingDTO.EvaluationRankingDTOBuilder out = EvaluationRankingDTO.builder();
+        return out
+                .status("ELIGIBLE_OK")
+                .ranking(1L)
+                .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
-                .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
-                .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
-                .rankingValue(getRandomPositiveNumber(bias));
-
+                .admissibilityCheckDate(today)
+                .criteriaConsensusTimestamp(today);
     }
 }
-
