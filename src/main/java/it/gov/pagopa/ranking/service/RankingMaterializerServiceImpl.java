@@ -67,14 +67,16 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             int rank = 1;
             List<OnboardingRankingRequests> pageContent;
             Sort sorting = getSorting(initiativeConfig);
+
+            List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>(savableEntitiesMaxSize);
+            List<OnboardingRankingRequests> requestsToSave = new ArrayList<>(savableEntitiesMaxSize);
+
             while (!(pageContent = onboardingRankingRequestsRepository.findAllByInitiativeId(
                     initiativeId,
                     PageRequest.of(page++, size, sorting))
             ).isEmpty()) {
                 log.info("[RANKING_MATERIALIZER] Reading page number {} of initiative with id {}", page, initiativeId);
 
-                List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>(savableEntitiesMaxSize);
-                List<OnboardingRankingRequests> requestsToSave = new ArrayList<>(savableEntitiesMaxSize);
                 for (OnboardingRankingRequests r : pageContent) {
                     requestsToWrite.add(r);
 
@@ -89,13 +91,12 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
                         writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
                     }
                 }
-
-                if (!requestsToSave.isEmpty())
-                    saveRequestsAndClearList(requestsToSave);
-
-                if (!requestsToWrite.isEmpty())
-                    writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
             }
+            if (!requestsToSave.isEmpty())
+                saveRequestsAndClearList(requestsToSave);
+
+            if (!requestsToWrite.isEmpty())
+                writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
         } catch (IOException e) {
             throw new IllegalStateException("[RANKING_MATERIALIZER] Failed to create FileWriter", e);
         }
