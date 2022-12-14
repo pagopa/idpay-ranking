@@ -1,6 +1,5 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
-import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -14,22 +13,17 @@ class OnboardingRankingRequest2EvaluationMapperTest {
     public static final String ONBOARDING_KO = "ONBOARDING_KO";
 
     @Test
-    void testSingleFieldsWithNoStatus(){
+    void testToNotify(){
         // Given
         OnboardingRankingRequest2EvaluationMapper mapper = new OnboardingRankingRequest2EvaluationMapper();
 
         OnboardingRankingRequests requests = OnboardingRankingRequestsFaker.mockInstance(1);
 
         // When
-        EvaluationDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(requests);
 
         // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(requests.getInitiativeId(), result.getInitiativeId());
-        Assertions.assertEquals(requests.getOrganizationId(), result.getOrganizationId());
-        Assertions.assertEquals(requests.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
-        Assertions.assertEquals(requests.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
-        Assertions.assertEquals(requests.getUserId(), result.getUserId());
+        commonChecks(requests, result, ONBOARDING_OK);
     }
 
     @Test
@@ -37,18 +31,14 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         // Given
         OnboardingRankingRequest2EvaluationMapper mapper = new OnboardingRankingRequest2EvaluationMapper();
 
-        OnboardingRankingRequests requests = OnboardingRankingRequestsFaker.mockInstance(1);
-        requests.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
+        OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
+        request.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
 
         // When
-        EvaluationDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(request);
 
         // Then
-        Assertions.assertNotNull(result);
-        if(result instanceof EvaluationRankingDTO evaluationRankingDTO){
-            Assertions.assertEquals(requests.getRank(), evaluationRankingDTO.getRanking());
-            Assertions.assertEquals(ONBOARDING_OK, evaluationRankingDTO.getStatus());
-        }
+        commonChecks(request, result, ONBOARDING_OK);
     }
 
     @Test
@@ -60,14 +50,10 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         requests.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
         // When
-        EvaluationDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(requests);
 
         // Then
-        Assertions.assertNotNull(result);
-        if(result instanceof EvaluationRankingDTO evaluationRankingDTO){
-            Assertions.assertEquals(requests.getRank(), evaluationRankingDTO.getRanking());
-            Assertions.assertEquals(ONBOARDING_KO, evaluationRankingDTO.getStatus());
-        }
+        commonChecks(requests, result, ONBOARDING_OK);
     }
 
     @Test
@@ -79,14 +65,21 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         requests.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
 
         // When
-        EvaluationDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(requests);
 
         // Then
+        commonChecks(requests, result, ONBOARDING_KO);
+    }
+
+    private static void commonChecks(OnboardingRankingRequests requests, EvaluationRankingDTO result, String expectedStatus) {
         Assertions.assertNotNull(result);
-        if(result instanceof EvaluationRankingDTO evaluationRankingDTO){
-            Assertions.assertEquals(requests.getRank(), evaluationRankingDTO.getRanking());
-            Assertions.assertEquals(ONBOARDING_KO, evaluationRankingDTO.getStatus());
-        }
+        Assertions.assertEquals(requests.getInitiativeId(), result.getInitiativeId());
+        Assertions.assertEquals(requests.getOrganizationId(), result.getOrganizationId());
+        Assertions.assertEquals(requests.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
+        Assertions.assertEquals(requests.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
+        Assertions.assertEquals(requests.getUserId(), result.getUserId());
+        Assertions.assertEquals(requests.getRankingValue2Show(), result.getRankingValue());
+        Assertions.assertEquals(expectedStatus, result.getStatus());
     }
 
 }

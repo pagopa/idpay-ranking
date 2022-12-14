@@ -1,6 +1,5 @@
 package it.gov.pagopa.ranking.service;
 
-import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
@@ -29,7 +28,7 @@ class OnboardingNotifierServiceImplTest {
         OnboardingNotifierProducer onboardingNotifierProducer = Mockito.mock(OnboardingNotifierProducer.class);
         InitiativeConfigService initiativeConfigService = Mockito.mock(InitiativeConfigService.class);
 
-        EvaluationDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
+        EvaluationRankingDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests2 = OnboardingRankingRequestsFaker.mockInstance(2);
         onboardingRankingRequests.add(onboardingRankingRequests1);
@@ -57,7 +56,7 @@ class OnboardingNotifierServiceImplTest {
         OnboardingNotifierProducer onboardingNotifierProducer = Mockito.mock(OnboardingNotifierProducer.class);
         InitiativeConfigService initiativeConfigService = Mockito.mock(InitiativeConfigService.class);
 
-        EvaluationDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
+        EvaluationRankingDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests2 = OnboardingRankingRequestsFaker.mockInstance(2);
         onboardingRankingRequests.add(onboardingRankingRequests1);

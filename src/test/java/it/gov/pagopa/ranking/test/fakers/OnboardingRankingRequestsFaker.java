@@ -42,13 +42,17 @@ public class OnboardingRankingRequestsFaker {
 
     public static OnboardingRankingRequests.OnboardingRankingRequestsBuilder mockInstanceBuilder(Integer bias) {
         OnboardingRankingRequests.OnboardingRankingRequestsBuilder out = OnboardingRankingRequests.builder();
+        int rankingValue = getRandomPositiveNumber(bias);
+
         return out.id("userId_%dinitiativeId_%d")
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
-                .rankingValue(getRandomPositiveNumber(bias))
+                .rankingValue(rankingValue)
+                .rankingValueOriginal(rankingValue)
+                .rankingValue2Show(rankingValue)
                 .beneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY)
                 .rank(bias);
 

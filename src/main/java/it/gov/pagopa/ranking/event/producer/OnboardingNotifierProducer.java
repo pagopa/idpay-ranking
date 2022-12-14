@@ -1,9 +1,9 @@
 package it.gov.pagopa.ranking.event.producer;
 
-import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
+import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 
 public interface OnboardingNotifierProducer {
 
-    public boolean notify(EvaluationDTO evaluationDTO);
+    boolean notify(EvaluationRankingDTO evaluationDTO);
 
 }
