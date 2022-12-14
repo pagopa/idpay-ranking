@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 
 import java.time.LocalDateTime;
@@ -44,9 +45,12 @@ public class OnboardingRankingRequestsFaker {
         return out.id("userId_%dinitiativeId_%d")
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
+                .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
-                .rankingValue(getRandomPositiveNumber(bias));
+                .rankingValue(getRandomPositiveNumber(bias))
+                .beneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY)
+                .rank(bias);
 
     }
 }

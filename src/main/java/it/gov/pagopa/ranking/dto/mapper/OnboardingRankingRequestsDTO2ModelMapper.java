@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,13 @@ public class OnboardingRankingRequestsDTO2ModelMapper implements Function<Onboar
         out.setId(buildId(onboardingRankingRequestDTO));
         out.setUserId(onboardingRankingRequestDTO.getUserId());
         out.setInitiativeId(onboardingRankingRequestDTO.getInitiativeId());
+        out.setOrganizationId(onboardingRankingRequestDTO.getOrganizationId());
         out.setAdmissibilityCheckDate(onboardingRankingRequestDTO.getAdmissibilityCheckDate());
         out.setCriteriaConsensusTimestamp(onboardingRankingRequestDTO.getCriteriaConsensusTimestamp());
         out.setRankingValue(onboardingRankingRequestDTO.getRankingValue());
         out.setRankingValueOriginal(onboardingRankingRequestDTO.getRankingValue());
+        out.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY);
+        // TODO handle ONBOARDING_KO
 
         return out;
     }

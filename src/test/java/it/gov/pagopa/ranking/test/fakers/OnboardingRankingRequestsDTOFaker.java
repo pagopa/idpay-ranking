@@ -3,7 +3,6 @@ package it.gov.pagopa.ranking.test.fakers;
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
-import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -34,7 +33,7 @@ public class OnboardingRankingRequestsDTOFaker {
     }
 
     /**
-     * It will return an example of {@link OnboardingRankingRequests}. Providing a bias, it will return a pseudo-casual object
+     * It will return an example of {@link OnboardingRankingRequestDTO}. Providing a bias, it will return a pseudo-casual object
      */
     public static OnboardingRankingRequestDTO mockInstance(Integer bias) {
         return mockInstanceBuilder(bias).build();
@@ -44,6 +43,7 @@ public class OnboardingRankingRequestsDTOFaker {
         OnboardingRankingRequestDTO.OnboardingRankingRequestDTOBuilder out = OnboardingRankingRequestDTO.builder();
         return out.userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
+                .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
                 .rankingValue(getRandomPositiveNumber(bias));
