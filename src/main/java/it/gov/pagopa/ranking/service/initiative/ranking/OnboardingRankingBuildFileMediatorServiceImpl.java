@@ -64,7 +64,7 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
     }
 
     private Path sign(Path localRankingFilePath, InitiativeConfig initiativeConfig) {
-        Path signedFilePath = p7mSignerService.sign(localRankingFilePath);
+        Path signedFilePath = p7mSignerService.sign(Path.of(initiativeConfig.getRankingFilePath()));
         initiativeConfig.setRankingFilePath(signedFilePath.toString());
 
         // TODO delete csv
@@ -74,21 +74,18 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
 
     private void uploadFileAndSaveUpdatedInitiative(Path signedFilePath, InitiativeConfig initiativeConfig) {
 
-        try(InputStream signedFileStream = Files.newInputStream(signedFilePath)) {
-            rankingBlobClient.uploadFile(
-                    signedFileStream,
-                    signedFilePath.toString(),
-                    "application/pkcs7-mime"
-            );
+        rankingBlobClient.uploadFile(
+                signedFilePath,
+                initiativeConfig.getRankingFilePath(),
+                "application/pkcs7-mime");
 
-            // TODO delete local p7m
+        // TODO delete local p7m
 
-            initiativeConfig.setRankingStatus(RankingStatus.READY);
-            initiativeConfigRepository.save(initiativeConfig);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot read signed file: %s".formatted(signedFilePath), e);
-        }
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
+        initiativeConfigRepository.save(initiativeConfig);
 
     }
+
+
 
 }
