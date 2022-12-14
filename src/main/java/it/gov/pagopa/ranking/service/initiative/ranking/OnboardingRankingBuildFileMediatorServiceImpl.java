@@ -64,8 +64,8 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
     }
 
     private Path sign(Path localRankingFilePath, InitiativeConfig initiativeConfig) {
-        Path signedFilePath = p7mSignerService.sign(Path.of(initiativeConfig.getRankingFilePath()));
-        initiativeConfig.setRankingFilePath(signedFilePath.toString());
+        Path signedFilePath = p7mSignerService.sign(localRankingFilePath);
+        initiativeConfig.setRankingFilePath(initiativeConfig.getRankingFilePath().concat(".p7m"));
 
         // TODO delete csv
 
