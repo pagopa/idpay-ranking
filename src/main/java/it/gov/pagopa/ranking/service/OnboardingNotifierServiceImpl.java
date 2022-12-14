@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.service;
 
-import it.gov.pagopa.ranking.dto.event.EvaluationDTO;
+import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
@@ -39,7 +39,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
         initiativeConfigService.save(initiative);
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
         onboardingRankingRequests.forEach(onboardingRankingRequest -> {
-            EvaluationDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest);
+            EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest);
             log.debug("[NOTIFY_CITIZEN] - notifying onboarding request to onboarding outcome topic: {}", evaluationDTO);
             try {
                 if (!onboardingNotifierProducer.notify(evaluationDTO)) {

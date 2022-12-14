@@ -7,14 +7,25 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class EvaluationRankingDTO extends EvaluationDTO{
+public class EvaluationRankingDTO {
+    @NotEmpty
+    private String userId;
+    @NotEmpty
+    private String initiativeId;
+    @NotEmpty
+    private String organizationId;
+    @NotNull
+    private LocalDateTime admissibilityCheckDate;
+    private LocalDateTime criteriaConsensusTimestamp;
     @NotEmpty
     private String status;
-    private Long ranking;
+    private Long rankingValue;
 }
