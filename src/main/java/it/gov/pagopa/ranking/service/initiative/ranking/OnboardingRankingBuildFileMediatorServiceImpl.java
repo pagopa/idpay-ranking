@@ -1,12 +1,19 @@
 package it.gov.pagopa.ranking.service.initiative.ranking;
 
+import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
+import it.gov.pagopa.ranking.model.RankingStatus;
+import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.service.RankingMaterializerService;
 import it.gov.pagopa.ranking.service.initiative.ranking.retrieve.OnboardingRankingRuleEndedRetrieverService;
+import it.gov.pagopa.ranking.service.sign.P7mSignerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -15,10 +22,16 @@ import java.util.List;
 public class OnboardingRankingBuildFileMediatorServiceImpl implements OnboardingRankingBuildFileMediatorService{
     private final OnboardingRankingRuleEndedRetrieverService onboardingRankingRuleEndedRetrieverService;
     private final RankingMaterializerService rankingMaterializerService;
+    private final P7mSignerService p7mSignerService;
+    private final InitiativeRankingBlobClient rankingBlobClient;
+    private final InitiativeConfigRepository initiativeConfigRepository;
 
-    public OnboardingRankingBuildFileMediatorServiceImpl(OnboardingRankingRuleEndedRetrieverService onboardingRankingRuleEndedRetrieverService, RankingMaterializerService rankingMaterializerService) {
+    public OnboardingRankingBuildFileMediatorServiceImpl(OnboardingRankingRuleEndedRetrieverService onboardingRankingRuleEndedRetrieverService, RankingMaterializerService rankingMaterializerService, P7mSignerService p7mSignerService, InitiativeRankingBlobClient rankingBlobClient, InitiativeConfigRepository initiativeConfigRepository) {
         this.onboardingRankingRuleEndedRetrieverService = onboardingRankingRuleEndedRetrieverService;
         this.rankingMaterializerService = rankingMaterializerService;
+        this.p7mSignerService = p7mSignerService;
+        this.rankingBlobClient = rankingBlobClient;
+        this.initiativeConfigRepository = initiativeConfigRepository;
     }
 
     @Scheduled(cron = "${app.ranking-build-file.retrieve-initiative.schedule}")
@@ -39,13 +52,43 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
                         initiativeConfig.getInitiativeId(),
                         localRankingFilePath);
 
-                //TODO sign and upload ranking file
+                Path signedFilePath = sign(localRankingFilePath, initiativeConfig);
+
+                uploadFileAndSaveUpdatedInitiative(signedFilePath, initiativeConfig);
             }
         }else{
             log.debug("[RANKING_BUILD_ONBOARDING_RANKING_FILE] There aren't ended initiatives");
         }
 
         return initiativeEndOnboardingDate;
+    }
+
+    private Path sign(Path localRankingFilePath, InitiativeConfig initiativeConfig) {
+        Path signedFilePath = p7mSignerService.sign(localRankingFilePath);
+        initiativeConfig.setRankingFilePath(signedFilePath.toString());
+
+        // TODO delete csv
+
+        return signedFilePath;
+    }
+
+    private void uploadFileAndSaveUpdatedInitiative(Path signedFilePath, InitiativeConfig initiativeConfig) {
+
+        try(InputStream signedFileStream = Files.newInputStream(signedFilePath)) {
+            rankingBlobClient.uploadFile(
+                    signedFileStream,
+                    signedFilePath.toString(),
+                    "application/pkcs7-mime"
+            );
+
+            // TODO delete local p7m
+
+            initiativeConfig.setRankingStatus(RankingStatus.READY);
+            initiativeConfigRepository.save(initiativeConfig);
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read signed file: %s".formatted(signedFilePath), e);
+        }
+
     }
 
 }
