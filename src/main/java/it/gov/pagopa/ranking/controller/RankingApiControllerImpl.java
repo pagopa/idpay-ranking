@@ -27,13 +27,8 @@ public class RankingApiControllerImpl implements RankingApiController{
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
                 initiativeId, organizationId, page, size);
 
-        List<RankingRequestsApiDTO> result = rankingRequestsApiService.findByInitiativeId(organizationId, initiativeId, page, size, filter);
+        return rankingRequestsApiService.findByInitiativeId(organizationId, initiativeId, page, size, filter);
 
-        if (result == null) {
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
-        } else {
-            return result;
-        }
     }
 
     @Override
@@ -41,13 +36,7 @@ public class RankingApiControllerImpl implements RankingApiController{
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
                 initiativeId, organizationId, page, size);
 
-        RankingPageDTO result = rankingRequestsApiService.findByInitiativeIdPaged(organizationId, initiativeId, page, size, filter);
-
-        if (result == null) {
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
-        } else {
-            return result;
-        }
+        return rankingRequestsApiService.findByInitiativeIdPaged(organizationId, initiativeId, page, size, filter);
     }
 
     @Override

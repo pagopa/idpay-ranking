@@ -40,7 +40,6 @@ class RankingRequestsApiServiceImplTest {
     @Mock private OnboardingRankingRequestsRepository requestsRepositoryMock;
     @Mock private RankingContextHolderService contextHolderServiceMock;
     @Mock private OnboardingNotifierService onboardingNotifierService;
-    @Mock private InitiativeConfigService initiativeConfigService;
     private final OnboardingRankingRequest2RankingRequestsApiDTOMapper mapper = new OnboardingRankingRequest2RankingRequestsApiDTOMapper();
     private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper = new PageOnboardingRequests2RankingPageDTOMapper();
 
@@ -48,7 +47,7 @@ class RankingRequestsApiServiceImplTest {
 
     @BeforeEach
     void init() {
-        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, pageDtoMapper, contextHolderServiceMock, onboardingNotifierService, initiativeConfigService);
+        service = new RankingRequestsApiServiceImpl(requestsRepositoryMock, mapper, pageDtoMapper, contextHolderServiceMock, onboardingNotifierService);
     }
 
     @Test
@@ -121,17 +120,17 @@ class RankingRequestsApiServiceImplTest {
     }
 
     @Test
-    void testInitiativeNull() {
+    void testInitiativeNotFound() {
         // Given
 
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.any(), Mockito.any()))
-                .thenReturn(null);
+                .thenThrow(ClientExceptionNoBody.class);
 
         // When
-        List<RankingRequestsApiDTO> results = service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
+        Executable executable = () -> service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
 
         // Then
-        Assertions.assertNull(results);
+        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
     }
 
     @Test
@@ -201,17 +200,17 @@ class RankingRequestsApiServiceImplTest {
     }
 
     @Test
-    void testPagedInitiativeNull() {
+    void testPagedInitiativeNotFound() {
         // Given
 
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.any(), Mockito.any()))
-                .thenReturn(null);
+                .thenThrow(ClientExceptionNoBody.class);
 
         // When
-        RankingPageDTO result = service.findByInitiativeIdPaged("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
+        Executable executable = () -> service.findByInitiativeIdPaged("orgId", "initiativeId", 0, 10, new RankingRequestFilter());
 
         // Then
-        Assertions.assertNull(result);
+        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
     }
 
     @Test
@@ -221,8 +220,8 @@ class RankingRequestsApiServiceImplTest {
         initiativeConfig.setRankingStatus(RankingStatus.READY);
 
         // When
-        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
-                .thenReturn(Optional.of(initiativeConfig));
+        Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(initiativeConfig);
         List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
         OnboardingRankingRequests rankingRequests = new OnboardingRankingRequests();
         onboardingRankingRequests.add(rankingRequests);
@@ -242,23 +241,12 @@ class RankingRequestsApiServiceImplTest {
         initiativeConfig.setRankingStatus(RankingStatus.WAITING_END);
 
         // When
-        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
-                .thenReturn(Optional.of(initiativeConfig));
+        Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(initiativeConfig);
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
         IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
-    }
-
-    @Test
-    void testNotifyWithNoInitiative() {
-        // When
-        Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
-                .thenReturn(Optional.empty());
-
-        // Then
-        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
-        ClientExceptionNoBody clientExceptionNoBody = Assertions.assertThrows(ClientExceptionNoBody.class, executable);
     }
 
 }

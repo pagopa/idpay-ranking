@@ -57,14 +57,12 @@ class InitiativePersistenceMediatorImplTest {
         InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
         Mockito.when(initiativeBuild2ConfigMapperMock.apply(initiativeRequest)).thenReturn(initiativeConfig);
 
-        Mockito.when(initiativeConfigServiceMock.save(initiativeConfig)).thenAnswer(i -> i.getArguments()[0]);
         // When
         initiativePersistenceMediator.execute(MessageBuilder.withPayload(TestUtils.jsonSerializer(initiativeRequest)).build());
 
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock).save(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock).setInitiativeConfig(Mockito.any());
     }
 
@@ -83,7 +81,6 @@ class InitiativePersistenceMediatorImplTest {
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock,Mockito.never()).save(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
     }
 
@@ -102,7 +99,6 @@ class InitiativePersistenceMediatorImplTest {
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock,Mockito.never()).save(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
     }
 
@@ -124,7 +120,6 @@ class InitiativePersistenceMediatorImplTest {
 
         InitiativeConfig expectedToSave = getInitiativeConfigExpected(initiativeRequest);
         Mockito.when(initiativeBuild2ConfigMapperMock.apply(initiativeRequest)).thenReturn(expectedToSave);
-        Mockito.when(initiativeConfigServiceMock.save(Mockito.any())).thenAnswer(i -> i.getArguments()[0]);
 
 
         // When
@@ -133,7 +128,6 @@ class InitiativePersistenceMediatorImplTest {
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock).save(expectedToSave);
         Mockito.verify(rankingContextHolderServiceMock).setInitiativeConfig(Mockito.any());
     }
 
@@ -160,7 +154,6 @@ class InitiativePersistenceMediatorImplTest {
         // Then
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
-        Mockito.verify(initiativeConfigServiceMock,Mockito.never()).save(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
     }
 

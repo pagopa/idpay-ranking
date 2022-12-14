@@ -20,23 +20,23 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
 
     private final OnboardingNotifierProducer onboardingNotifierProducer;
     private final OnboardingRankingRequest2EvaluationMapper onboardingRankingRequest2EvaluationMapper;
-    private final InitiativeConfigService initiativeConfigService;
+    private final RankingContextHolderService rankingContextHolderService;
 
     public OnboardingNotifierServiceImpl(
             OnboardingNotifierProducer onboardingNotifierProducer,
             OnboardingRankingRequest2EvaluationMapper onboardingRankingRequest2EvaluationMapper,
-            InitiativeConfigService initiativeConfigService
+            RankingContextHolderService rankingContextHolderService
             ) {
         this.onboardingNotifierProducer = onboardingNotifierProducer;
         this.onboardingRankingRequest2EvaluationMapper = onboardingRankingRequest2EvaluationMapper;
-        this.initiativeConfigService = initiativeConfigService;
+        this.rankingContextHolderService = rankingContextHolderService;
     }
 
     @Override
     @Async
     public void callOnboardingNotifier(InitiativeConfig initiative, List<OnboardingRankingRequests> onboardingRankingRequests) {
         initiative.setRankingStatus(RankingStatus.PUBLISHING);
-        initiativeConfigService.save(initiative);
+        rankingContextHolderService.setInitiativeConfig(initiative);
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
         onboardingRankingRequests.forEach(onboardingRankingRequest -> {
             EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest);
@@ -51,7 +51,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
         }); //Check if parallel is needed and calculate Numb of Threads necessary
         initiative.setRankingPublishedTimestamp(LocalDateTime.now());
         initiative.setRankingStatus(RankingStatus.COMPLETED);
-        initiativeConfigService.save(initiative); //TODO need to send the modification to someone?
+        rankingContextHolderService.setInitiativeConfig(initiative); //TODO need to send the modification to someone?
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
     }
 }
