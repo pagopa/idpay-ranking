@@ -4,6 +4,7 @@ import com.mongodb.MongoException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequestsDTO2ModelMapper;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.TestPropertySource;
@@ -39,6 +41,9 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
     @SpyBean
     private OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
 
+    @Autowired
+    private OnboardingRankingRequestsDTO2ModelMapper mapper;
+
     @AfterEach
     void cleanData(){onboardingRankingRequestsRepository.deleteAll();}
 
@@ -61,6 +66,8 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         long timeEnd=System.currentTimeMillis();
 
         Assertions.assertEquals(validOnboardings, countSaved);
+
+        checkStoredOnboardingRequests();
 
         checkErrorsPublished(notValidOnboardings, maxWaitingMs, errorUseCases);
 
@@ -95,16 +102,28 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         );
     }
 
+    private void checkStoredOnboardingRequests() {
+        for (OnboardingRankingRequests o : onboardingRankingRequestsRepository.findAll()) {
+            int bias = Integer.parseInt(o.getUserId().substring(7));
+            Assertions.assertEquals(
+                    mapper.apply(OnboardingRankingRequestsDTOFaker.mockInstanceBuilder(bias)
+                            .onboardingKo(bias%3==2)
+                            .build())
+                    , o);
+        }
+    }
+
     private List<String> buildValidPayloads(int bias, int n) {
         return IntStream.range(bias, bias + n)
-                .mapToObj(OnboardingRankingRequestsDTOFaker::mockInstance)
+                .mapToObj(i -> OnboardingRankingRequestsDTOFaker.mockInstanceBuilder(i)
+                        .onboardingKo(i%3==2)
+                        .build())
                 .map(TestUtils::jsonSerializer)
                 .toList();
     }
 
     private long waitForOnboardingStored(int N) {
         long[] countSaved={0};
-        //noinspection ConstantConditions
         waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved onboarding ranking request, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }

@@ -21,8 +21,8 @@ public class OnboardingRankingRequestsDTO2ModelMapper implements Function<Onboar
         out.setRankingValue(onboardingRankingRequestDTO.getRankingValue());
         out.setRankingValueOriginal(onboardingRankingRequestDTO.getRankingValue());
         out.setBeneficiaryRankingStatus(onboardingRankingRequestDTO.isOnboardingKo()
-                ? BeneficiaryRankingStatus.TO_NOTIFY
-                : BeneficiaryRankingStatus.ONBOARDING_KO);
+                ? BeneficiaryRankingStatus.ONBOARDING_KO
+                : BeneficiaryRankingStatus.TO_NOTIFY);
 
         return out;
     }

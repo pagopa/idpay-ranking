@@ -46,7 +46,8 @@ public class OnboardingRankingRequestsDTOFaker {
                 .organizationId("organizationId_%d".formatted(bias))
                 .admissibilityCheckDate(LocalDateTime.of(2022,11,22,12,30,30))
                 .criteriaConsensusTimestamp(LocalDateTime.of(2022, 11,22, 12,30, 30))
-                .rankingValue(getRandomPositiveNumber(bias));
+                .rankingValue(getRandomPositiveNumber(bias))
+                .onboardingKo(false);
 
     }
 }
