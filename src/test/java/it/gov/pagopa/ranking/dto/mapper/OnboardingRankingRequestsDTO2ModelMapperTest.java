@@ -43,7 +43,7 @@ class OnboardingRankingRequestsDTO2ModelMapperTest {
         OnboardingRankingRequests result = mapper.apply(requestDto, initiative);
 
         // Then
-        commonChecks(requestDto, result, Integer.MAX_VALUE);
+        commonChecks(requestDto, result, Long.MAX_VALUE);
 
         Assertions.assertEquals(BeneficiaryRankingStatus.ONBOARDING_KO, result.getBeneficiaryRankingStatus());
     }
