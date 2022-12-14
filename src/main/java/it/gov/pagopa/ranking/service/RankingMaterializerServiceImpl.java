@@ -71,6 +71,8 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             List<OnboardingRankingRequests> requestsToWrite = new ArrayList<>(savableEntitiesMaxSize);
             List<OnboardingRankingRequests> requestsToSave = new ArrayList<>(savableEntitiesMaxSize);
 
+            boolean useHeader = true;
+
             while (!(pageContent = onboardingRankingRequestsRepository.findAllByInitiativeId(
                     initiativeId,
                     PageRequest.of(page++, size, sorting))
@@ -88,7 +90,8 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
 
                     if (requestsToSave.size() == savableEntitiesMaxSize) {
                         saveRequestsAndClearList(requestsToSave);
-                        writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
+                        writeRequestsAndClearList(outputCsvWriter, requestsToWrite, useHeader);
+                        if(useHeader) useHeader = false;
                     }
                 }
             }
@@ -96,7 +99,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
                 saveRequestsAndClearList(requestsToSave);
 
             if (!requestsToWrite.isEmpty())
-                writeRequestsAndClearList(outputCsvWriter, page, requestsToWrite);
+                writeRequestsAndClearList(outputCsvWriter, requestsToWrite, useHeader);
         } catch (IOException e) {
             throw new IllegalStateException("[RANKING_MATERIALIZER] Failed to create FileWriter", e);
         }
@@ -104,8 +107,8 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
         return Path.of(localFileName);
     }
 
-    private void writeRequestsAndClearList(FileWriter outputCsvWriter, int page, List<OnboardingRankingRequests> requestsToWrite) {
-        csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, page == 1);
+    private void writeRequestsAndClearList(FileWriter outputCsvWriter, List<OnboardingRankingRequests> requestsToWrite, boolean useHeader) {
+        csvWriterService.write(buildCsvLines(requestsToWrite), outputCsvWriter, useHeader);
         requestsToWrite.clear();
     }
 

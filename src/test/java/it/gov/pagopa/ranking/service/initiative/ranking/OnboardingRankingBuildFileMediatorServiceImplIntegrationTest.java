@@ -2,10 +2,13 @@ package it.gov.pagopa.ranking.service.initiative.ranking;
 
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
+import it.gov.pagopa.ranking.connector.azure.storage.AzureBlobClient;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.service.sign.P7mSignerService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import org.junit.jupiter.api.AfterEach;
@@ -19,11 +22,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @TestPropertySource(properties = {
@@ -38,6 +42,10 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private static final int RANKING_SIZE = 51; // must be a multiple of 3
     private static final String OTHER_INITIATIVE_ID = "OTHER_INITIATIVE_ID";
     private static final int N = 9; // must be a multiple of 3
+    private static final String EXPECTED_FILE_PATH = "%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID);
+    private static final Path LOCAL_CSV_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv".formatted(ORGANIZATION_ID, INITIATIVE_ID));
+    private static final Path LOCAL_P7M_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID));
+    private static final String EXPECTED_CSV_HEADER = "\"userId\";\"criteriaConsensusTimestamp\";\"rankingValue\";\"ranking\";\"status\"";
 
 
     @Value("${app.ranking-build-file.retrieve-initiative.day-before}")
@@ -53,6 +61,9 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
     @Autowired
     private OnboardingRankingBuildFileMediatorServiceImpl onboardingRankingBuildFileMediatorService;
+
+    @Autowired
+    private P7mSignerService p7mSignerService;
 
     private final List<OnboardingRankingRequests> testData = new ArrayList<>();
 
@@ -108,11 +119,22 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     }
 
     @Test
-    void test() {
+    void test() throws IOException {
+        // When
         onboardingRankingBuildFileMediatorService.schedule();
 
+        // materialize
         checkRankingMaterializeResult();
-        // TODO verify uploaded file
+
+        // sign & upload
+        checkUpdatedInitiative();
+
+        checkResultCsvFile();
+
+        Assertions.assertTrue(p7mSignerService.verifySign(LOCAL_P7M_PATH));
+
+        // TODO verify upload Azure
+
     }
 
     private void checkRankingMaterializeResult() {
@@ -142,6 +164,38 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
                 Assertions.assertEquals(BeneficiaryRankingStatus.TO_NOTIFY, entity.getBeneficiaryRankingStatus());
             }
             ++i;
+        }
+    }
+
+    private void checkUpdatedInitiative() {
+        Optional<InitiativeConfig> optional = initiativeConfigRepository.findById(INITIATIVE_ID);
+        Assertions.assertTrue(optional.isPresent());
+
+        InitiativeConfig resultInitiative = optional.get();
+        Assertions.assertEquals(RANKING_SIZE, resultInitiative.getTotalEligibleOk());
+        Assertions.assertEquals(N, resultInitiative.getTotalEligibleKo());
+        Assertions.assertEquals(N, resultInitiative.getTotalOnboardingKo());
+        Assertions.assertEquals(EXPECTED_FILE_PATH, resultInitiative.getRankingFilePath());
+    }
+
+    private void checkResultCsvFile() throws IOException {
+        List<String> lines = Files.readAllLines(LOCAL_CSV_PATH);
+        Assertions.assertEquals(70, lines.size());
+
+        testData.sort(
+                Comparator.comparing(OnboardingRankingRequests::getRankingValue)
+                        .thenComparing(OnboardingRankingRequests::getCriteriaConsensusTimestamp)
+        );
+        for(int i=0; i<lines.size();i++) {
+            String l = lines.get(i);
+            if(i==0)
+                Assertions.assertEquals(EXPECTED_CSV_HEADER, l);
+            else {
+                OnboardingRankingRequests entry = testData.get(i-1);
+                if(entry.getInitiativeId().equals(INITIATIVE_ID)) {
+                    Assertions.assertTrue(l.contains(entry.getUserId()));
+                }
+            }
         }
     }
 
