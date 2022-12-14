@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -63,7 +63,6 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest
 @EmbeddedKafka(topics = {
         "${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}",
-        "${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}",
         "${spring.cloud.stream.bindings.errors-out-0.destination}",
 }, controlledShutdown = true)
 @TestPropertySource(
@@ -81,7 +80,6 @@ import static org.awaitility.Awaitility.await;
                 "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.kafka.binder.zkNodes=${spring.embedded.zookeeper.connect}",
                 "spring.cloud.stream.binders.kafka-onboarding-ranking-requests.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
-                "spring.cloud.stream.binders.kafka-initiative-ranking.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.binders.kafka-errors.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 //endregion
 
@@ -92,7 +90,7 @@ import static org.awaitility.Awaitility.await;
                 //endregion
         })
 @AutoConfigureDataMongo
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient
 public abstract class BaseIntegrationTest {
     @Autowired
     protected EmbeddedKafkaBroker kafkaBroker;
@@ -118,15 +116,11 @@ public abstract class BaseIntegrationTest {
 
     @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}")
     protected String topicOnboardingRankingRequest;
-    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}")
-    protected String topicInitiativeRanking;
     @Value("${spring.cloud.stream.bindings.errors-out-0.destination}")
     protected String topicErrors;
 
     @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.group}")
     protected String groupIdOnboardingRankingRequest;
-    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}")
-    protected String groupIdInitiativeRanking;
 
     @BeforeAll
     public static void unregisterPreviouslyKafkaServers() throws MalformedObjectNameException, MBeanRegistrationException, InstanceNotFoundException {
@@ -333,7 +327,7 @@ public abstract class BaseIntegrationTest {
     protected final Pattern errorUseCaseIdPatternMatch = getErrorUseCaseIdPatternMatch();
 
     protected Pattern getErrorUseCaseIdPatternMatch() {
-        return Pattern.compile("\"initiativeId\":\"initiativeId_([0-9]+)_?[^\"]*\"");
+        return Pattern.compile("\"initiativeId\":\"id_([0-9]+)_?[^\"]*\"");
     }
 
     protected void checkErrorsPublished(int notValidRules, long maxWaitingMs, List<Pair<Supplier<String>, java.util.function.Consumer<ConsumerRecord<String, String>>>> errorUseCases) {

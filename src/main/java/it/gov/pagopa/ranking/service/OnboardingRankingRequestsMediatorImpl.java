@@ -40,7 +40,7 @@ public class OnboardingRankingRequestsMediatorImpl extends BaseKafkaConsumer<Onb
             OnboardingRankingRequests onboardingRankingRequests = onboardingRankingRequestsDTO2ModelMapper.apply(onboardingRankingRequestDTO);
             onboardingRankingRequestsService.save(onboardingRankingRequests);
         } catch (MongoException e){
-            errorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", true, e);
+            errorNotifierService.notifyRanking(message, "[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", true, e);
         }
     }
 
@@ -51,6 +51,6 @@ public class OnboardingRankingRequestsMediatorImpl extends BaseKafkaConsumer<Onb
 
     @Override
     protected Consumer<Throwable> onDeserializationError(Message<String> message) {
-        return e -> errorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] Unexpected JSON", true, e);
+        return e -> errorNotifierService.notifyRanking(message, "[ONBOARDING_RANKING_REQUEST] Unexpected JSON", true, e);
     }
 }

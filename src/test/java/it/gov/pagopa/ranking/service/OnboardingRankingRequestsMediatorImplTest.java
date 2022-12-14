@@ -55,7 +55,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock).apply(Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
+        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyRanking(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
     }
 
     @Test
@@ -72,7 +72,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock, Mockito.never()).apply(Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
+        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyRanking(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
     }
 
     @Test
@@ -87,7 +87,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock, Mockito.never()).apply(Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(JsonProcessingException.class));
+        Mockito.verify(errorNotifierServiceMock).notifyRanking(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(JsonProcessingException.class));
     }
 
     @Test
@@ -107,6 +107,6 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock).apply(Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(MongoException.class));
+        Mockito.verify(errorNotifierServiceMock).notifyRanking(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(MongoException.class));
     }
 }
