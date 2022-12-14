@@ -5,7 +5,6 @@ import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMappe
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +21,6 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
         this.onboardingRankingRequest2EvaluationMapper = onboardingRankingRequest2EvaluationMapper;
     }
 
-    @Async
     @Override
     public void callOnboardingNotifier(OnboardingRankingRequests onboardingRankingRequests) {
         EvaluationDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequests);
