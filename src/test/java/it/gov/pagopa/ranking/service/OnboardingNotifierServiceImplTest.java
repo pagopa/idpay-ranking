@@ -27,7 +27,7 @@ class OnboardingNotifierServiceImplTest {
         // Given
         OnboardingRankingRequest2EvaluationMapper mapper = Mockito.mock(OnboardingRankingRequest2EvaluationMapper.class);
         OnboardingNotifierProducer onboardingNotifierProducer = Mockito.mock(OnboardingNotifierProducer.class);
-        InitiativeConfigService initiativeConfigService = Mockito.mock(InitiativeConfigService.class);
+        RankingContextHolderService rankingContextHolderService = Mockito.mock(RankingContextHolderService.class);
 
         EvaluationDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
@@ -38,12 +38,12 @@ class OnboardingNotifierServiceImplTest {
         Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class))).thenReturn(evaluationDTO);
         Mockito.when(onboardingNotifierProducer.notify(Mockito.any(EvaluationRankingDTO.class))).thenReturn(true);
 
-        OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, initiativeConfigService);
+        OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, rankingContextHolderService);
         onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
 
         Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class));
         Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size())).notify(Mockito.any(EvaluationRankingDTO.class));
-        Mockito.verify(initiativeConfigService, Mockito.times(2)).save(Mockito.any(InitiativeConfig.class));
+        Mockito.verify(rankingContextHolderService, Mockito.times(2)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 
     @Test
@@ -55,7 +55,7 @@ class OnboardingNotifierServiceImplTest {
         // Given
         OnboardingRankingRequest2EvaluationMapper mapper = Mockito.mock(OnboardingRankingRequest2EvaluationMapper.class);
         OnboardingNotifierProducer onboardingNotifierProducer = Mockito.mock(OnboardingNotifierProducer.class);
-        InitiativeConfigService initiativeConfigService = Mockito.mock(InitiativeConfigService.class);
+        RankingContextHolderService rankingContextHolderService = Mockito.mock(RankingContextHolderService.class);
 
         EvaluationDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
@@ -66,11 +66,11 @@ class OnboardingNotifierServiceImplTest {
         Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class))).thenReturn(evaluationDTO);
         Mockito.when(onboardingNotifierProducer.notify(Mockito.any(EvaluationRankingDTO.class))).thenReturn(false);
 
-        OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, initiativeConfigService);
+        OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, rankingContextHolderService);
         onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
 
         Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class));
         Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size())).notify(Mockito.any(EvaluationRankingDTO.class));
-        Mockito.verify(initiativeConfigService, Mockito.times(2)).save(Mockito.any(InitiativeConfig.class));
+        Mockito.verify(rankingContextHolderService, Mockito.times(2)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 }

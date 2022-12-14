@@ -33,42 +33,36 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     private final PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper;
     private final RankingContextHolderService rankingContextHolderService;
     private final OnboardingNotifierService onboardingNotifierService;
-    private final InitiativeConfigService initiativeConfigService;
 
     public RankingRequestsApiServiceImpl(
             OnboardingRankingRequestsRepository onboardingRankingRequestsRepository,
             OnboardingRankingRequest2RankingRequestsApiDTOMapper rankingRequestsApiDTOMapper,
             PageOnboardingRequests2RankingPageDTOMapper pageDtoMapper,
             RankingContextHolderService rankingContextHolderService,
-            OnboardingNotifierService onboardingNotifierService,
-            InitiativeConfigService initiativeConfigService) {
+            OnboardingNotifierService onboardingNotifierService
+    ) {
         this.onboardingRankingRequestsRepository = onboardingRankingRequestsRepository;
         this.dtoMapper = rankingRequestsApiDTOMapper;
         this.pageDtoMapper = pageDtoMapper;
         this.rankingContextHolderService = rankingContextHolderService;
         this.onboardingNotifierService = onboardingNotifierService;
-        this.initiativeConfigService = initiativeConfigService;
     }
 
     @Override
     public List<RankingRequestsApiDTO> findByInitiativeId(String organizationId, String initiativeId, int page, int size, RankingRequestFilter filter) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
-        if (initiative == null) {
-            return null;
+        if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
+            return onboardingRankingRequestsRepository.findAllBy(
+                            initiativeId,
+                            filter,
+                            PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
+                    ).getContent()
+                    .stream()
+                    .map(dtoMapper::apply)
+                    .toList();
         } else {
-            if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
-                return onboardingRankingRequestsRepository.findAllBy(
-                                initiativeId,
-                                filter,
-                                PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
-                        ).getContent()
-                        .stream()
-                        .map(dtoMapper::apply)
-                        .toList();
-            } else {
-                return Collections.emptyList();
-            }
+            return Collections.emptyList();
         }
     }
 
@@ -76,50 +70,41 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     public RankingPageDTO findByInitiativeIdPaged(String organizationId, String initiativeId, int page, int size, RankingRequestFilter filter) {
 
         InitiativeConfig initiative = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
-        if (initiative == null) {
-            return null;
+
+        Page<OnboardingRankingRequests> pageRequests = new PageImpl<>(Collections.emptyList());
+        if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
+            pageRequests = onboardingRankingRequestsRepository.findAllBy(
+                    initiativeId,
+                    filter,
+                    PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
+            );
+
+            return pageDtoMapper.apply(
+                    pageRequests,
+                    pageRequests.getContent().stream().map(dtoMapper::apply).toList(),
+                    initiative
+            );
         } else {
-
-            Page<OnboardingRankingRequests> pageRequests = new PageImpl<>(Collections.emptyList());
-            if (!initiative.getRankingStatus().equals(RankingStatus.WAITING_END)) {
-                pageRequests = onboardingRankingRequestsRepository.findAllBy(
-                        initiativeId,
-                        filter,
-                        PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
-                );
-
-                return pageDtoMapper.apply(
-                        pageRequests,
-                        pageRequests.getContent().stream().map(dtoMapper::apply).toList(),
-                        initiative
-                );
-            } else {
-               return pageDtoMapper.apply(
-                       pageRequests,
-                       Collections.emptyList(),
-                       initiative
-               );
-            }
+           return pageDtoMapper.apply(
+                   pageRequests,
+                   Collections.emptyList(),
+                   initiative
+           );
         }
     }
 
     @Override
     public void notifyCitizenRankings(String organizationId, String initiativeId) {
         String genericExceptionMessage;
-        InitiativeConfig initiative = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(
-                () -> {
-                    String exceptionMessage = "Initiative not found";
-                    log.error(exceptionMessage);
-                    return new ClientExceptionNoBody(HttpStatus.NOT_FOUND, new IllegalStateException("[NOTIFY_CITIZEN]-[ENTITY-DOCUMENT]-[Error] - " + exceptionMessage));
-                });
-        if(initiative.getRankingStatus().equals(RankingStatus.READY)){
+        InitiativeConfig initiativeConfig = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
+        if(initiativeConfig.getRankingStatus().equals(RankingStatus.READY)){
             List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
             if(!onboardingRankingRequests.isEmpty()) {
                 log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
-                onboardingNotifierService.callOnboardingNotifier(initiative, onboardingRankingRequests);
+                onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
             }
         }else {
-            genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiative.getRankingStatus());
+            genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiativeConfig.getRankingStatus());
             log.error(genericExceptionMessage);
             throw new IllegalStateException("[NOTIFY_CITIZEN]-[Error] - " + genericExceptionMessage);
         }
