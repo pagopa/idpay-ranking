@@ -5,6 +5,7 @@ import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -102,26 +104,20 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     }
 
     @Override
-    @Async
     public void notifyCitizenRankings(String organizationId, String initiativeId) {
         String genericExceptionMessage;
         InitiativeConfig initiative = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(
                 () -> {
                     String exceptionMessage = "Initiative not found";
                     log.error(exceptionMessage);
-                    return new IllegalStateException("[NOTIFY_CITIZEN]-[ENTITY-DOCUMENT]-[Error] - " + exceptionMessage);
+                    return new ClientExceptionNoBody(HttpStatus.NOT_FOUND, new IllegalStateException("[NOTIFY_CITIZEN]-[ENTITY-DOCUMENT]-[Error] - " + exceptionMessage));
                 });
         if(initiative.getRankingStatus().equals(RankingStatus.READY)){
             List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
             if(!onboardingRankingRequests.isEmpty()) {
-                initiative.setRankingStatus(RankingStatus.PUBLISHING);
-                initiativeConfigService.save(initiative);
                 log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
-                onboardingRankingRequests.forEach(onboardingNotifierService::callOnboardingNotifier); //Check if parallel is needed and calculate Numb of Threads necessary
+                onboardingNotifierService.callOnboardingNotifier(initiative, onboardingRankingRequests);
             }
-            initiative.setRankingPublishedTimestamp(LocalDateTime.now());
-            initiative.setRankingStatus(RankingStatus.COMPLETED);
-            initiativeConfigService.save(initiative); //TODO need to send the modification to someone?
         }else {
             genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiative.getRankingStatus());
             log.error(genericExceptionMessage);
