@@ -1,19 +1,21 @@
-package it.gov.pagopa.ranking.dto;
+package it.gov.pagopa.ranking.dto.event;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class OnboardingRankingRequestDTO {
+@SuperBuilder
+public class EvaluationRankingDTO {
     @NotEmpty
     private String userId;
     @NotEmpty
@@ -23,6 +25,7 @@ public class OnboardingRankingRequestDTO {
     @NotNull
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
-    private long rankingValue;
-    private boolean onboardingKo;
+    @NotEmpty
+    private String status;
+    private Long rankingValue;
 }

@@ -8,5 +8,9 @@ import java.util.List;
 
 public interface OnboardingRankingRequestsRepository extends MongoRepository<OnboardingRankingRequests,String>, OnboardingRankingRequestsRepositoryExtended {
 
+    Page<OnboardingRankingRequests> findByInitiativeId(String initiativeId, Pageable pageable);
+
+    List<OnboardingRankingRequests> findAllByOrganizationIdAndInitiativeId(String organizationId, String initiativeId);
+
     List<OnboardingRankingRequests> findAllByInitiativeId(String initiativeId, Pageable pageable);
 }

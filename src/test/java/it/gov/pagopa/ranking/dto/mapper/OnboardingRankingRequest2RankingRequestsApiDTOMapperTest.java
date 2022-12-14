@@ -14,6 +14,8 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         OnboardingRankingRequest2RankingRequestsApiDTOMapper mapper = new OnboardingRankingRequest2RankingRequestsApiDTOMapper();
 
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
+        request.setRankingValue(-1);
+        request.setRankingValueOriginal(-1);
 
         // When
         RankingRequestsApiDTO result = mapper.apply(request);
@@ -31,7 +33,7 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         Assertions.assertEquals(expected.getOrganizationId(), result.getOrganizationId());
         Assertions.assertEquals(expected.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(expected.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
-        Assertions.assertEquals(expected.getRankingValue(), result.getRankingValue());
+        Assertions.assertEquals(expected.getRankingValue2Show(), result.getRankingValue());
         Assertions.assertEquals(expected.getRank(), result.getRanking());
     }
 

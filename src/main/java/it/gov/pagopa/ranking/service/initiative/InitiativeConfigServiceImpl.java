@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import java.util.Optional;
+
 
 @Service
 public class InitiativeConfigServiceImpl implements InitiativeConfigService{
@@ -25,6 +27,11 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
     @Override
     public InitiativeConfig findById(String initiativeId) {
         return initiativeConfigRepository.findById(initiativeId).orElse(null);
+    }
+
+    @Override
+    public Optional<InitiativeConfig> findByIdOptional(String initiativeId) {
+        return initiativeConfigRepository.findById(initiativeId);
     }
 
     @Override
