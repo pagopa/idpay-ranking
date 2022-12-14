@@ -5,6 +5,7 @@ import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -227,7 +228,7 @@ class RankingRequestsApiServiceImplTest {
         onboardingRankingRequests.add(rankingRequests);
         Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
                 .thenReturn(onboardingRankingRequests);
-        Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(rankingRequests);
+        Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
@@ -257,7 +258,7 @@ class RankingRequestsApiServiceImplTest {
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
-        IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
+        ClientExceptionNoBody clientExceptionNoBody = Assertions.assertThrows(ClientExceptionNoBody.class, executable);
     }
 
 }
