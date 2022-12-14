@@ -214,10 +214,10 @@ class RankingRequestsApiServiceImplTest {
     }
 
     @Test
-    void givenInitiativeInPublishingStatus_thenNotifySuccess() {
+    void givenInitiativeInREADYStatus_thenNotifySuccess() {
         // Given organizationId and initiativeID on DB for Status Publishing
         InitiativeConfig initiativeConfig = new InitiativeConfig();
-        initiativeConfig.setRankingStatus(RankingStatus.PUBLISHING);
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
 
         // When
         Mockito.when(initiativeConfigService.findByIdOptional(Mockito.any()))
@@ -235,7 +235,7 @@ class RankingRequestsApiServiceImplTest {
     }
 
     @Test
-    void givenInitiativeNOTInPublishingStatus_thenThrowException() {
+    void givenInitiativeNOTInREADYStatus_thenThrowException() {
         // Given organizationId and initiativeID on DB for Status Publishing
         InitiativeConfig initiativeConfig = new InitiativeConfig();
         initiativeConfig.setRankingStatus(RankingStatus.WAITING_END);
