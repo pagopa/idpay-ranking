@@ -18,6 +18,12 @@ public class PageOnboardingRequests2RankingPageDTOMapper {
             InitiativeConfig initiativeConfig) {
         RankingPageDTO out = new RankingPageDTO();
 
+        String rankingFilePath = initiativeConfig.getRankingFilePath();
+        if(rankingFilePath!=null){
+            String[] pathSplit = rankingFilePath.split("/");
+            rankingFilePath=pathSplit[pathSplit.length-1];
+        }
+
         out.setContent(content);
         out.setPageNumber(pageOnboardingRequests.getNumber());
         out.setPageSize(pageOnboardingRequests.getSize());
@@ -26,7 +32,7 @@ public class PageOnboardingRequests2RankingPageDTOMapper {
         out.setRankingStatus(initiativeConfig.getRankingStatus());
         out.setRankingPublishedTimestamp(initiativeConfig.getRankingPublishedTimestamp());
         out.setRankingGeneratedTimestamp(initiativeConfig.getRankingGeneratedTimestamp());
-        out.setRankingFilePath(initiativeConfig.getRankingFilePath());
+        out.setRankingFilePath(rankingFilePath);
         out.setTotalEligibleOk(initiativeConfig.getTotalEligibleOk());
         out.setTotalEligibleKo(initiativeConfig.getTotalEligibleKo());
         out.setTotalOnboardingKo(initiativeConfig.getTotalOnboardingKo());
