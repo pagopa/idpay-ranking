@@ -21,7 +21,7 @@ public class ErrorManager {
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<ErrorDTO> handleException(RuntimeException error, HttpServletRequest request) {
         if(!(error instanceof ClientException clientException) || clientException.isPrintStackTrace()){
-            log.error("Something gone wrong handlind request: " + request.getRequestURI(), error);
+            log.error("Something gone wrong handling request: " + request.getRequestURI(), error);
         }
         if(error instanceof ClientExceptionNoBody clientExceptionNoBody){
             return ResponseEntity.status(clientExceptionNoBody.getHttpStatus()).build();
