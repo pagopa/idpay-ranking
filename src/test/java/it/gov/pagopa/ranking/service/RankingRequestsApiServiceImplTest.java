@@ -221,11 +221,45 @@ class RankingRequestsApiServiceImplTest {
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(initiativeConfig);
         List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
-        OnboardingRankingRequests rankingRequests = new OnboardingRankingRequests();
-        onboardingRankingRequests.add(rankingRequests);
+        OnboardingRankingRequests onboardingRankingRequest1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
+        OnboardingRankingRequests onboardingRankingRequest2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequest2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
+        onboardingRankingRequests.add(onboardingRankingRequest1);
+        onboardingRankingRequests.add(onboardingRankingRequest2);
         Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
                 .thenReturn(onboardingRankingRequests);
+        onboardingRankingRequests = onboardingRankingRequests.stream()
+                .filter(onboardingRankingRequest ->
+                        onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_KO) ||
+                                onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_OK)
+                )
+                .toList();
         Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenInitiativeInREADYStatusAndNobodyEligible_thenNotifyDoNothing() {
+        // Given organizationId and initiativeID on DB for Status Publishing
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
+
+        // When
+        Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(initiativeConfig);
+        List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
+        OnboardingRankingRequests onboardingRankingRequest1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
+        OnboardingRankingRequests onboardingRankingRequest2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequest2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY);
+        onboardingRankingRequests.add(onboardingRankingRequest1);
+        onboardingRankingRequests.add(onboardingRankingRequest2);
+        Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
+                .thenReturn(onboardingRankingRequests);
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");

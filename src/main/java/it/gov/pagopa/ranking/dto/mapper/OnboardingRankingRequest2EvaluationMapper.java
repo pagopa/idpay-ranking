@@ -25,8 +25,8 @@ public class OnboardingRankingRequest2EvaluationMapper {
 
     private static String transcodeRankingStatus(OnboardingRankingRequests onboardingRankingRequests) {
         return switch (onboardingRankingRequests.getBeneficiaryRankingStatus()) {
-            case ONBOARDING_KO -> ONBOARDING_KO;
-            case TO_NOTIFY, ELIGIBLE_OK, ELIGIBLE_KO -> ONBOARDING_OK;
+            case TO_NOTIFY, ONBOARDING_KO, ELIGIBLE_KO -> ONBOARDING_KO;
+            case ELIGIBLE_OK -> ONBOARDING_OK;
         };
     }
 
