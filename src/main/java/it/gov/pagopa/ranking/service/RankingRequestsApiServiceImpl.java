@@ -5,22 +5,17 @@ import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
-import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +51,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
             return onboardingRankingRequestsRepository.findAllBy(
                             initiativeId,
                             filter,
-                            PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.rank))
+                            PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.initiativeId, OnboardingRankingRequests.Fields.rank))
                     ).getContent()
                     .stream()
                     .map(dtoMapper::apply)
