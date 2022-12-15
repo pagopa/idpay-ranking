@@ -11,7 +11,6 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.test.fakers.RankingRequestsApiDTOFaker;
@@ -32,7 +31,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class RankingRequestsApiServiceImplTest {
@@ -59,7 +57,7 @@ class RankingRequestsApiServiceImplTest {
                 .thenReturn(initiativeConfig);
 
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
-        Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
+        Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.initiativeId, OnboardingRankingRequests.Fields.rank));
         Mockito.when(requestsRepositoryMock.findAllBy(initiativeConfig.getInitiativeId(), new RankingRequestFilter(), pageable))
                 .thenReturn(new PageImpl<>(List.of(request)));
 
@@ -70,7 +68,7 @@ class RankingRequestsApiServiceImplTest {
         Assertions.assertFalse(results.isEmpty());
         RankingRequestsApiDTO result = results.get(0);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.getRanking());
+        Assertions.assertEquals(0, result.getRanking());
     }
 
     @Test
@@ -87,7 +85,7 @@ class RankingRequestsApiServiceImplTest {
         OnboardingRankingRequests request3 = OnboardingRankingRequestsFaker.mockInstance(3);
         request1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
 
-        Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.rank));
+        Pageable pageable = PageRequest.of(0,10, Sort.by(OnboardingRankingRequests.Fields.initiativeId, OnboardingRankingRequests.Fields.rank));
         RankingRequestFilter rankingRequestFilter = RankingRequestFilter.builder().beneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK).userId(request1.getUserId()).build();
         Mockito.when(requestsRepositoryMock.findAllBy(initiativeConfig.getInitiativeId(), rankingRequestFilter, pageable))
                 .thenReturn(new PageImpl<>(List.of(request1, request2, request3)));
@@ -99,7 +97,7 @@ class RankingRequestsApiServiceImplTest {
         Assertions.assertFalse(results.isEmpty());
         RankingRequestsApiDTO result = results.get(0);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(1, result.getRanking());
+        Assertions.assertEquals(0, result.getRanking());
     }
 
     @Test
@@ -223,11 +221,45 @@ class RankingRequestsApiServiceImplTest {
         Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(initiativeConfig);
         List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
-        OnboardingRankingRequests rankingRequests = new OnboardingRankingRequests();
-        onboardingRankingRequests.add(rankingRequests);
+        OnboardingRankingRequests onboardingRankingRequest1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
+        OnboardingRankingRequests onboardingRankingRequest2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequest2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
+        onboardingRankingRequests.add(onboardingRankingRequest1);
+        onboardingRankingRequests.add(onboardingRankingRequest2);
         Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
                 .thenReturn(onboardingRankingRequests);
+        onboardingRankingRequests = onboardingRankingRequests.stream()
+                .filter(onboardingRankingRequest ->
+                        onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_KO) ||
+                                onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_OK)
+                )
+                .toList();
         Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void givenInitiativeInREADYStatusAndNobodyEligible_thenNotifyDoNothing() {
+        // Given organizationId and initiativeID on DB for Status Publishing
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
+
+        // When
+        Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(initiativeConfig);
+        List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
+        OnboardingRankingRequests onboardingRankingRequest1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
+        OnboardingRankingRequests onboardingRankingRequest2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequest2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY);
+        onboardingRankingRequests.add(onboardingRankingRequest1);
+        onboardingRankingRequests.add(onboardingRankingRequest2);
+        Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
+                .thenReturn(onboardingRankingRequests);
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");

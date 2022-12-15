@@ -97,7 +97,6 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     private long waitForInitiativeStored(int N) {
         long[] countSaved={0};
-        //noinspection ConstantConditions
         waitFor(()->(countSaved[0]=initiativeConfigRepository.count()) >= N, ()->"Expected %d saved ranking initiative, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }

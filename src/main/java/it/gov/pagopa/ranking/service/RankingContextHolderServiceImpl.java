@@ -7,14 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 @Service
 @Slf4j
 public class RankingContextHolderServiceImpl implements RankingContextHolderService{
     private final InitiativeConfigService initiativeConfigService;
-    private final Map<String, InitiativeConfig> initiativeId2Config=new ConcurrentHashMap<>();
 
     public RankingContextHolderServiceImpl(InitiativeConfigService initiativeConfigService) {
         this.initiativeConfigService = initiativeConfigService;
@@ -22,7 +18,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
 
     @Override
     public InitiativeConfig getInitiativeConfig(String initiativeId, String organizationId) {
-        InitiativeConfig initiativeConfigRetrieved = initiativeId2Config.computeIfAbsent(initiativeId, this::retrieveInitiativeConfig);
+        InitiativeConfig initiativeConfigRetrieved = retrieveInitiativeConfig(initiativeId);
         if(initiativeConfigRetrieved.getOrganizationId().equals(organizationId)){
             return initiativeConfigRetrieved;
         } else {
@@ -33,8 +29,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
 
     @Override
     public void setInitiativeConfig(InitiativeConfig initiativeConfig) {
-        InitiativeConfig initiativeSaved = initiativeConfigService.save(initiativeConfig);
-        initiativeId2Config.put(initiativeSaved.getInitiativeId(),initiativeSaved);
+        initiativeConfigService.save(initiativeConfig);
     }
 
     private InitiativeConfig retrieveInitiativeConfig(String initiativeId) {

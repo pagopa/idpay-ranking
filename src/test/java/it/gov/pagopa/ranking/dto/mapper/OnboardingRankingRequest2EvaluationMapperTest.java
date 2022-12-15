@@ -13,20 +13,6 @@ class OnboardingRankingRequest2EvaluationMapperTest {
     public static final String ONBOARDING_KO = "ONBOARDING_KO";
 
     @Test
-    void testToNotify(){
-        // Given
-        OnboardingRankingRequest2EvaluationMapper mapper = new OnboardingRankingRequest2EvaluationMapper();
-
-        OnboardingRankingRequests requests = OnboardingRankingRequestsFaker.mockInstance(1);
-
-        // When
-        EvaluationRankingDTO result = mapper.apply(requests);
-
-        // Then
-        commonChecks(requests, result, ONBOARDING_OK);
-    }
-
-    @Test
     void testEligibleOK(){
         // Given
         OnboardingRankingRequest2EvaluationMapper mapper = new OnboardingRankingRequest2EvaluationMapper();
@@ -53,7 +39,7 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         EvaluationRankingDTO result = mapper.apply(requests);
 
         // Then
-        commonChecks(requests, result, ONBOARDING_OK);
+        commonChecks(requests, result, ONBOARDING_KO);
     }
 
     @Test

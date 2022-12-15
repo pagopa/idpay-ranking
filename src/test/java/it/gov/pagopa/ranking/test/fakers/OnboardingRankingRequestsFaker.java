@@ -44,7 +44,7 @@ public class OnboardingRankingRequestsFaker {
         OnboardingRankingRequests.OnboardingRankingRequestsBuilder out = OnboardingRankingRequests.builder();
         int rankingValue = getRandomPositiveNumber(bias);
 
-        return out.id("userId_%dinitiativeId_%d")
+        return out.id("userId_%dinitiativeId_%d".formatted(bias,bias))
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
@@ -54,7 +54,7 @@ public class OnboardingRankingRequestsFaker {
                 .rankingValueOriginal(rankingValue)
                 .rankingValue2Show(rankingValue)
                 .beneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY)
-                .rank(bias);
+                .rank(0);
 
     }
 }
