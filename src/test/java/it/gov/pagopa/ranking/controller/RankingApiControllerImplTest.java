@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
 @WebMvcTest(RankingApiControllerImpl.class)
 class RankingApiControllerImplTest {
 
@@ -193,5 +195,29 @@ class RankingApiControllerImplTest {
                         .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}/paged",
                                 "orgId", "initiativeId"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void testNotifyWithException() throws Exception {
+        Mockito.doThrow(new IllegalStateException("genericExceptionMessage")).when(service).notifyCitizenRankings("orgId", "initiativeId");
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}/notified",
+                                "orgId", "initiativeId"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void testNotifySuccess() throws Exception {
+        Mockito.doNothing().when(service).notifyCitizenRankings("orgId", "initiativeId");
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}/notified",
+                                "orgId", "initiativeId"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andDo(print())
+                .andReturn();
     }
 }

@@ -4,10 +4,10 @@ import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
-import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.service.RankingRequestsApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -48,6 +48,13 @@ public class RankingApiControllerImpl implements RankingApiController{
         } else {
             return result;
         }
+    }
+
+    @Override
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void notifyCitizenRankings(String organizationId, String initiativeId) {
+        log.info("[NOTIFY_CITIZEN] - Request to notify Citizen on Ranking List for initiativeId: {}", initiativeId);
+        rankingRequestsApiService.notifyCitizenRankings(organizationId, initiativeId);
     }
 
 }

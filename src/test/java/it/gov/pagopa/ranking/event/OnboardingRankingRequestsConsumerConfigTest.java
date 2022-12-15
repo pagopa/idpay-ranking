@@ -4,8 +4,11 @@ import com.mongodb.MongoException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequestsDTO2ModelMapper;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
+import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
 import it.gov.pagopa.ranking.utils.TestUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.TestPropertySource;
@@ -36,8 +40,15 @@ import java.util.stream.IntStream;
 })
 class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
 
+    public static final String INITIATIVEID = "INITIATIVEID";
     @SpyBean
     private OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
+
+    @Autowired
+    private OnboardingRankingRequestsDTO2ModelMapper mapper;
+
+    @Autowired
+    private InitiativeConfigRepository initiativeConfigRepository;
 
     @AfterEach
     void cleanData(){onboardingRankingRequestsRepository.deleteAll();}
@@ -47,6 +58,8 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         int validOnboardings = 1000;
         int notValidOnboardings = errorUseCases.size();
         long maxWaitingMs = 30000;
+
+        storeInitiative();
 
         List<String> onboardingPayloads = new ArrayList<>(buildValidPayloads(errorUseCases.size(), validOnboardings / 2));
         onboardingPayloads.addAll(IntStream.range(0, notValidOnboardings).mapToObj(i -> errorUseCases.get(i).getFirst().get()).toList());
@@ -61,6 +74,8 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         long timeEnd=System.currentTimeMillis();
 
         Assertions.assertEquals(validOnboardings, countSaved);
+
+        checkStoredOnboardingRequests();
 
         checkErrorsPublished(notValidOnboardings, maxWaitingMs, errorUseCases);
 
@@ -95,16 +110,36 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         );
     }
 
+    private void storeInitiative() {
+        initiativeConfigRepository.save(InitiativeConfigFaker.mockInstanceBuilder(0)
+                .initiativeId(INITIATIVEID)
+                .build());
+    }
+
+    private void checkStoredOnboardingRequests() {
+        for (OnboardingRankingRequests o : onboardingRankingRequestsRepository.findAll()) {
+            int bias = Integer.parseInt(o.getUserId().substring(7));
+            Assertions.assertEquals(
+                    mapper.apply(OnboardingRankingRequestsDTOFaker.mockInstanceBuilder(bias)
+                            .initiativeId(INITIATIVEID)
+                            .onboardingKo(bias%3==2)
+                            .build(), InitiativeConfigFaker.mockInstance(0))
+                    , o);
+        }
+    }
+
     private List<String> buildValidPayloads(int bias, int n) {
         return IntStream.range(bias, bias + n)
-                .mapToObj(OnboardingRankingRequestsDTOFaker::mockInstance)
+                .mapToObj(i -> OnboardingRankingRequestsDTOFaker.mockInstanceBuilder(i)
+                        .initiativeId(INITIATIVEID)
+                        .onboardingKo(i%3==2)
+                        .build())
                 .map(TestUtils::jsonSerializer)
                 .toList();
     }
 
     private long waitForOnboardingStored(int N) {
         long[] countSaved={0};
-        //noinspection ConstantConditions
         waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved onboarding ranking request, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }
@@ -128,14 +163,22 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
                 errorMessage -> checkErrorMessageHeaders(errorMessage, "[ONBOARDING_RANKING_REQUEST] Unexpected JSON", jsonNotValid)
         ));
 
+        String unexistentInitiativeIdJson= TestUtils.jsonSerializer(OnboardingRankingRequestsDTOFaker.mockInstance(errorUseCases.size()));
+        errorUseCases.add(Pair.of(
+                () -> unexistentInitiativeIdJson,
+                errorMessage -> checkErrorMessageHeaders(errorMessage,"[ONBOARDING_RANKING_REQUEST] The input initiative doesn't exists: initiativeId_2", unexistentInitiativeIdJson)
+        ));
+
         OnboardingRankingRequestDTO onboardingMongoException= OnboardingRankingRequestsDTOFaker.mockInstance(errorUseCases.size());
+        onboardingMongoException.setInitiativeId(INITIATIVEID);
         String onboardingExceptionId = OnboardingRankingRequestsDTO2ModelMapper.buildId(onboardingMongoException);
+        String onboardingMongoExceptionJson = TestUtils.jsonSerializer(onboardingMongoException);
         errorUseCases.add(Pair.of(
                 () -> {
                     Mockito.doThrow(MongoException.class).when(onboardingRankingRequestsRepository).save(Mockito.argThat(i -> i.getId().equals(onboardingExceptionId)));
-                    return TestUtils.jsonSerializer(onboardingMongoException);
+                    return onboardingMongoExceptionJson;
                     },
-                errorMessage -> checkErrorMessageHeaders(errorMessage,"[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", TestUtils.jsonSerializer(onboardingMongoException))
+                errorMessage -> checkErrorMessageHeaders(errorMessage,"[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", onboardingMongoExceptionJson)
         ));
     }
 
