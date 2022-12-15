@@ -3,7 +3,6 @@ package it.gov.pagopa.ranking.controller;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
-import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.AssertionErrors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -97,9 +94,7 @@ class RankingApiControllerImplTest {
                 .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "orgId", "initiativeId"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(result -> {
-                    Assertions.assertTrue(result.getResponse().getContentLength() == 0);
-                });
+                .andExpect(result -> Assertions.assertEquals(0, result.getResponse().getContentLength()));
     }
 
     @Test
