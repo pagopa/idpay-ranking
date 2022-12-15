@@ -1,11 +1,10 @@
 package it.gov.pagopa.ranking.service.initiative.ranking;
 
 import it.gov.pagopa.ranking.BaseIntegrationTest;
-import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
-import it.gov.pagopa.ranking.connector.azure.storage.AzureBlobClient;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
 import it.gov.pagopa.ranking.service.sign.P7mSignerService;
@@ -15,19 +14,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @TestPropertySource(properties = {
@@ -43,8 +45,11 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private static final int RANKING_SIZE = 51; // must be a multiple of 3
     private static final int N = 9; // must be a multiple of 3
     private static final String EXPECTED_FILE_PATH = "%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID);
+
     private static final Path LOCAL_CSV_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv".formatted(ORGANIZATION_ID, INITIATIVE_ID));
+    private static final Path LOCAL_CSV_COPY_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.copy.csv".formatted(ORGANIZATION_ID, INITIATIVE_ID));
     private static final Path LOCAL_P7M_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID));
+    private static final Path UPLOADED_P7M_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv.uploaded.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID));
     private static final String EXPECTED_CSV_HEADER = "\"userId\";\"criteriaConsensusTimestamp\";\"rankingValue\";\"ranking\";\"status\"";
 
 
@@ -56,8 +61,8 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
 
-    @Autowired
-    private P7mSignerService p7mSignerService;
+    @SpyBean
+    private P7mSignerService p7mSignerServiceSpy;
 
     @Autowired
     private OnboardingRankingBuildFileMediatorServiceImpl onboardingRankingBuildFileMediatorService;
@@ -113,20 +118,41 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
     @Test
     void test() throws IOException {
+        // copy csv to be able to check its content later
+        Mockito.lenient()
+                .doAnswer(i -> {
+                    Path csvFile = i.getArgument(0);
+                    Path destination = csvFile.getParent().resolve(csvFile.getFileName().toString().replaceAll("\\.([^.]+$)", ".copy.$1"));
+                    try {
+                        Files.copy(csvFile,
+                                destination,
+                                StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Something gone wrong copying test file %s into %s".formatted(csvFile, destination), e);
+                    }
+                    return i.callRealMethod();
+                })
+                .when(p7mSignerServiceSpy)
+                .sign(Mockito.any());
+
         // When
         onboardingRankingBuildFileMediatorService.schedule();
 
         // materialize
         checkRankingMaterializeResult();
 
-        // sign & upload
+        // sign
+        checkResultCsvFile(LOCAL_CSV_COPY_PATH);
+
+        Assertions.assertTrue(p7mSignerServiceSpy.verifySign(UPLOADED_P7M_PATH));
+
+        // upload
+        Assertions.assertFalse(Files.exists(LOCAL_CSV_PATH));
+        Assertions.assertFalse(Files.exists(LOCAL_P7M_PATH));
+        Assertions.assertTrue(Files.exists(UPLOADED_P7M_PATH));
+
         checkUpdatedInitiative();
 
-        checkResultCsvFile();
-
-        Assertions.assertTrue(p7mSignerService.verifySign(LOCAL_P7M_PATH));
-
-        // TODO verify upload Azure
 
     }
 
@@ -169,10 +195,11 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
         Assertions.assertEquals(N, resultInitiative.getTotalEligibleKo());
         Assertions.assertEquals(N, resultInitiative.getTotalOnboardingKo());
         Assertions.assertEquals(EXPECTED_FILE_PATH, resultInitiative.getRankingFilePath());
+        Assertions.assertEquals(RankingStatus.READY, resultInitiative.getRankingStatus());
     }
 
-    private void checkResultCsvFile() throws IOException {
-        List<String> lines = Files.readAllLines(LOCAL_CSV_PATH);
+    private void checkResultCsvFile(Path file) throws IOException {
+        List<String> lines = Files.readAllLines(file);
         Assertions.assertEquals(70, lines.size());
 
         testData.sort(

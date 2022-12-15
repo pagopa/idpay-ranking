@@ -67,7 +67,8 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
         Path signedFilePath = p7mSignerService.sign(localRankingFilePath);
         initiativeConfig.setRankingFilePath(initiativeConfig.getRankingFilePath().concat(".p7m"));
 
-        // TODO delete csv
+        // delete local .csv
+        deleteFile(localRankingFilePath);
 
         return signedFilePath;
     }
@@ -79,13 +80,23 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
                 initiativeConfig.getRankingFilePath(),
                 "application/pkcs7-mime");
 
-        // TODO delete local p7m
+        // delete local .p7m
+        deleteFile(signedFilePath);
+
 
         initiativeConfig.setRankingStatus(RankingStatus.READY);
         initiativeConfigRepository.save(initiativeConfig);
 
     }
 
+    private void deleteFile(Path filePath) {
+
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            log.warn("[RANKING_BUILD_ONBOARDING_RANKING_FILE] Cannot delete file {} from container", filePath, e);
+        }
+    }
 
 
 }
