@@ -1,10 +1,7 @@
 package it.gov.pagopa.ranking.service.initiative.ranking.retrieve;
 
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
-import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
-import com.azure.messaging.servicebus.administration.models.QueueRuntimeProperties;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.dto.initiative.OnboardingRequestPendingDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
@@ -42,16 +39,21 @@ public class OnboardingRankingRuleEndedRetrieverServiceImpl implements Onboardin
     private boolean checkPendingOnboardingRequests(String initiativeId) {
         log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Start check if there are any pending onboarding request for ended initiative: {}", initiativeId);
         int messageInQueue = azureServiceBusClient.countMessageInOnboardingRequestQueue();
-        try (ServiceBusReceiverClient receiverClient = azureServiceBusClient.getOnboardingRequestReceiverClient()){
-            ServiceBusReceivedMessage serviceBusReceivedMessage;
-            for(int count=1; (serviceBusReceivedMessage=receiverClient.peekMessage()) != null && count<=messageInQueue; count++){
-                OnboardingRequestPendingDTO body = serviceBusReceivedMessage.getBody().toObject(OnboardingRequestPendingDTO.class);
-                if(body.getInitiativeId() != null && body.getInitiativeId().equals(initiativeId)){
-                    log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Found at least one user ({}) having a pending onboarding request onto initiative {}", body.getUserId(), body.getInitiativeId());
-                    return false;
+
+        if(messageInQueue>0) {
+            try (ServiceBusReceiverClient receiverClient = azureServiceBusClient.getOnboardingRequestReceiverClient()) {
+                ServiceBusReceivedMessage serviceBusReceivedMessage;
+                for (int count = 1; (serviceBusReceivedMessage = receiverClient.peekMessage()) != null && count <= messageInQueue; count++) {
+                    OnboardingRequestPendingDTO body = serviceBusReceivedMessage.getBody().toObject(OnboardingRequestPendingDTO.class);
+                    if (body.getInitiativeId() != null && body.getInitiativeId().equals(initiativeId)) {
+                        log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] Found at least one user ({}) having a pending onboarding request onto initiative {}", body.getUserId(), body.getInitiativeId());
+                        return false;
+                    }
                 }
             }
         }
+
+        log.info("[INITIATIVE_RETRIEVE_CHECK_PENDING_ONBOARDING] No pending requests for initiative having id {}", initiativeId);
         return true;
     }
 }
