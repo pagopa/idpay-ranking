@@ -15,7 +15,7 @@ public class OnboardingRankingRequests2RankingCsvDTOMapper implements Function<O
         return RankingCsvDTO.builder()
                 .userId(onboardingRankingRequests.getUserId())
                 .criteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp())
-                .rankingValue(onboardingRankingRequests.getRankingValue())
+                .rankingValue(onboardingRankingRequests.getRankingValue2Show())
                 .rank(onboardingRankingRequests.getRank())
                 .status(onboardingRankingRequests.getBeneficiaryRankingStatus())
                 .build();

@@ -10,6 +10,8 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidKeyException;
 
 @Slf4j
@@ -21,6 +23,20 @@ public abstract class BaseAzureBlobClientImpl implements AzureBlobClient{
         final CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
         this.blobContainer = storageAccount.createCloudBlobClient().getContainerReference(blobContainerName);
     }
+
+    @Override
+    public void uploadFile(Path file, String destination, String contentType) {
+        try(InputStream signedFileStream = Files.newInputStream(file)) {
+            this.uploadFile(
+                    signedFileStream,
+                    destination,
+                    contentType
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read file: %s".formatted(file), e);
+        }
+    }
+
     @Override
     public void uploadFile(InputStream file, String destination, String contentType) throws FileUploadException {
         log.info("Uploading file {} (contentType={}) into azure blob", destination, contentType);
