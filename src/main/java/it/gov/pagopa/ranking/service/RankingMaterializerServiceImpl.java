@@ -169,6 +169,7 @@ public class RankingMaterializerServiceImpl implements RankingMaterializerServic
             if (initiativeConfig.getRankingFields().get(0).getFieldCode() != null) {
                 direction = initiativeConfig.getRankingFields().get(0).getDirection();
                 List<Sort.Order> orders = List.of(
+                        new Sort.Order(Sort.Direction.ASC, OnboardingRankingRequests.Fields.initiativeId),
                         new Sort.Order(direction, OnboardingRankingRequests.Fields.rankingValue),
                         new Sort.Order(Sort.Direction.ASC, OnboardingRankingRequests.Fields.criteriaConsensusTimestamp)
                 );
