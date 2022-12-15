@@ -5,6 +5,7 @@ import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2RankingRequestsApiDTOMapper;
 import it.gov.pagopa.ranking.dto.mapper.PageOnboardingRequests2RankingPageDTOMapper;
+import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -94,9 +95,18 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
         InitiativeConfig initiativeConfig = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
         if(initiativeConfig.getRankingStatus().equals(RankingStatus.READY)){
             List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
+            onboardingRankingRequests = onboardingRankingRequests.stream()
+                    .filter(onboardingRankingRequest ->
+                            onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_KO) ||
+                            onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_OK)
+                    )
+                    .toList();
             if(!onboardingRankingRequests.isEmpty()) {
-                log.info("[NOTIFY_CITIZEN] - Sending citizen into outbound outcome Topic is about to begin...");
+                log.info("[NOTIFY_CITIZEN] - Sending No. of {} citizen into outbound outcome Topic is about to begin...", onboardingRankingRequests.size());
                 onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
+            }
+            else {
+                log.info("[NOTIFY_CITIZEN] - No citizen to be notified...");
             }
         }else {
             genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiativeConfig.getRankingStatus());
