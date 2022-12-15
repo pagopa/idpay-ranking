@@ -28,7 +28,7 @@ public class OnboardingRankingRequestsDTO2ModelMapper implements BiFunction<Onbo
             out.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
             out.setRankingValue(
                     !CollectionUtils.isEmpty(initiativeConfig.getRankingFields()) && Sort.Direction.ASC.equals(initiativeConfig.getRankingFields().get(0).getDirection())
-                    ? Integer.MAX_VALUE
+                    ? Long.MAX_VALUE
                     : -1);
         } else {
             out.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.TO_NOTIFY);

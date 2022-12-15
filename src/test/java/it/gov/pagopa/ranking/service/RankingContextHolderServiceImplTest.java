@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.service;
 
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,6 +17,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,7 +64,7 @@ class RankingContextHolderServiceImplTest {
         Assertions.assertNotNull(inspectCache.get(initiativeIdInCache));
         Assertions.assertEquals(1,inspectCache.size());
 
-        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).findById(initiativeIdInCache);
+        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).findByIdOptional(initiativeIdInCache);
     }
 
     @Test
@@ -71,13 +74,13 @@ class RankingContextHolderServiceImplTest {
         Assertions.assertNotNull(inspectCache.get(initiativeIdInCache));
         Assertions.assertEquals(1,inspectCache.size());
 
-        InitiativeConfig result = rankingContextHolderService.getInitiativeConfig(initiativeIdInCache, "ANOTHER_ORGANIZATIONID");
+        Executable executable = () -> rankingContextHolderService.getInitiativeConfig(initiativeIdInCache, "ANOTHER_ORGANIZATIONID");
 
         // Then
-        Assertions.assertNull(result);
+        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
 
         Assertions.assertEquals(1,inspectCache.size());
-        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).findById(initiativeIdInCache);
+        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).findByIdOptional(initiativeIdInCache);
     }
 
     @Test
@@ -86,7 +89,7 @@ class RankingContextHolderServiceImplTest {
         String initiativeIdTest = "NEW_INITIATIVEID";
         String organizationIdTest = "NEW_ORGANIZATIONID";
         InitiativeConfig initiativeConfigMock = InitiativeConfigFaker.mockInstanceBuilder(1).initiativeId(initiativeIdTest).organizationId(organizationIdTest).build();
-        Mockito.when(initiativeConfigServiceMock.findById(initiativeIdTest)).thenReturn(initiativeConfigMock);
+        Mockito.when(initiativeConfigServiceMock.findByIdOptional(initiativeIdTest)).thenReturn(Optional.of(initiativeConfigMock));
 
         // When
         Map<String, InitiativeConfig> inspectCache = retrieveCache();
@@ -103,7 +106,7 @@ class RankingContextHolderServiceImplTest {
         Assertions.assertNotNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(2,inspectCache.size());
 
-        Mockito.verify(initiativeConfigServiceMock).findById(initiativeIdTest);
+        Mockito.verify(initiativeConfigServiceMock).findByIdOptional(initiativeIdTest);
     }
 
     @Test
@@ -111,44 +114,44 @@ class RankingContextHolderServiceImplTest {
         // Given
         String initiativeIdTest = "NEW_INITIATIVEID";
         String organizationIdTest = "NEW_ORGANIZATIONID";
-        Mockito.when(initiativeConfigServiceMock.findById(initiativeIdTest)).thenReturn(InitiativeConfig.builder().initiativeId(initiativeIdTest).organizationId(organizationIdTest).build());
+        Mockito.when(initiativeConfigServiceMock.findByIdOptional(initiativeIdTest)).thenReturn(Optional.of(InitiativeConfig.builder().initiativeId(initiativeIdTest).organizationId(organizationIdTest).build()));
 
         // When
         Map<String, InitiativeConfig> inspectCache = retrieveCache();
         Assertions.assertNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(1,inspectCache.size());
 
-        InitiativeConfig result = rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "ANOTHER_ORGANIZATIONID");
+        Executable executable = () -> rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "ANOTHER_ORGANIZATIONID");
 
         // Then
-        Assertions.assertNull(result);
+        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
 
         Assertions.assertNotNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(2,inspectCache.size());
 
-        Mockito.verify(initiativeConfigServiceMock).findById(initiativeIdTest);
+        Mockito.verify(initiativeConfigServiceMock).findByIdOptional(initiativeIdTest);
     }
 
     @Test
     void getInitiativeNotInDB(){
         // Given
         String initiativeIdTest = "NEW_INITIATIVEID";
-        Mockito.when(initiativeConfigServiceMock.findById(initiativeIdTest)).thenReturn(null);
+        Mockito.when(initiativeConfigServiceMock.findByIdOptional(initiativeIdTest)).thenReturn(Optional.empty());
 
         // When
         Map<String, InitiativeConfig> inspectCache = retrieveCache();
         Assertions.assertNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(1,inspectCache.size());
 
-        InitiativeConfig result = rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "NEW_ORGANIZATIONID");
+        Executable executable = () -> rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "NEW_ORGANIZATIONID");
 
         // Then
-        Assertions.assertNull(result);
+        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
 
         Assertions.assertNull(inspectCache.get(initiativeIdTest));
         Assertions.assertEquals(1,inspectCache.size());
 
-        Mockito.verify(initiativeConfigServiceMock).findById(initiativeIdTest);
+        Mockito.verify(initiativeConfigServiceMock).findByIdOptional(initiativeIdTest);
     }
 
     private Map<String, InitiativeConfig> retrieveCache() {

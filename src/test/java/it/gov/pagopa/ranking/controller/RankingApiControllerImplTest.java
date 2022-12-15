@@ -3,6 +3,7 @@ package it.gov.pagopa.ranking.controller;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -16,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.AssertionErrors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,15 +88,18 @@ class RankingApiControllerImplTest {
     }
 
     @Test
-    void testNotFound() throws Exception {
-
+    void testEmptyList() throws Exception {
+        List<RankingRequestsApiDTO> rankingRequestsApiDTOS = new ArrayList<>();
         Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
-                .thenReturn(null);
+                .thenReturn(rankingRequestsApiDTOS);
 
         mvc.perform(MockMvcRequestBuilders
                 .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "orgId", "initiativeId"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(result -> {
+                    Assertions.assertTrue(result.getResponse().getContentLength() == 0);
+                });
     }
 
     @Test
@@ -186,15 +193,19 @@ class RankingApiControllerImplTest {
     }
 
     @Test
-    void testPagedNotFound() throws Exception {
+    void testPagedEmpty() throws Exception {
 
-        Mockito.when(service.findByInitiativeId("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
-                .thenReturn(null);
+        Mockito.when(service.findByInitiativeIdPaged("orgId", "initiativeId", 0, 10, new RankingRequestFilter()))
+                .thenReturn(RankingPageDTO.builder().build());
 
         mvc.perform(MockMvcRequestBuilders
                         .get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}/paged",
                                 "orgId", "initiativeId"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(result -> {
+                    String expected = "{\"content\":null,\"pageNumber\":0,\"pageSize\":0,\"totalElements\":0,\"totalPages\":0,\"rankingStatus\":null,\"rankingPublishedTimestamp\":null,\"rankingGeneratedTimestamp\":null,\"totalEligibleOk\":0,\"totalEligibleKo\":0,\"totalOnboardingKo\":0,\"rankingFilePath\":null}";
+                    Assertions.assertEquals(expected, result.getResponse().getContentAsString());
+                });
     }
 
     @Test

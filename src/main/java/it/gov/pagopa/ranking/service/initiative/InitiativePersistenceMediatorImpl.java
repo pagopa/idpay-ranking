@@ -61,9 +61,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                         || initiativeRetrieved.getRankingStatus().equals(RankingStatus.WAITING_END)){
 
                     InitiativeConfig initiativeConfig = initiativeBuild2ConfigMapper.apply(payload);
-                    InitiativeConfig initiativeSave = initiativeConfigService.save(initiativeConfig);
 
-                    rankingContextHolderService.setInitiativeConfig(initiativeSave);
+                    rankingContextHolderService.setInitiativeConfig(initiativeConfig);
                 }else {
                    log.error("The initiative is in the ending phase: {}", payload);
                 }
