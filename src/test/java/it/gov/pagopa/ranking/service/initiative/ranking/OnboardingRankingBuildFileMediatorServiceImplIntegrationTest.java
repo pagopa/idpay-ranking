@@ -39,8 +39,8 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
     private static final String INITIATIVE_ID = "INITIATIVE_ID";
     private static final String ORGANIZATION_ID = "ORGANIZATION_ID";
-    private static final int RANKING_SIZE = 51; // must be a multiple of 3
     private static final String OTHER_INITIATIVE_ID = "OTHER_INITIATIVE_ID";
+    private static final int RANKING_SIZE = 51; // must be a multiple of 3
     private static final int N = 9; // must be a multiple of 3
     private static final String EXPECTED_FILE_PATH = "%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID);
     private static final Path LOCAL_CSV_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv".formatted(ORGANIZATION_ID, INITIATIVE_ID));
@@ -56,14 +56,11 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
 
-    @MockBean(answer = Answers.RETURNS_MOCKS)
-    private AzureServiceBusClient azureServiceBusClientMock;
+    @Autowired
+    private P7mSignerService p7mSignerService;
 
     @Autowired
     private OnboardingRankingBuildFileMediatorServiceImpl onboardingRankingBuildFileMediatorService;
-
-    @Autowired
-    private P7mSignerService p7mSignerService;
 
     private final List<OnboardingRankingRequests> testData = new ArrayList<>();
 
@@ -94,10 +91,6 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
 
         buildTestData(RANKING_SIZE, OTHER_INITIATIVE_ID, BeneficiaryRankingStatus.TO_NOTIFY);
 
-
-        // MOCKS
-        Mockito.when(azureServiceBusClientMock.countMessageInOnboardingRequestQueue()).thenReturn(0);
-        Mockito.when(azureServiceBusClientMock.getOnboardingRequestReceiverClient().peekMessage()).thenReturn(null);
     }
 
     private void buildTestData(int n, String initiativeId, BeneficiaryRankingStatus status) {

@@ -1,11 +1,14 @@
 package it.gov.pagopa.ranking;
 
+import com.azure.core.http.rest.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.process.runtime.Executable;
+import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
+import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.StreamsHealthIndicator;
 import it.gov.pagopa.ranking.utils.TestUtils;
@@ -22,7 +25,10 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
@@ -30,6 +36,7 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -38,13 +45,19 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ReflectionUtils;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import javax.management.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.*;
@@ -113,6 +126,12 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected StreamsHealthIndicator streamsHealthIndicator;
 
+    @MockBean(answer = Answers.RETURNS_MOCKS)
+    private AzureServiceBusClient azureServiceBusClientMock;
+
+    @MockBean
+    private InitiativeRankingBlobClient initiativeRankingBlobClientMock;
+
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -170,6 +189,28 @@ public abstract class BaseIntegrationTest {
                         """,
                 mongoUrl,
                 "bootstrapServers: %s, zkNodes: %s".formatted(bootstrapServers, zkNodes));
+    }
+
+    @BeforeEach
+    void initMocks() {
+        Mockito.lenient().when(azureServiceBusClientMock.countMessageInOnboardingRequestQueue()).thenReturn(0);
+        Mockito.lenient().when(azureServiceBusClientMock.getOnboardingRequestReceiverClient().peekMessage()).thenReturn(null);
+
+        Mockito.lenient()
+                .doAnswer(i -> {
+                    Path uploadingFile = i.getArgument(0);
+                    Path destination = uploadingFile.getParent().resolve(uploadingFile.getFileName().toString().replaceAll("\\.([^.]+$)", ".uploaded.$1"));
+                    try {
+                        Files.copy(uploadingFile,
+                                destination,
+                                StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Something gone wrong simulating upload of test file %s into %s".formatted(uploadingFile, destination), e);
+                    }
+                    return null;
+                })
+                .when(initiativeRankingBlobClientMock)
+                .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
     }
 
     @Test
