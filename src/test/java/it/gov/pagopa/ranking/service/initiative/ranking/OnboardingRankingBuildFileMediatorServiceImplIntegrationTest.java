@@ -196,6 +196,7 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
         Assertions.assertEquals(N, resultInitiative.getTotalOnboardingKo());
         Assertions.assertEquals(EXPECTED_FILE_PATH, resultInitiative.getRankingFilePath());
         Assertions.assertEquals(RankingStatus.READY, resultInitiative.getRankingStatus());
+        Assertions.assertNotNull(resultInitiative.getRankingGeneratedTimestamp());
     }
 
     private void checkResultCsvFile(Path file) throws IOException {

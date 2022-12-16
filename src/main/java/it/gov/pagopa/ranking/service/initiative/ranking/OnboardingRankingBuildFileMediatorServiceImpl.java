@@ -12,9 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -83,8 +83,8 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
         // delete local .p7m
         deleteFile(signedFilePath);
 
-
         initiativeConfig.setRankingStatus(RankingStatus.READY);
+        initiativeConfig.setRankingGeneratedTimestamp(LocalDateTime.now());
         initiativeConfigRepository.save(initiativeConfig);
 
     }
