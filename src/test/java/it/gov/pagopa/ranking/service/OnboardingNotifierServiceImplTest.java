@@ -33,15 +33,15 @@ class OnboardingNotifierServiceImplTest {
         onboardingRankingRequests.add(onboardingRankingRequests1);
         onboardingRankingRequests.add(onboardingRankingRequests2);
 
-        Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class))).thenReturn(evaluationDTO);
+        Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class))).thenReturn(evaluationDTO);
         Mockito.when(onboardingNotifierProducer.notify(Mockito.any(EvaluationRankingDTO.class))).thenReturn(true);
 
         OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, rankingContextHolderService);
         onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
 
-        Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class));
+        Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class));
         Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size())).notify(Mockito.any(EvaluationRankingDTO.class));
-        Mockito.verify(rankingContextHolderService, Mockito.times(2)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
+        Mockito.verify(rankingContextHolderService, Mockito.times(1)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 
     @Test
@@ -61,14 +61,14 @@ class OnboardingNotifierServiceImplTest {
         onboardingRankingRequests.add(onboardingRankingRequests1);
         onboardingRankingRequests.add(onboardingRankingRequests2);
 
-        Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class))).thenReturn(evaluationDTO);
+        Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class))).thenReturn(evaluationDTO);
         Mockito.when(onboardingNotifierProducer.notify(Mockito.any(EvaluationRankingDTO.class))).thenReturn(false);
 
         OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, rankingContextHolderService);
         onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
 
-        Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class));
+        Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class));
         Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size())).notify(Mockito.any(EvaluationRankingDTO.class));
-        Mockito.verify(rankingContextHolderService, Mockito.times(2)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
+        Mockito.verify(rankingContextHolderService, Mockito.times(1)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 }

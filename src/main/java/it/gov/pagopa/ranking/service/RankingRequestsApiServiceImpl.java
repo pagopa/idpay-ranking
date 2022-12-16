@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,12 +102,17 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                             onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_OK)
                     )
                     .toList();
+            initiativeConfig.setRankingStatus(RankingStatus.PUBLISHING);
+            rankingContextHolderService.setInitiativeConfig(initiativeConfig);
             if(!onboardingRankingRequests.isEmpty()) {
                 log.info("[NOTIFY_CITIZEN] - Sending No. of {} citizen into outbound outcome Topic is about to begin...", onboardingRankingRequests.size());
                 onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
             }
             else {
                 log.info("[NOTIFY_CITIZEN] - No citizen to be notified...");
+                initiativeConfig.setRankingPublishedTimestamp(LocalDateTime.now());
+                initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
+                rankingContextHolderService.setInitiativeConfig(initiativeConfig);
             }
         }else {
             genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiativeConfig.getRankingStatus());

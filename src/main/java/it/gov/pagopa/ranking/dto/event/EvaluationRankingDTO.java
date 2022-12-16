@@ -8,7 +8,9 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode
@@ -20,6 +22,7 @@ public class EvaluationRankingDTO {
     private String userId;
     @NotEmpty
     private String initiativeId;
+    private String initiativeName;
     @NotEmpty
     private String organizationId;
     @NotNull
@@ -27,5 +30,7 @@ public class EvaluationRankingDTO {
     private LocalDateTime criteriaConsensusTimestamp;
     @NotEmpty
     private String status;
-    private Long rankingValue;
+    @NotNull
+    private List<OnboardingRejectionReason> onboardingRejectionReasons;
+    private BigDecimal beneficiaryBudget;
 }

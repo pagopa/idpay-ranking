@@ -5,7 +5,6 @@ import it.gov.pagopa.ranking.model.RankingStatus;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import java.util.Optional;
 
 public interface InitiativeConfigService {

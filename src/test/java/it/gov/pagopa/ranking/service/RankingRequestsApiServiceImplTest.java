@@ -229,17 +229,13 @@ class RankingRequestsApiServiceImplTest {
         onboardingRankingRequests.add(onboardingRankingRequest2);
         Mockito.when(requestsRepositoryMock.findAllByOrganizationIdAndInitiativeId(Mockito.any(), Mockito.any()))
                 .thenReturn(onboardingRankingRequests);
-        onboardingRankingRequests = onboardingRankingRequests.stream()
-                .filter(onboardingRankingRequest ->
-                        onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_KO) ||
-                                onboardingRankingRequest.getBeneficiaryRankingStatus().equals(BeneficiaryRankingStatus.ELIGIBLE_OK)
-                )
-                .toList();
-        Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
+        Mockito.doNothing().when(onboardingNotifierService).callOnboardingNotifier(initiativeConfig, List.of(onboardingRankingRequest2));
 
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
         Assertions.assertDoesNotThrow(executable);
+
+        Mockito.verify(contextHolderServiceMock, Mockito.times(1)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 
     @Test
@@ -264,6 +260,8 @@ class RankingRequestsApiServiceImplTest {
         // Then
         Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
         Assertions.assertDoesNotThrow(executable);
+
+        Mockito.verify(contextHolderServiceMock, Mockito.times(2)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
     }
 
     @Test

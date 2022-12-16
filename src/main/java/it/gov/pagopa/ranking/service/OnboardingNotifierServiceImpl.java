@@ -6,7 +6,6 @@ import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
-import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -35,11 +34,9 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     @Override
     @Async
     public void callOnboardingNotifier(InitiativeConfig initiative, List<OnboardingRankingRequests> onboardingRankingRequests) {
-        initiative.setRankingStatus(RankingStatus.PUBLISHING);
-        rankingContextHolderService.setInitiativeConfig(initiative);
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
         onboardingRankingRequests.forEach(onboardingRankingRequest -> {
-            EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest);
+            EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest, initiative);
             log.debug("[NOTIFY_CITIZEN] - notifying onboarding request to onboarding outcome topic: {}", evaluationDTO);
             try {
                 if (!onboardingNotifierProducer.notify(evaluationDTO)) {

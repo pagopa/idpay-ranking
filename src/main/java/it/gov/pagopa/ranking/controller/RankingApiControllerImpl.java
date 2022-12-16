@@ -3,7 +3,6 @@ package it.gov.pagopa.ranking.controller;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
-import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.service.RankingRequestsApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

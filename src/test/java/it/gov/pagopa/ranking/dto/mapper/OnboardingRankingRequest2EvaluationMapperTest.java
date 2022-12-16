@@ -2,7 +2,9 @@ package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,9 +21,10 @@ class OnboardingRankingRequest2EvaluationMapperTest {
 
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
         request.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
+        InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
 
         // When
-        EvaluationRankingDTO result = mapper.apply(request);
+        EvaluationRankingDTO result = mapper.apply(request, initiativeConfig);
 
         // Then
         commonChecks(request, result, ONBOARDING_OK);
@@ -34,9 +37,10 @@ class OnboardingRankingRequest2EvaluationMapperTest {
 
         OnboardingRankingRequests requests = OnboardingRankingRequestsFaker.mockInstance(1);
         requests.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
+        InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
 
         // When
-        EvaluationRankingDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(requests, initiativeConfig);
 
         // Then
         commonChecks(requests, result, ONBOARDING_KO);
@@ -49,9 +53,10 @@ class OnboardingRankingRequest2EvaluationMapperTest {
 
         OnboardingRankingRequests requests = OnboardingRankingRequestsFaker.mockInstance(1);
         requests.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ONBOARDING_KO);
+        InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
 
         // When
-        EvaluationRankingDTO result = mapper.apply(requests);
+        EvaluationRankingDTO result = mapper.apply(requests, initiativeConfig);
 
         // Then
         commonChecks(requests, result, ONBOARDING_KO);
@@ -64,7 +69,6 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         Assertions.assertEquals(requests.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(requests.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(requests.getUserId(), result.getUserId());
-        Assertions.assertEquals(requests.getRankingValue2Show(), result.getRankingValue());
         Assertions.assertEquals(expectedStatus, result.getStatus());
     }
 

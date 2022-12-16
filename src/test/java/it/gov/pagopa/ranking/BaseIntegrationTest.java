@@ -1,6 +1,5 @@
 package it.gov.pagopa.ranking;
 
-import com.azure.core.http.rest.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -45,11 +44,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ReflectionUtils;
-import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import javax.management.*;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;

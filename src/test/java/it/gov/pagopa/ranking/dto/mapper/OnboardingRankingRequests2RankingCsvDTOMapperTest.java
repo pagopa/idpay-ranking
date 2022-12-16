@@ -7,8 +7,6 @@ import it.gov.pagopa.ranking.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class OnboardingRankingRequests2RankingCsvDTOMapperTest {
 
     private final OnboardingRankingRequests2RankingCsvDTOMapper mapper = new OnboardingRankingRequests2RankingCsvDTOMapper();

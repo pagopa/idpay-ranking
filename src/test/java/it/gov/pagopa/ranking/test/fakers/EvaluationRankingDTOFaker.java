@@ -46,7 +46,6 @@ public class EvaluationRankingDTOFaker {
         EvaluationRankingDTO.EvaluationRankingDTOBuilder<?,?> out = EvaluationRankingDTO.builder();
         return out
                 .status("ELIGIBLE_OK")
-                .rankingValue(1L)
                 .userId("userId_%d".formatted(bias))
                 .initiativeId("initiativeId_%d".formatted(bias))
                 .organizationId("organizationId_%d".formatted(bias))
