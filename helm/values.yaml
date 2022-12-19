@@ -79,3 +79,5 @@ microservice-chart:
     INITIATIVE_BLOB_STORAGE_CONNECTION_STRING: initiative-storage-blob-connection-string
     RANKING_P7M_CERT: ranking-p7m-cert
     RANKING_P7M_KEY_PEM: ranking-p7m-key
+    PDV_DECRYPT_API_KEY: pdv-api-key
+    PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url
