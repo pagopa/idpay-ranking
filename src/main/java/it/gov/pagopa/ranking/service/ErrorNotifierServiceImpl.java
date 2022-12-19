@@ -27,33 +27,52 @@ public class ErrorNotifierServiceImpl implements ErrorNotifierService {
     private final StreamBridge streamBridge;
     private final String applicationName;
 
-    private final String rankingMessagingServiceType;
-    private final String rankingServer;
-    private final String rankingTopic;
-    private final String rankingGroup;
+    private final String onboardingRankingRequestMessagingServiceType;
+    private final String onboardingRankingRequestServer;
+    private final String onboardingRankingRequestTopic;
+    private final String onboardingRankingRequestGroup;
+
+    private final String initiativeRankingMessagingServiceType;
+    private final String initiativeRankingServer;
+    private final String initiativeRankingTopic;
+    private final String initiativeRankingdGroup;
 
 
     @SuppressWarnings("squid:S00107") // suppressing too many parameters constructor alert
     public ErrorNotifierServiceImpl(StreamBridge streamBridge,
                                     @Value("${spring.application.name}") String applicationName,
 
-                                    @Value("${spring.cloud.stream.binders.kafka-onboarding-ranking-requests.type}") String rankingMessagingServiceType,
-                                    @Value("${spring.cloud.stream.binders.kafka-onboarding-ranking-requests.environment.spring.cloud.stream.kafka.binder.brokers}") String rankingServer,
-                                    @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}") String rankingTopic,
-                                    @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.group}") String rankingGroup){
+                                    @Value("${spring.cloud.stream.binders.kafka-onboarding-ranking-requests.type}") String onboardingRankingRequestMessagingServiceType,
+                                    @Value("${spring.cloud.stream.binders.kafka-onboarding-ranking-requests.environment.spring.cloud.stream.kafka.binder.brokers}") String onboardingRankingRequestServer,
+                                    @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}") String onboardingRankingRequestTopic,
+                                    @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.group}") String onboardingRankingRequestGroup,
+
+                                    @Value("${spring.cloud.stream.binders.kafka-initiative-ranking.type}") String initiativeBuildServiceType,
+                                    @Value("${spring.cloud.stream.binders.kafka-initiative-ranking.environment.spring.cloud.stream.kafka.binder.brokers}") String initiativeRankingServer,
+                                    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}") String initiativeRankingTopic,
+                                    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}") String initiativeRankingdGroup){
         this.streamBridge = streamBridge;
         this.applicationName = applicationName;
 
-        this.rankingMessagingServiceType = rankingMessagingServiceType;
-        this.rankingServer = rankingServer;
-        this.rankingTopic = rankingTopic;
-        this.rankingGroup = rankingGroup;
+        this.onboardingRankingRequestMessagingServiceType = onboardingRankingRequestMessagingServiceType;
+        this.onboardingRankingRequestServer = onboardingRankingRequestServer;
+        this.onboardingRankingRequestTopic = onboardingRankingRequestTopic;
+        this.onboardingRankingRequestGroup = onboardingRankingRequestGroup;
+        this.initiativeRankingMessagingServiceType = initiativeBuildServiceType;
+        this.initiativeRankingServer = initiativeRankingServer;
+        this.initiativeRankingTopic = initiativeRankingTopic;
+        this.initiativeRankingdGroup = initiativeRankingdGroup;
     }
 
 
     @Override
-    public void notifyRanking(Message<?> message, String description, boolean retryable, Throwable exception) {
-        notify(rankingMessagingServiceType, rankingServer, rankingTopic, rankingGroup, message, description, retryable, true, exception);
+    public void notifyOnboardingRankingRequest(Message<?> message, String description, boolean retryable, Throwable exception) {
+        notify(onboardingRankingRequestMessagingServiceType, onboardingRankingRequestServer, onboardingRankingRequestTopic, onboardingRankingRequestGroup, message, description, retryable, true, exception);
+    }
+
+    @Override
+    public void notifyInitiativeBuild(Message<?> message, String description, boolean retryable, Throwable exception) {
+        notify(initiativeRankingMessagingServiceType, initiativeRankingServer, initiativeRankingTopic, initiativeRankingdGroup, message, description, retryable, true, exception);
     }
 
 
