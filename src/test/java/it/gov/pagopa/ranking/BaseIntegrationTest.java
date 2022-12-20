@@ -110,7 +110,8 @@ import static org.awaitility.Awaitility.await;
 
                 //region wiremock
                 "logging.level.WireMock=OFF",
-                "app.pdv.base-url=http://localhost:${wiremock.server.port}"
+                "app.pdv.base-url=http://localhost:${wiremock.server.port}",
+                "app.pdv.headers.x-api-key=x_api_key"
                 //endregion
         })
 @AutoConfigureDataMongo
