@@ -9,6 +9,7 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.process.runtime.Executable;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
+import it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderExt;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.StreamsHealthIndicator;
 import it.gov.pagopa.ranking.utils.TestUtils;
@@ -111,7 +112,8 @@ import static org.awaitility.Awaitility.await;
                 //region wiremock
                 "logging.level.WireMock=OFF",
                 "app.pdv.base-url=http://localhost:${wiremock.server.port}",
-                "app.pdv.headers.x-api-key=x_api_key"
+                "app.pdv.headers.x-api-key=x_api_key",
+                "feign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderExt"
                 //endregion
         })
 @AutoConfigureDataMongo
@@ -160,6 +162,9 @@ public abstract class BaseIntegrationTest {
     protected String groupIdOnboardingRankingRequest;
     @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}")
     protected String groupIdInitiativeRanking;
+
+    private final PdvErrorDecoderExt pdvErrorDecoder = new PdvErrorDecoderExt();
+
 
     @BeforeAll
     public static void unregisterPreviouslyKafkaServers() throws MalformedObjectNameException, MBeanRegistrationException, InstanceNotFoundException {
@@ -224,6 +229,9 @@ public abstract class BaseIntegrationTest {
                 })
                 .when(initiativeRankingBlobClientMock)
                 .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
+
+        // reset counter of Feign retries
+        pdvErrorDecoder.resetCounter();
     }
 
     @Test

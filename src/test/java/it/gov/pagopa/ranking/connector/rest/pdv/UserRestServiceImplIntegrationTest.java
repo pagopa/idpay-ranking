@@ -18,6 +18,8 @@ class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UserRestService userRestService;
 
+    private final PdvErrorDecoderExt pdvErrorDecoder = new PdvErrorDecoderExt();
+
     @Test
     void retrieveUserInfoOk() {
         String userId = "USERID_OK_1";
@@ -73,6 +75,9 @@ class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
         }catch (Throwable e){
             Assertions.assertEquals(RetryableException.class, e.getClass());
         }
+
+        // 5 times is default for Feign retryer
+        Assertions.assertEquals(5, pdvErrorDecoder.getInvocationCount());
     }
 
     /*@Test
