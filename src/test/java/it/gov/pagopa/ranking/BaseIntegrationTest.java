@@ -9,7 +9,7 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.process.runtime.Executable;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
-import it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderExt;
+import it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.StreamsHealthIndicator;
 import it.gov.pagopa.ranking.utils.TestUtils;
@@ -163,9 +163,6 @@ public abstract class BaseIntegrationTest {
     @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}")
     protected String groupIdInitiativeRanking;
 
-    private final PdvErrorDecoderExt pdvErrorDecoder = new PdvErrorDecoderExt();
-
-
     @BeforeAll
     public static void unregisterPreviouslyKafkaServers() throws MalformedObjectNameException, MBeanRegistrationException, InstanceNotFoundException {
         TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Rome")));
@@ -231,7 +228,7 @@ public abstract class BaseIntegrationTest {
                 .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
 
         // reset counter of Feign retries
-        pdvErrorDecoder.resetCounter();
+        PdvErrorDecoderSpy.resetCounter();
     }
 
     @Test
