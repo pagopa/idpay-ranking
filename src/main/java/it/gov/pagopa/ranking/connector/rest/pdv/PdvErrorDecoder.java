@@ -16,7 +16,7 @@ public class PdvErrorDecoder implements ErrorDecoder {
 
         // Retry if status is 429
         if (response.status() == 429) {
-            log.info("Retrying is about to start");
+            log.info("Retrying PDV invocation {}", response.request().url());
             return new RetryableException(
                     response.status(),
                     exception.getMessage(),

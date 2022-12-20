@@ -36,7 +36,8 @@ import java.util.stream.IntStream;
 @TestPropertySource(properties = {
         "app.ranking.csv.tmp-dir=target/tmp",
         "app.ranking.query-page-size=10",
-        "app.ranking.savable-entities-size=13"
+        "app.ranking.savable-entities-size=13",
+        "app.pdv.header.x-api-key=x-api-key"
 })
 class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseIntegrationTest {
 
@@ -104,6 +105,7 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private void buildTestData(int n, String initiativeId, BeneficiaryRankingStatus status) {
         testData.addAll(onboardingRankingRequestsRepository.saveAll(IntStream.range(testData.size(), testData.size()+ n).mapToObj(i -> OnboardingRankingRequestsFaker.mockInstanceBuilder(i)
                 .initiativeId(initiativeId)
+                .userId("USERID_OK_%d".formatted(i))
                 .rank(1)
                 .rankingValue(i%3==1? i+1 : i)
                 .criteriaConsensusTimestamp(i%3==1? LocalDateTime.now().plusMinutes(1) : LocalDateTime.now())

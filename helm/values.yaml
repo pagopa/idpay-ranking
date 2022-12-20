@@ -52,6 +52,8 @@ microservice-chart:
     APPLICATIONINSIGHTS_INSTRUMENTATION_MICROMETER_ENABLED: "false"
 
   envConfigMapExternals:
+    rest-client:
+      PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url
     idpay-common:
       TZ: TZ
     idpay-eventhub-00:
@@ -80,4 +82,3 @@ microservice-chart:
     RANKING_P7M_CERT: ranking-p7m-cert
     RANKING_P7M_KEY_PEM: ranking-p7m-key
     PDV_DECRYPT_API_KEY: pdv-api-key
-    PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url

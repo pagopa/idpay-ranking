@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@FeignClient(name = "${app.pdv.cf}", url = "${app.pdv.base-url}")
+@FeignClient(name = "pdv", url = "${app.pdv.base-url}")
 public interface UserRestClient {
 
     @GetMapping(value = "/tokens/{token}/pii", produces = MediaType.APPLICATION_JSON_VALUE)
