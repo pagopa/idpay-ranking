@@ -113,7 +113,7 @@ import static org.awaitility.Awaitility.await;
                 "logging.level.WireMock=OFF",
                 "app.pdv.base-url=http://localhost:${wiremock.server.port}",
                 "app.pdv.headers.x-api-key=x_api_key",
-                "feign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderExt"
+                "feign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy"
                 //endregion
         })
 @AutoConfigureDataMongo

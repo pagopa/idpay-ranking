@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PdvErrorDecoderSpy extends PdvErrorDecoder{
 
-    private static AtomicInteger invocationCount;
+    private static AtomicInteger invocationCount = new AtomicInteger();
 
     @Override
     public Exception decode(String methodKey, Response response) {

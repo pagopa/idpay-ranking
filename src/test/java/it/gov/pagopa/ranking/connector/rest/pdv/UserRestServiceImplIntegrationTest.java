@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.connector.rest.pdv;
 
+import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import feign.RetryableException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
@@ -50,8 +51,8 @@ class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
             userRestService.getUser(userId);
             Assertions.fail("Exception expected");
         }catch (Throwable e){
-            Assertions.assertTrue(e instanceof FeignClientException);
-            Assertions.assertEquals(FeignClientException.InternalServerError.class,e.getClass());
+            Assertions.assertTrue(e instanceof FeignException);
+            Assertions.assertEquals(FeignException.InternalServerError.class,e.getClass());
         }
     }
 
