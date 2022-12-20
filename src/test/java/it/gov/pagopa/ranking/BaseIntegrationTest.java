@@ -6,6 +6,8 @@ import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.process.runtime.Executable;
+import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
+import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.StreamsHealthIndicator;
 import it.gov.pagopa.ranking.utils.TestUtils;
@@ -22,14 +24,18 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -41,10 +47,14 @@ import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.management.*;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.*;
@@ -63,6 +73,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest
 @EmbeddedKafka(topics = {
         "${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}",
+        "${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}",
         "${spring.cloud.stream.bindings.errors-out-0.destination}",
 }, controlledShutdown = true)
 @TestPropertySource(
@@ -80,7 +91,13 @@ import static org.awaitility.Awaitility.await;
                 "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.kafka.binder.zkNodes=${spring.embedded.zookeeper.connect}",
                 "spring.cloud.stream.binders.kafka-onboarding-ranking-requests.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
+                "spring.cloud.stream.binders.kafka-initiative-ranking.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.binders.kafka-errors.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
+                //endregion
+
+                //region service bus mock
+                "app.service-bus.namespace.string-connection=Endpoint=sb://ServiceBusEndpoint;SharedAccessKeyName=sharedAccessKeyName;SharedAccessKey=sharedAccessKey",
+                "app.service-bus.onboarding-request-pending.string-connection=Endpoint=sb://ServiceBusEndpoint;SharedAccessKeyName=sharedAccessKeyName;SharedAccessKey=sharedAccessKey;EntityPath=entityPath",
                 //endregion
 
                 //region mongodb
@@ -90,7 +107,7 @@ import static org.awaitility.Awaitility.await;
                 //endregion
         })
 @AutoConfigureDataMongo
-@AutoConfigureWebTestClient
+@AutoConfigureMockMvc
 public abstract class BaseIntegrationTest {
     @Autowired
     protected EmbeddedKafkaBroker kafkaBroker;
@@ -106,6 +123,12 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected StreamsHealthIndicator streamsHealthIndicator;
 
+    @MockBean(answer = Answers.RETURNS_MOCKS)
+    private AzureServiceBusClient azureServiceBusClientMock;
+
+    @MockBean
+    private InitiativeRankingBlobClient initiativeRankingBlobClientMock;
+
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -116,11 +139,15 @@ public abstract class BaseIntegrationTest {
 
     @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}")
     protected String topicOnboardingRankingRequest;
+    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}")
+    protected String topicInitiativeRanking;
     @Value("${spring.cloud.stream.bindings.errors-out-0.destination}")
     protected String topicErrors;
 
     @Value("${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.group}")
     protected String groupIdOnboardingRankingRequest;
+    @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}")
+    protected String groupIdInitiativeRanking;
 
     @BeforeAll
     public static void unregisterPreviouslyKafkaServers() throws MalformedObjectNameException, MBeanRegistrationException, InstanceNotFoundException {
@@ -159,6 +186,28 @@ public abstract class BaseIntegrationTest {
                         """,
                 mongoUrl,
                 "bootstrapServers: %s, zkNodes: %s".formatted(bootstrapServers, zkNodes));
+    }
+
+    @BeforeEach
+    void initMocks() {
+        Mockito.lenient().when(azureServiceBusClientMock.countMessageInOnboardingRequestQueue()).thenReturn(0);
+        Mockito.lenient().when(azureServiceBusClientMock.getOnboardingRequestReceiverClient().peekMessage()).thenReturn(null);
+
+        Mockito.lenient()
+                .doAnswer(i -> {
+                    Path uploadingFile = i.getArgument(0);
+                    Path destination = uploadingFile.getParent().resolve(uploadingFile.getFileName().toString().replaceAll("\\.([^.]+$)", ".uploaded.$1"));
+                    try {
+                        Files.copy(uploadingFile,
+                                destination,
+                                StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Something gone wrong simulating upload of test file %s into %s".formatted(uploadingFile, destination), e);
+                    }
+                    return null;
+                })
+                .when(initiativeRankingBlobClientMock)
+                .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
     }
 
     @Test
@@ -327,7 +376,7 @@ public abstract class BaseIntegrationTest {
     protected final Pattern errorUseCaseIdPatternMatch = getErrorUseCaseIdPatternMatch();
 
     protected Pattern getErrorUseCaseIdPatternMatch() {
-        return Pattern.compile("\"initiativeId\":\"id_([0-9]+)_?[^\"]*\"");
+        return Pattern.compile("\"initiativeId\":\"initiativeId_([0-9]+)_?[^\"]*\"");
     }
 
     protected void checkErrorsPublished(int notValidRules, long maxWaitingMs, List<Pair<Supplier<String>, java.util.function.Consumer<ConsumerRecord<String, String>>>> errorUseCases) {
