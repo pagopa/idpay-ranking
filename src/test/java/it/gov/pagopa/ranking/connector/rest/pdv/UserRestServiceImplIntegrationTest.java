@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.connector.rest.pdv;
 
 import feign.FeignException;
 import feign.FeignException.FeignClientException;
+import feign.RetryableException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.model.User;
 import org.junit.jupiter.api.Assertions;
@@ -70,7 +71,7 @@ class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
         try{
             userRestService.getUser(userId);
         }catch (Throwable e){
-            Assertions.assertEquals(FeignException.TooManyRequests.class,e.getClass());
+            Assertions.assertEquals(RetryableException.class, e.getClass());
         }
     }
 
