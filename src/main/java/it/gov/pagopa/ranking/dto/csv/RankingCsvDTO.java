@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 public class RankingCsvDTO {
 
-    @CsvBindByName(column = "userId") private String userId;
+    @CsvBindByName(column = "fiscalCode") private String fiscalCode;
 
     @CsvBindByName(column = "criteriaConsensusTimestamp")
     @CsvDate(value = "yyyy-MM-dd HH:mm:ss")

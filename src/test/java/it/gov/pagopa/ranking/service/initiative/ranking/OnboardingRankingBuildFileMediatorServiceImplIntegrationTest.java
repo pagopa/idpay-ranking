@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service.initiative.ranking;
 
 import it.gov.pagopa.ranking.BaseIntegrationTest;
+import it.gov.pagopa.ranking.connector.rest.pdv.UserRestService;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -35,7 +36,7 @@ import java.util.stream.IntStream;
 @TestPropertySource(properties = {
         "app.ranking.csv.tmp-dir=target/tmp",
         "app.ranking.query-page-size=10",
-        "app.ranking.savable-entities-size=13"
+        "app.ranking.savable-entities-size=13",
 })
 class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseIntegrationTest {
 
@@ -50,7 +51,7 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private static final Path LOCAL_CSV_COPY_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.copy.csv".formatted(ORGANIZATION_ID, INITIATIVE_ID));
     private static final Path LOCAL_P7M_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID));
     private static final Path UPLOADED_P7M_PATH = Path.of("target/tmp/%s/%s/initiative-ranking.csv.uploaded.p7m".formatted(ORGANIZATION_ID, INITIATIVE_ID));
-    private static final String EXPECTED_CSV_HEADER = "\"userId\";\"criteriaConsensusTimestamp\";\"rankingValue\";\"ranking\";\"status\"";
+    private static final String EXPECTED_CSV_HEADER = "\"fiscalCode\";\"criteriaConsensusTimestamp\";\"rankingValue\";\"ranking\";\"status\"";
 
 
     @Value("${app.ranking-build-file.retrieve-initiative.day-before}")
@@ -60,6 +61,8 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
+    @Autowired
+    private UserRestService userRestService;
 
     @SpyBean
     private P7mSignerService p7mSignerServiceSpy;
@@ -101,8 +104,10 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private void buildTestData(int n, String initiativeId, BeneficiaryRankingStatus status) {
         testData.addAll(onboardingRankingRequestsRepository.saveAll(IntStream.range(testData.size(), testData.size()+ n).mapToObj(i -> OnboardingRankingRequestsFaker.mockInstanceBuilder(i)
                 .initiativeId(initiativeId)
+                .userId("USERID_OK_%d".formatted(i))
                 .rank(1)
                 .rankingValue(i%3==1? i+1 : i)
+                .rankingValue2Show(i%3==1? i+1 : i)
                 .criteriaConsensusTimestamp(i%3==1? LocalDateTime.now().plusMinutes(1) : LocalDateTime.now())
                 .beneficiaryRankingStatus(i==0? BeneficiaryRankingStatus.ELIGIBLE_OK : status)
                 .build()
@@ -203,19 +208,20 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
         List<String> lines = Files.readAllLines(file);
         Assertions.assertEquals(70, lines.size());
 
-        testData.sort(
-                Comparator.comparing(OnboardingRankingRequests::getRankingValue)
-                        .thenComparing(OnboardingRankingRequests::getCriteriaConsensusTimestamp)
-        );
+        List<OnboardingRankingRequests> expectedLines = testData.stream()
+                .filter(d -> INITIATIVE_ID.equals(d.getInitiativeId()))
+                .sorted(
+                        Comparator.comparing(OnboardingRankingRequests::getRankingValue)
+                                .thenComparing(OnboardingRankingRequests::getCriteriaConsensusTimestamp))
+                .toList();
         for(int i=0; i<lines.size();i++) {
             String l = lines.get(i);
             if(i==0)
                 Assertions.assertEquals(EXPECTED_CSV_HEADER, l);
             else {
-                OnboardingRankingRequests entry = testData.get(i-1);
-                if(entry.getInitiativeId().equals(INITIATIVE_ID)) {
-                    Assertions.assertTrue(l.contains(entry.getUserId()));
-                }
+                OnboardingRankingRequests entry = expectedLines.get(i-1);
+                Assertions.assertTrue(l.contains("\"fiscalCode\""));
+                Assertions.assertTrue(l.contains("\"%d\"".formatted(entry.getRankingValue())), "The rankingValue %s is not present in line %s".formatted(entry.getRankingValue(), l));
             }
         }
     }

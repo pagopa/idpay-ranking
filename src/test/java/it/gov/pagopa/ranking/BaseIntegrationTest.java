@@ -2,12 +2,14 @@ package it.gov.pagopa.ranking;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.process.runtime.Executable;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
+import it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy;
 import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.StreamsHealthIndicator;
 import it.gov.pagopa.ranking.utils.TestUtils;
@@ -36,6 +38,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataM
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -105,9 +108,17 @@ import static org.awaitility.Awaitility.await;
                 "logging.level.org.springframework.boot.autoconfigure.mongo.embedded=WARN",
                 "spring.mongodb.embedded.version=4.0.21",
                 //endregion
+
+                //region wiremock
+                "logging.level.WireMock=OFF",
+                "app.pdv.base-url=http://localhost:${wiremock.server.port}",
+                "app.pdv.headers.x-api-key=x_api_key",
+                "feign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy"
+                //endregion
         })
 @AutoConfigureDataMongo
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(stubs = "classpath:/stub/pdv", port = 0)
 public abstract class BaseIntegrationTest {
     @Autowired
     protected EmbeddedKafkaBroker kafkaBroker;
@@ -119,6 +130,9 @@ public abstract class BaseIntegrationTest {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongodbUri;
+
+    @Autowired
+    private WireMockServer wireMockServer;
 
     @Autowired
     protected StreamsHealthIndicator streamsHealthIndicator;
@@ -182,10 +196,14 @@ public abstract class BaseIntegrationTest {
                         ************************
                         Embedded mongo: %s
                         Embedded kafka: %s
+                        Wiremock HTTP: http://localhost:%s
+                        Wiremock HTTPS: %s
                         ************************
                         """,
                 mongoUrl,
-                "bootstrapServers: %s, zkNodes: %s".formatted(bootstrapServers, zkNodes));
+                "bootstrapServers: %s, zkNodes: %s".formatted(bootstrapServers, zkNodes),
+                wireMockServer.getOptions().portNumber(),
+                wireMockServer.baseUrl());
     }
 
     @BeforeEach
@@ -208,6 +226,9 @@ public abstract class BaseIntegrationTest {
                 })
                 .when(initiativeRankingBlobClientMock)
                 .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
+
+        // reset counter of Feign retries
+        PdvErrorDecoderSpy.resetCounter();
     }
 
     @Test
