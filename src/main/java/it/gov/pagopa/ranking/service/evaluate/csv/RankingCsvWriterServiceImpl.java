@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service.csv;
+package it.gov.pagopa.ranking.service.evaluate.csv;
 
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;

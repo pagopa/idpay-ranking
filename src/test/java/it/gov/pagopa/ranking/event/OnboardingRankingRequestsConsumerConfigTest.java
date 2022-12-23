@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 @TestPropertySource(properties = {
-        "logging.level.it.gov.pagopa.ranking.service.OnboardingRankingRequestsMediatorImpl=WARN",
+        "logging.level.it.gov.pagopa.ranking.service.onboarding.OnboardingRankingRequestsMediatorImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.OnboardingRankingRequestsServiceImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.BaseKafkaConsumer=WARN",
 })

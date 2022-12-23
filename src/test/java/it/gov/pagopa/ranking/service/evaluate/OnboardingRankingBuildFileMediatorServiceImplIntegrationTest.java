@@ -1,7 +1,6 @@
-package it.gov.pagopa.ranking.service.initiative.ranking;
+package it.gov.pagopa.ranking.service.evaluate;
 
 import it.gov.pagopa.ranking.BaseIntegrationTest;
-import it.gov.pagopa.ranking.connector.rest.pdv.UserRestService;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -61,8 +60,6 @@ class OnboardingRankingBuildFileMediatorServiceImplIntegrationTest extends BaseI
     private OnboardingRankingRequestsRepository onboardingRankingRequestsRepository;
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
-    @Autowired
-    private UserRestService userRestService;
 
     @SpyBean
     private P7mSignerService p7mSignerServiceSpy;

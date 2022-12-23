@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service;
+package it.gov.pagopa.ranking.service.onboarding;
 
 import org.springframework.messaging.Message;
 

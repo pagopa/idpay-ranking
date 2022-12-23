@@ -2,7 +2,7 @@ package it.gov.pagopa.ranking.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
-import it.gov.pagopa.ranking.service.initiative.ranking.OnboardingRankingBuildFileMediatorService;
+import it.gov.pagopa.ranking.service.evaluate.OnboardingRankingBuildFileMediatorService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;

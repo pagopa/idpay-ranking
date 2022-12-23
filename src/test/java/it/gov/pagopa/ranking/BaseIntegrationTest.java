@@ -83,6 +83,7 @@ import static org.awaitility.Awaitility.await;
         properties = {
                 //region common feature disabled
                 "logging.level.it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl=WARN",
+                "app.ranking-build-file.retrieve-initiative.schedule=-",
                 //endregion
 
                 //region kafka brokers

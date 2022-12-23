@@ -173,6 +173,8 @@ logging:
     org.mongodb.driver: ${LOG_LEVEL_MONGODB_DRIVER:WARN}
 
 app:
+  threads:
+    schedule-max-number: ${THREADS_SCHEDULE_MAX_NUMBER:1}
   pdv:
     base-url: ${PDV_DECRYPT_BASE_URL:}
     headers.x-api-key: ${PDV_DECRYPT_API_KEY:}

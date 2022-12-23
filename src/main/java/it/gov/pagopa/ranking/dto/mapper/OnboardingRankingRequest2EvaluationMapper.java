@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.gov.pagopa.ranking.constants.OnboardingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING;
+
 @Service
 public class OnboardingRankingRequest2EvaluationMapper {
 
@@ -37,6 +39,7 @@ public class OnboardingRankingRequest2EvaluationMapper {
             //Simple builder with no specific Reason
             rejectionReasons.add(OnboardingRejectionReason.builder()
                     .type(OnboardingRejectionReason.OnboardingRejectionReasonType.OUT_OF_RANKING)
+                    .code(REJECTION_REASON_CITIZEN_OUT_OF_RANKING)
                     .detail(String.valueOf(rank))
                     .build());
             return rejectionReasons;
