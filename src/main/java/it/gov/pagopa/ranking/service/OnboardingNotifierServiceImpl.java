@@ -35,7 +35,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     @Async
     public void callOnboardingNotifier(InitiativeConfig initiative, List<OnboardingRankingRequests> onboardingRankingRequests) {
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
-        onboardingRankingRequests.forEach(onboardingRankingRequest -> {
+        onboardingRankingRequests.stream().parallel().forEach(onboardingRankingRequest -> {
             EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest, initiative);
             log.debug("[NOTIFY_CITIZEN] - notifying onboarding request to onboarding outcome topic: {}", evaluationDTO);
             try {
@@ -45,10 +45,10 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
             } catch (Exception e) {
                 log.error(String.format("[UNEXPECTED_ONBOARDING_NOTIFIER_PROCESSOR_ERROR] Unexpected error occurred publishing onboarding ranking result: %s", evaluationDTO), e);
             }
-        }); //Check if parallel is needed and calculate Numb of Threads necessary
+        });
         initiative.setRankingPublishedTimestamp(LocalDateTime.now());
         initiative.setRankingStatus(RankingStatus.COMPLETED);
-        rankingContextHolderService.setInitiativeConfig(initiative); //TODO need to send the modification to someone?
+        rankingContextHolderService.setInitiativeConfig(initiative);
         log.info("[NOTIFY_CITIZEN] - onboarding_ranking_rule saved with Ranking status: {}", initiative.getRankingStatus());
     }
 }
