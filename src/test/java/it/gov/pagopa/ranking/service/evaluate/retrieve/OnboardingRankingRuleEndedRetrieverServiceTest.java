@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service.initiative.ranking.retrieve;
+package it.gov.pagopa.ranking.service.evaluate.retrieve;
 
 import com.azure.core.util.BinaryData;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;

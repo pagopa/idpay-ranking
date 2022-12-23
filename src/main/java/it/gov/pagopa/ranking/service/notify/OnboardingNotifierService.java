@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service;
+package it.gov.pagopa.ranking.service.notify;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;

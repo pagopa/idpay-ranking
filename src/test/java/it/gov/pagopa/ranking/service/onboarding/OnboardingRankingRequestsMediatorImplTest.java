@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service;
+package it.gov.pagopa.ranking.service.onboarding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.MongoException;
@@ -7,6 +7,9 @@ import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequestsDTO2ModelMapper
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
+import it.gov.pagopa.ranking.service.ErrorNotifierService;
+import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
+import it.gov.pagopa.ranking.service.OnboardingRankingRequestsService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;

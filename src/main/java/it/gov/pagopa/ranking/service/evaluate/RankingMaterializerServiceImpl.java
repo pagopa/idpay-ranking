@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service;
+package it.gov.pagopa.ranking.service.evaluate;
 
 import it.gov.pagopa.ranking.dto.csv.RankingCsvDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequests2RankingCsvDTOMapper;
@@ -6,7 +6,7 @@ import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.ranking.service.csv.RankingCsvWriterService;
+import it.gov.pagopa.ranking.service.evaluate.csv.RankingCsvWriterService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;

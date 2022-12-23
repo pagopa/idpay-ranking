@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.event;
 
-import it.gov.pagopa.ranking.service.OnboardingRankingRequestsMediator;
+import it.gov.pagopa.ranking.service.onboarding.OnboardingRankingRequestsMediator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
