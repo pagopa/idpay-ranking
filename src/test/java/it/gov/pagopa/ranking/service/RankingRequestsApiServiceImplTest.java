@@ -11,6 +11,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
+import it.gov.pagopa.ranking.service.notify.OnboardingNotifierService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.test.fakers.RankingRequestsApiDTOFaker;

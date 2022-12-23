@@ -1,11 +1,10 @@
-package it.gov.pagopa.ranking.service.initiative.ranking;
+package it.gov.pagopa.ranking.service.evaluate;
 
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
-import it.gov.pagopa.ranking.service.RankingMaterializerService;
-import it.gov.pagopa.ranking.service.initiative.ranking.retrieve.OnboardingRankingRuleEndedRetrieverService;
+import it.gov.pagopa.ranking.service.evaluate.retrieve.OnboardingRankingRuleEndedRetrieverService;
 import it.gov.pagopa.ranking.service.sign.P7mSignerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

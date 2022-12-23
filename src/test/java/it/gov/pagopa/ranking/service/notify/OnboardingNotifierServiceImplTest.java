@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.service;
+package it.gov.pagopa.ranking.service.notify;
 
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
@@ -6,6 +6,7 @@ import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
+import it.gov.pagopa.ranking.service.RankingContextHolderService;
 import it.gov.pagopa.ranking.test.fakers.EvaluationRankingDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import org.junit.jupiter.api.Test;
