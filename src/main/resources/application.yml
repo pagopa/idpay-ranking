@@ -1,13 +1,6 @@
 server:
   port: ${RANKING_PORT:8080}
 
-info:
-  build:
-    artifact: "@project.artifactId@"
-    name: "@project.artifactId@"
-    description: "@project.description@"
-    version: "@project.version@"
-
 spring:
   application:
     name: "@project.artifactId@"
@@ -142,6 +135,7 @@ spring:
           maxConnectionLifeTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_LIFE_MS:0}
           maxConnectionIdleTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_IDLE_MS:0}
           maxConnecting: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTING:2}
+
 feign:
   okhttp:
     enabled: true
@@ -152,6 +146,10 @@ feign:
       pdv:
         errorDecoder: it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoder
         loggerLevel: ${FEIGN_PDV_LOGGER_LEVEL:${FEIGN_LOGGER_LEVEL:basic}}
+
+management.endpoints:
+  web:
+    exposure.include: info, health
 
 logging:
   level:
