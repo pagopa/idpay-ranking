@@ -4,12 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Supplier;
 
 @Service
 @Slf4j
@@ -64,6 +68,14 @@ public class ErrorNotifierServiceImpl implements ErrorNotifierService {
         this.initiativeRankingdGroup = initiativeRankingdGroup;
     }
 
+    /** Declared just to let know Spring to connect the producer at startup */
+    @Configuration
+    static class ErrorNotifierProducerConfig {
+        @Bean
+        public Supplier<Flux<Message<Object>>> errors() {
+            return Flux::empty;
+        }
+    }
 
     @Override
     public void notifyOnboardingRankingRequest(Message<?> message, String description, boolean retryable, Throwable exception) {
