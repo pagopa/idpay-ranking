@@ -12,7 +12,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer
+        definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking
       bindings:
         onboardingRankingRequestsConsumer-in-0:
           destination: ${KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC:idpay-onboarding-ranking-request}
@@ -109,7 +109,7 @@ spring:
           errors-out-0:
             producer:
               configuration:
-                client.id: transactions-errors
+                client.id: opnboarding-ranking-errors
                 connections.max.idle.ms: ${KAFKA_ERRORS_CONNECTION_MAX_IDLE_TIME:180000}
                 retry.backoff.ms: ${KAFKA_ERRORS_KAFKA_RETRY_MS:${KAFKA_RETRY_MS:10000}}
                 linger.ms: ${KAFKA_ERRORS_LINGER_MS:${KAFKA_LINGER_MS:2}}
