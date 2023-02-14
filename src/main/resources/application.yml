@@ -1,13 +1,6 @@
 server:
   port: ${RANKING_PORT:8080}
 
-info:
-  build:
-    artifact: "@project.artifactId@"
-    name: "@project.artifactId@"
-    description: "@project.description@"
-    version: "@project.version@"
-
 spring:
   application:
     name: "@project.artifactId@"
@@ -19,7 +12,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer
+        definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking
       bindings:
         onboardingRankingRequestsConsumer-in-0:
           destination: ${KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC:idpay-onboarding-ranking-request}
@@ -80,7 +73,7 @@ spring:
             security.protocol: ${KAFKA_RANKING_SECURITY_PROTOCOL:SASL_SSL}
             connections.max.idle.ms: ${KAFKA_CONFIG_CONNECTION_MAX_IDLE_TIME:180000}
             metadata.max.idle.ms: ${KAFKA_CONFIG_METADATA_MAX_IDLE_MS:180000}
-            metadata.max.age.ms: ${KAFKA_CONFIG_METADATA_MAX_AGE_INTERVAL:180000}
+            metadata.max.age.ms: ${KAFKA_CONFIG_METADATA_MAX_AGE_INTERVAL:179000}
             max.request.size: ${KAFKA_CONFIG_METADATA_MAX_REQUEST_SIZE:1000000}
         bindings:
           onboardingRankingRequestsConsumer-in-0:
@@ -88,7 +81,7 @@ spring:
               startOffset: ${KAFKA_ONBOARDING_RANKING_REQUESTS_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
               autoCommitOffset: false
               ackMode: MANUAL_IMMEDIATE
-              ackTime: ${KAFKA_ONBOARDING_RANKING_REQUESTS_ACK_MILLIS:10000}
+              ackTime: ${KAFKA_ONBOARDING_RANKING_REQUESTS_ACK_MILLIS:1000}
               standardHeaders: ${KAFKA_ONBOARDING_RANKING_REQUESTS_STANDARD_HEADERS:${KAFKA_CONSUMER_CONFIG_STANDARD_HEADERS:both}}
               configuration:
                 max.poll:
@@ -103,7 +96,7 @@ spring:
               startOffset: ${KAFKA_INITIATIVE_RANKING_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
               autoCommitOffset: false
               ackMode: MANUAL_IMMEDIATE
-              ackTime: ${KAFKA_INITIATIVE_RANKING_ACK_MILLIS:10000}
+              ackTime: ${KAFKA_INITIATIVE_RANKING_ACK_MILLIS:1000}
               standardHeaders: ${KAFKA_INITIATIVE_RANKING_STANDARD_HEADERS:${KAFKA_CONSUMER_CONFIG_STANDARD_HEADERS:both}}
               configuration:
                 max.poll:
@@ -116,7 +109,7 @@ spring:
           errors-out-0:
             producer:
               configuration:
-                client.id: transactions-errors
+                client.id: opnboarding-ranking-errors
                 connections.max.idle.ms: ${KAFKA_ERRORS_CONNECTION_MAX_IDLE_TIME:180000}
                 retry.backoff.ms: ${KAFKA_ERRORS_KAFKA_RETRY_MS:${KAFKA_RETRY_MS:10000}}
                 linger.ms: ${KAFKA_ERRORS_LINGER_MS:${KAFKA_LINGER_MS:2}}
@@ -142,6 +135,7 @@ spring:
           maxConnectionLifeTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_LIFE_MS:0}
           maxConnectionIdleTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_IDLE_MS:0}
           maxConnecting: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTING:2}
+
 feign:
   okhttp:
     enabled: true
@@ -152,6 +146,10 @@ feign:
       pdv:
         errorDecoder: it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoder
         loggerLevel: ${FEIGN_PDV_LOGGER_LEVEL:${FEIGN_LOGGER_LEVEL:basic}}
+
+management.endpoints:
+  web:
+    exposure.include: info, health
 
 logging:
   level:

@@ -30,10 +30,14 @@ public class UserRestServiceImpl implements UserRestService{
            return userFromCache;
        } else {
            log.debug("[CACHE_MISS] Cannot locally find user with id {}", userId);
+           long startTime = System.currentTimeMillis();
+
            User user = User.builder()
                    .fiscalCode(
                            userClient.getPii(userId, apiKey).getPii()
                    ).build();
+
+           log.info("[PERFORMANCE_LOG] [PDV_INTEGRATION] Time occurred to call pdv {} ms", System.currentTimeMillis() - startTime);
 
            userCache.put(userId, user);
            log.debug("Added user info of user {} to local map", userId);
