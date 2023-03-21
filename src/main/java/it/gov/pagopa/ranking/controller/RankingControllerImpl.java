@@ -17,6 +17,11 @@ public class RankingControllerImpl implements RankingController{
     }
 
     @Override
+    public void forceRankingInitiativeEnd(String initiativeId) {
+        onboardingRankingBuildFileMediatorService.forceRankingInitiativeEnd(initiativeId);
+    }
+
+    @Override
     public List<InitiativeConfig> forceRankingFileBuildScheduling() {
         log.info("Forcing onboarding ranking build file");
         return onboardingRankingBuildFileMediatorService.execute();

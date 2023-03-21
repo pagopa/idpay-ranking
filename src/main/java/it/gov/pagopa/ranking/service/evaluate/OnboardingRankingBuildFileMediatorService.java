@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface OnboardingRankingBuildFileMediatorService {
     List<InitiativeConfig> execute();
+
+     void forceRankingInitiativeEnd(String initiativeId);
 }
