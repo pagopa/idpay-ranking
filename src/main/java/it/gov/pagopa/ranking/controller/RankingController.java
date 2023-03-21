@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.controller;
 
 import it.gov.pagopa.ranking.model.InitiativeConfig;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ public interface RankingController {
     @PutMapping("/initiative/{initiativeId}/reset-status-set-ranking-end-date")
     void updateRankingInitiativeEnd(
             @PathVariable String initiativeId,
-            @RequestParam LocalDate rankingEndDate
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate rankingEndDate
     );
 
     @GetMapping("/ranking/build/file/start")
