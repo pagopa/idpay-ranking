@@ -1,8 +1,10 @@
 package it.gov.pagopa.ranking.service.initiative;
 
+import it.gov.pagopa.ranking.exception.ClientException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,5 +38,19 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
     @Override
     public List<InitiativeConfig> findByRankingStatusRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive) {
         return initiativeConfigRepository.findByRankingStatusAndRankingEndDateBetween(rankingStatus, startIntervalExclusive, endIntervalExclusive);
+    }
+
+    @Override
+    public void setInitiativeRankingEndDateAndStatusWaitingEnd(String initiativeId, LocalDate date) {
+        InitiativeConfig initiative = this.findById(initiativeId);
+
+        if (initiative != null) {
+            initiative.setRankingEndDate(date);
+            initiative.setRankingStatus(RankingStatus.WAITING_END);
+
+            initiativeConfigRepository.save(initiative);
+        } else {
+            throw new ClientException(HttpStatus.NOT_FOUND, "[RANKING][FORCE_RANKING_END] Initiative with id %s not found".formatted(initiativeId));
+        }
     }
 }

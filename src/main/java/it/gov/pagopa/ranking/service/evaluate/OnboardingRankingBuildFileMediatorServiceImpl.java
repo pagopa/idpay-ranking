@@ -1,21 +1,18 @@
 package it.gov.pagopa.ranking.service.evaluate;
 
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
-import it.gov.pagopa.ranking.exception.ClientException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.service.evaluate.retrieve.OnboardingRankingRuleEndedRetrieverService;
 import it.gov.pagopa.ranking.service.sign.P7mSignerService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -63,20 +60,6 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
         }
 
         return initiativeEndOnboardingDate;
-    }
-
-    @Override
-    public void forceRankingInitiativeEnd(String initiativeId) {
-        InitiativeConfig initiative = initiativeConfigRepository.findById(initiativeId).orElse(null);
-
-        if (initiative != null) {
-            initiative.setRankingEndDate(LocalDate.now().minusDays(1));
-            initiative.setRankingStatus(RankingStatus.WAITING_END);
-
-            initiativeConfigRepository.save(initiative);
-        } else {
-            throw new ClientException(HttpStatus.NOT_FOUND, "[RANKING][FORCE_RANKING_END] Initiative with id %s not found".formatted(initiativeId));
-        }
     }
 
     private Path sign(Path localRankingFilePath, InitiativeConfig initiativeConfig) {
