@@ -21,6 +21,7 @@ public class InitiativeConfig {
     @Id
     private String initiativeId;
     private String initiativeName;
+    private LocalDate initiativeEndDate;
     private String organizationId;
     private String initiativeStatus;
     private LocalDate rankingStartDate;

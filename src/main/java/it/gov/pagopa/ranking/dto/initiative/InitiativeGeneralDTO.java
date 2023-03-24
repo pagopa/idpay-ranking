@@ -32,6 +32,10 @@ public class InitiativeGeneralDTO {
     @JsonProperty("rankingEndDate")
     private LocalDate rankingEndDate;
 
+    @JsonProperty("endDate")
+    private LocalDate endDate;
+
+
     @JsonProperty("rankingEnabled")
     private boolean rankingEnabled;
 
