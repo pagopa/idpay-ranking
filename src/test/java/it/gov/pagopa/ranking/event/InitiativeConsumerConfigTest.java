@@ -193,6 +193,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                 .initiativeStatus("old_initiative_status_%d".formatted(i))
                 .rankingStartDate(nowDate.plusMonths(1L))
                 .rankingEndDate(nowDate.plusMonths(8L))
+                .initiativeEndDate(nowDate.plusMonths(8L))
                 .initiativeBudget(BigDecimal.TEN)
                 .beneficiaryInitiativeBudget(BigDecimal.ONE)
                 .rankingFields(List.of(
@@ -233,6 +234,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         Assertions.assertEquals(initiativeBuildDTO.getStatus(), initiativeConfig.getInitiativeStatus());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingStartDate(), initiativeConfig.getRankingStartDate());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingEndDate(), initiativeConfig.getRankingEndDate());
+        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getEndDate(), initiativeConfig.getInitiativeEndDate());
         Assertions.assertEquals(rankingStatus, initiativeConfig.getRankingStatus());
     }
 

@@ -23,6 +23,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
         return InitiativeConfig.builder()
                 .initiativeId(initiativeBuildDTO.getInitiativeId())
                 .initiativeName(initiativeBuildDTO.getInitiativeName())
+                .initiativeEndDate(initiativeBuildDTO.getGeneral().getEndDate())
                 .organizationId(initiativeBuildDTO.getOrganizationId())
                 .initiativeStatus(initiativeBuildDTO.getStatus())
                 .rankingStartDate(initiativeBuildDTO.getGeneral().getRankingStartDate())
