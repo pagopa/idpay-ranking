@@ -1,9 +1,10 @@
 package it.gov.pagopa.ranking.service.initiative;
 
-import it.gov.pagopa.ranking.exception.ClientException;
+import it.gov.pagopa.ranking.exception.ClientExceptionNoBody;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 public class InitiativeConfigServiceImpl implements InitiativeConfigService{
     private final InitiativeConfigRepository initiativeConfigRepository;
 
@@ -50,7 +52,8 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
 
             initiativeConfigRepository.save(initiative);
         } else {
-            throw new ClientException(HttpStatus.NOT_FOUND, "[RANKING][FORCE_RANKING_END] Initiative with id %s not found".formatted(initiativeId));
+            log.info("[RANKING][FORCE_RANKING_END] Could not find initiative having id {}", initiativeId);
+            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
         }
     }
 }
