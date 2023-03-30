@@ -61,6 +61,7 @@ public class Initiative2BuildDTOFaker {
                 .rankingStartDate(nowDate)
                 .rankingEndDate(nowDate.plusMonths(1L))
                 .rankingEnabled(Boolean.TRUE)
+                .endDate(nowDate)
                 .build();
         out.general(initiativeGeneralDTO);
 

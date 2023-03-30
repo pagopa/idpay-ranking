@@ -56,6 +56,7 @@ public class InitiativeConfigFaker {
         out.initiativeStatus(bias!=null? "status_%d".formatted(bias) : "?????");
         out.rankingStartDate(now);
         out.rankingEndDate(now.plusMonths(7L));
+        out.initiativeEndDate(now.plusMonths(7L));
         out.initiativeBudget(BigDecimal.TEN);
         out.beneficiaryInitiativeBudget(BigDecimal.ONE);
         out.rankingStatus(RankingStatus.WAITING_END);
