@@ -199,6 +199,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                 .rankingFields(List.of(
                         Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
                 ))
+                .initiativeRewardType("REFUND")
                 .build();
     }
 
