@@ -26,14 +26,10 @@ public class OnboardingRankingRequestsRepositoryExtendedImpl implements Onboardi
         if (pageable == null) {
             pageable = Pageable.unpaged();
         }
-        query = query.with(pageable);
-
-        // Find List
-        List<OnboardingRankingRequests> onboardingRankingRequests = mongoTemplate.find(query, OnboardingRankingRequests.class);
-
         // Count objects
         long count = mongoTemplate.count(query, OnboardingRankingRequests.class);
-
+        // Find List
+        List<OnboardingRankingRequests> onboardingRankingRequests = mongoTemplate.find(query.with(pageable), OnboardingRankingRequests.class);
         // Convert in pageable
         return new PageImpl<>(onboardingRankingRequests, pageable, count);
     }
