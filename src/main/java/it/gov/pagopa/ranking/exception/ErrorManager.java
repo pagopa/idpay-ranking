@@ -20,9 +20,12 @@ public class ErrorManager {
     }
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<ErrorDTO> handleException(RuntimeException error, HttpServletRequest request) {
-        if(!(error instanceof ClientException clientException) || clientException.isPrintStackTrace()){
-            log.error("Something gone wrong handlind request: " + request.getRequestURI(), error);
+        if(!(error instanceof ClientException clientException) || clientException.isPrintStackTrace() || clientException.getCause() != null){
+            log.error("Something gone wrong handling request {}", getRequestDetails(request), error);
+        } else {
+            log.info("A {} occurred handling request {}: {} at {}", clientException.getClass().getSimpleName(), getRequestDetails(request), error.getMessage(), error.getStackTrace().length > 0 ? error.getStackTrace()[0] : "UNKNOWN");
         }
+
         if(error instanceof ClientExceptionNoBody clientExceptionNoBody){
             return ResponseEntity.status(clientExceptionNoBody.getHttpStatus()).build();
         }
@@ -41,6 +44,10 @@ public class ErrorManager {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(errorDTO);
         }
+    }
+
+    private String getRequestDetails(HttpServletRequest request) {
+        return "%s %s".formatted(request.getMethod(), request.getRequestURI());
     }
 
 }
