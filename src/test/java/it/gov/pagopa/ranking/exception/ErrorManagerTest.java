@@ -26,7 +26,7 @@ class ErrorManagerTest extends BaseIntegrationTest {
     void handleExceptionClientExceptionNoBody() throws Exception {
 
         Mockito.when(controller.rankingRequests("ClientExceptionNoBody", "INITIATIVE_ID", 0, 10, new RankingRequestFilter()))
-                .thenThrow(new ClientExceptionNoBody(HttpStatus.NOT_FOUND));
+                .thenThrow(new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "NOTFOUND"));
 
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "ClientExceptionNoBody", "INITIATIVE_ID"))

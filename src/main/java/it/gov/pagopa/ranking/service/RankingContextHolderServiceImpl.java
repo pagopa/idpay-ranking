@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class RankingContextHolderServiceImpl implements RankingContextHolderService{
+public class RankingContextHolderServiceImpl implements RankingContextHolderService {
     private final InitiativeConfigService initiativeConfigService;
 
     public RankingContextHolderServiceImpl(InitiativeConfigService initiativeConfigService) {
@@ -19,11 +19,10 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
     @Override
     public InitiativeConfig getInitiativeConfig(String initiativeId, String organizationId) {
         InitiativeConfig initiativeConfigRetrieved = retrieveInitiativeConfig(initiativeId);
-        if(initiativeConfigRetrieved.getOrganizationId().equals(organizationId)){
+        if (initiativeConfigRetrieved.getOrganizationId().equals(organizationId)) {
             return initiativeConfigRetrieved;
         } else {
-            log.info("The initiative {} does not related with organization {}", initiativeId, organizationId);
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
+            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "The initiative %s does not related with organization %s".formatted(initiativeId, organizationId));
         }
     }
 
@@ -35,10 +34,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
     private InitiativeConfig retrieveInitiativeConfig(String initiativeId) {
         log.debug("[CACHE_MISS] Cannot find locally initiativeId {}", initiativeId);
         long startTime = System.currentTimeMillis();
-        InitiativeConfig initiativeConfig = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(() -> {
-            log.error("[RANKING_CONTEXT] cannot find initiative having id %s".formatted(initiativeId));
-            return new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
-        });
+        InitiativeConfig initiativeConfig = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(() -> new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "[RANKING_CONTEXT] cannot find initiative having id %s".formatted(initiativeId)));
         log.info("[CACHE_MISS] [PERFORMANCE_LOG] Time spent fetching initiativeId: {} ms", System.currentTimeMillis() - startTime);
         return initiativeConfig;
     }

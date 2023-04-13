@@ -52,8 +52,7 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
 
             initiativeConfigRepository.save(initiative);
         } else {
-            log.info("[RANKING][FORCE_RANKING_END] Could not find initiative having id {}", initiativeId);
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND);
+            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "[RANKING][FORCE_RANKING_END] Could not find initiative having id %s".formatted(initiativeId));
         }
     }
 }
