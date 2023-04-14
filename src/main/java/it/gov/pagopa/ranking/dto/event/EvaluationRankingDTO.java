@@ -35,4 +35,5 @@ public class EvaluationRankingDTO {
     @NotNull
     private List<OnboardingRejectionReason> onboardingRejectionReasons;
     private BigDecimal beneficiaryBudget;
+    private String initiativeRewardType;
 }

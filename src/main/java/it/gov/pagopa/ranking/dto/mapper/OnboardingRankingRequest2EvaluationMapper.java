@@ -24,6 +24,7 @@ public class OnboardingRankingRequest2EvaluationMapper {
         evaluationRankingDTO.setInitiativeId(onboardingRankingRequests.getInitiativeId());
         evaluationRankingDTO.setInitiativeName(initiative.getInitiativeName());
         evaluationRankingDTO.setInitiativeEndDate(initiative.getInitiativeEndDate());
+        evaluationRankingDTO.setInitiativeRewardType(initiative.getInitiativeRewardType());
         evaluationRankingDTO.setStatus(transcodeRankingStatus(onboardingRankingRequests));
         evaluationRankingDTO.setAdmissibilityCheckDate(onboardingRankingRequests.getAdmissibilityCheckDate());
         evaluationRankingDTO.setCriteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp());

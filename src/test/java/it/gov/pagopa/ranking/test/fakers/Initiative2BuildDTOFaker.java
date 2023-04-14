@@ -72,6 +72,7 @@ public class Initiative2BuildDTOFaker {
                 .automatedCriteria(automatedCriteriaDTOS)
                 .build();
         out.beneficiaryRule(initiativeBeneficiaryRuleDTO);
+        out.initiativeRewardType("REFUND");
 
         return out;
 
