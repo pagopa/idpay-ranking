@@ -29,5 +29,7 @@ public class InitiativeBuildDTO {
     private InitiativeBeneficiaryRuleDTO beneficiaryRule;
     @JsonProperty("initiativeRewardType")
     private String initiativeRewardType;
+    @JsonProperty("organizationName")
+    private String organizationName;
 
 }

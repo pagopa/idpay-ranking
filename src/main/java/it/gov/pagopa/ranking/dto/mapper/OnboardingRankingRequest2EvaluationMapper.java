@@ -31,6 +31,7 @@ public class OnboardingRankingRequest2EvaluationMapper {
         evaluationRankingDTO.setOrganizationId(onboardingRankingRequests.getOrganizationId());
         evaluationRankingDTO.setBeneficiaryBudget(initiative.getBeneficiaryInitiativeBudget());
         evaluationRankingDTO.setOnboardingRejectionReasons(this.buildRejectionReasons(onboardingRankingRequests.getBeneficiaryRankingStatus(), onboardingRankingRequests.getRank()));
+        evaluationRankingDTO.setOrganizationName(initiative.getOrganizationName());
 
         return evaluationRankingDTO;
     }

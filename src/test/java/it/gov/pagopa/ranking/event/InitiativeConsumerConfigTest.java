@@ -190,6 +190,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                 .initiativeId("initiativeId_%d".formatted(i))
                 .initiativeName("old_initiative_name_%d".formatted(i))
                 .organizationId("old_organization_id_%d".formatted(i))
+                .organizationName("old_organization_name_%d".formatted(i))
                 .initiativeStatus("old_initiative_status_%d".formatted(i))
                 .rankingStartDate(nowDate.plusMonths(1L))
                 .rankingEndDate(nowDate.plusMonths(8L))

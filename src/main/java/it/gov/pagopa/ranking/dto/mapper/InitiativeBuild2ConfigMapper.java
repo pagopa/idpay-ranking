@@ -34,6 +34,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
+                .organizationName(initiativeBuildDTO.getOrganizationName())
                 .build();
     }
 
