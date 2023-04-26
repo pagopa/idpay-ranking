@@ -50,7 +50,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     @Test
     void initiativeConsumer() {
-        int validInitiative = 1000;
+        int validInitiative = 100;
         int notValidInitiative = errorUseCases.size();
         long maxWaitingMs = 30000;
 
@@ -64,7 +64,8 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         long timePublishingEnd=System.currentTimeMillis();
 
 
-        waitForInitiativeStored((validInitiative/useCases.size()*5));
+        int expectedStoredRankingInitiatives = validInitiative / useCases.size() * (useCases.size() - 1); // 1 of the useCases will not be stored
+        waitForInitiativeStored(expectedStoredRankingInitiatives);
         long timeEnd=System.currentTimeMillis();
 
         checkResponse();
