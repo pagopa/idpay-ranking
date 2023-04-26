@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.initiative.AutomatedCriteriaDTO;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeAdditionalInfoDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
@@ -19,6 +20,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
     @Override
     public InitiativeConfig apply(InitiativeBuildDTO initiativeBuildDTO) {
         List<AutomatedCriteriaDTO> automatedCriteriaList = initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria();
+        InitiativeAdditionalInfoDTO additionalInfo = initiativeBuildDTO.getAdditionalInfo();
 
         return InitiativeConfig.builder()
                 .initiativeId(initiativeBuildDTO.getInitiativeId())
@@ -26,6 +28,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .initiativeEndDate(initiativeBuildDTO.getGeneral().getEndDate())
                 .initiativeRewardType(initiativeBuildDTO.getInitiativeRewardType())
                 .organizationId(initiativeBuildDTO.getOrganizationId())
+                .organizationName(initiativeBuildDTO.getOrganizationName())
                 .initiativeStatus(initiativeBuildDTO.getStatus())
                 .rankingStartDate(initiativeBuildDTO.getGeneral().getRankingStartDate())
                 .rankingEndDate(initiativeBuildDTO.getGeneral().getRankingEndDate())
@@ -34,7 +37,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
-                .organizationName(initiativeBuildDTO.getOrganizationName())
+                .isLogoPresent((additionalInfo != null && additionalInfo.getLogoFileName() != null) ? Boolean.TRUE : Boolean.FALSE)
                 .build();
     }
 

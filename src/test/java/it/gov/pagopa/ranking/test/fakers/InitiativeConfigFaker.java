@@ -71,6 +71,7 @@ public class InitiativeConfigFaker {
         out.totalEligibleKo(0);
         out.totalOnboardingKo(0);
         out.initiativeRewardType("REFUND");
+        out.isLogoPresent(Boolean.FALSE);
 
         return out;
 

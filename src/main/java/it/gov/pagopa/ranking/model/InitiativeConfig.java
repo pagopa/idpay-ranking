@@ -39,4 +39,5 @@ public class InitiativeConfig {
     private long totalEligibleOk;
     private long totalEligibleKo;
     private long totalOnboardingKo;
+    private Boolean isLogoPresent;
 }

@@ -201,6 +201,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                         Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
                 ))
                 .initiativeRewardType("REFUND")
+                .isLogoPresent(Boolean.FALSE)
                 .build();
     }
 
