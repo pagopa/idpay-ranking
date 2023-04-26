@@ -50,7 +50,7 @@ public class Initiative2BuildDTOFaker {
         out.initiativeId(bias!=null? "initiativeId_%d".formatted(bias) : "?????");
         out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
         out.organizationId(bias!=null? "organizationId_%d".formatted(bias) : "?????");
-        out.organizationName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
+        out.organizationName(bias!=null? "organizationName_%d".formatted(bias) : "?????");
         out.status(bias!=null? "status_%d".formatted(bias) : "?????");
 
         InitiativeGeneralDTO initiativeGeneralDTO = InitiativeGeneralDTO.builder()

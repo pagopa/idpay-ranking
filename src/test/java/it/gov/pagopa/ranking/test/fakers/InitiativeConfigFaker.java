@@ -53,7 +53,7 @@ public class InitiativeConfigFaker {
         out.initiativeId(bias!=null? "initiativeId_%d".formatted(bias) : "?????");
         out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
         out.organizationId(bias!=null? "organizationId_%d".formatted(bias) : "?????");
-        out.organizationName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
+        out.organizationName(bias!=null? "organizationName_%d".formatted(bias) : "?????");
         out.initiativeStatus(bias!=null? "status_%d".formatted(bias) : "?????");
         out.rankingStartDate(now);
         out.rankingEndDate(now.plusMonths(7L));

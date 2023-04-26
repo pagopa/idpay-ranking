@@ -37,7 +37,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
-                .isLogoPresent((additionalInfo != null && additionalInfo.getLogoFileName() != null) ? Boolean.TRUE : Boolean.FALSE)
+                .isLogoPresent(additionalInfo != null && additionalInfo.getLogoFileName() != null)
                 .build();
     }
 
