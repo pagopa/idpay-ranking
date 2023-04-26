@@ -17,10 +17,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 class ErrorManagerTest extends BaseIntegrationTest {
 
     @MockBean
-    RankingApiController controller;
+    private RankingApiController controller;
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
     void handleExceptionClientExceptionNoBody() throws Exception {
