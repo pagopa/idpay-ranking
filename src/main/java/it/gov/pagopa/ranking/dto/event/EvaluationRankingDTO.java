@@ -27,6 +27,7 @@ public class EvaluationRankingDTO {
     private LocalDate initiativeEndDate;
     @NotEmpty
     private String organizationId;
+    private String organizationName;
     @NotNull
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
@@ -36,4 +37,5 @@ public class EvaluationRankingDTO {
     private List<OnboardingRejectionReason> onboardingRejectionReasons;
     private BigDecimal beneficiaryBudget;
     private String initiativeRewardType;
+    private Boolean isLogoPresent;
 }

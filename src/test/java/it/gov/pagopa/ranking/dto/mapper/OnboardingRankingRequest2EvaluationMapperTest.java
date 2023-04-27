@@ -27,7 +27,7 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         EvaluationRankingDTO result = mapper.apply(request, initiativeConfig);
 
         // Then
-        commonChecks(request, result, ONBOARDING_OK);
+        commonChecks(request, result, ONBOARDING_OK, initiativeConfig);
     }
 
     @Test
@@ -43,7 +43,7 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         EvaluationRankingDTO result = mapper.apply(requests, initiativeConfig);
 
         // Then
-        commonChecks(requests, result, ONBOARDING_KO);
+        commonChecks(requests, result, ONBOARDING_KO, initiativeConfig);
     }
 
     @Test
@@ -59,17 +59,22 @@ class OnboardingRankingRequest2EvaluationMapperTest {
         EvaluationRankingDTO result = mapper.apply(requests, initiativeConfig);
 
         // Then
-        commonChecks(requests, result, ONBOARDING_KO);
+        commonChecks(requests, result, ONBOARDING_KO, initiativeConfig);
     }
 
-    private static void commonChecks(OnboardingRankingRequests requests, EvaluationRankingDTO result, String expectedStatus) {
+    private static void commonChecks(OnboardingRankingRequests requests, EvaluationRankingDTO result, String expectedStatus, InitiativeConfig initiative) {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(requests.getInitiativeId(), result.getInitiativeId());
+        Assertions.assertEquals(initiative.getInitiativeName(), result.getInitiativeName());
+        Assertions.assertEquals(initiative.getInitiativeEndDate(), result.getInitiativeEndDate());
         Assertions.assertEquals(requests.getOrganizationId(), result.getOrganizationId());
+        Assertions.assertEquals(initiative.getOrganizationName(), result.getOrganizationName());
         Assertions.assertEquals(requests.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(requests.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(requests.getUserId(), result.getUserId());
         Assertions.assertEquals(expectedStatus, result.getStatus());
+        Assertions.assertEquals(initiative.getInitiativeRewardType(), result.getInitiativeRewardType());
+        Assertions.assertEquals(initiative.getIsLogoPresent(), result.getIsLogoPresent());
     }
 
 }

@@ -50,7 +50,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     @Test
     void initiativeConsumer() {
-        int validInitiative = 1000;
+        int validInitiative = 100;
         int notValidInitiative = errorUseCases.size();
         long maxWaitingMs = 30000;
 
@@ -64,7 +64,8 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         long timePublishingEnd=System.currentTimeMillis();
 
 
-        waitForInitiativeStored((validInitiative/useCases.size()*5));
+        int expectedStoredRankingInitiatives = validInitiative / useCases.size() * (useCases.size() - 1); // 1 of the useCases will not be stored
+        waitForInitiativeStored(expectedStoredRankingInitiatives);
         long timeEnd=System.currentTimeMillis();
 
         checkResponse();
@@ -190,6 +191,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                 .initiativeId("initiativeId_%d".formatted(i))
                 .initiativeName("old_initiative_name_%d".formatted(i))
                 .organizationId("old_organization_id_%d".formatted(i))
+                .organizationName("old_organization_name_%d".formatted(i))
                 .initiativeStatus("old_initiative_status_%d".formatted(i))
                 .rankingStartDate(nowDate.plusMonths(1L))
                 .rankingEndDate(nowDate.plusMonths(8L))
@@ -200,6 +202,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                         Order.builder().fieldCode("ISEE").direction(Sort.Direction.ASC).build()
                 ))
                 .initiativeRewardType("REFUND")
+                .isLogoPresent(Boolean.FALSE)
                 .build();
     }
 

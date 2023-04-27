@@ -28,6 +28,7 @@ class InitiativeBuild2ConfigMapperTest {
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeId(), result.getInitiativeId());
         Assertions.assertEquals(initiativeBuildDTO.getInitiativeName(), result.getInitiativeName());
         Assertions.assertEquals(initiativeBuildDTO.getOrganizationId(), result.getOrganizationId());
+        Assertions.assertEquals(initiativeBuildDTO.getOrganizationName(), result.getOrganizationName());
         Assertions.assertEquals(initiativeBuildDTO.getStatus(), result.getInitiativeStatus());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingStartDate(), result.getRankingStartDate());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingEndDate(), result.getRankingEndDate());
@@ -36,6 +37,24 @@ class InitiativeBuild2ConfigMapperTest {
         Assertions.assertEquals(RankingStatus.WAITING_END, result.getRankingStatus());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.calculateSize(initiativeBuildDTO), result.getSize());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.retrieveRankingFieldCodes(initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria()), result.getRankingFields());
+        Assertions.assertTrue(result.getIsLogoPresent());
+
+        TestUtils.checkNotNullFields(result,"rankingFilePath", "rankingPublishedTimestamp", "rankingGeneratedTimestamp");
+    }
+
+    @Test
+    void applyLogoNotPresent() {
+        // Given
+        InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper = new InitiativeBuild2ConfigMapper();
+
+        InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(1);
+        initiativeBuildDTO.getAdditionalInfo().setLogoFileName("");
+        // When
+        InitiativeConfig result = initiativeBuild2ConfigMapper.apply(initiativeBuildDTO);
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertFalse(result.getIsLogoPresent());
 
         TestUtils.checkNotNullFields(result,"rankingFilePath", "rankingPublishedTimestamp", "rankingGeneratedTimestamp");
     }
