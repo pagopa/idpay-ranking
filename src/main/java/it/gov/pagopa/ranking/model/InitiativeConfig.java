@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "onboarding_ranking_rule")
@@ -21,7 +21,10 @@ public class InitiativeConfig {
     @Id
     private String initiativeId;
     private String initiativeName;
+    private LocalDate initiativeEndDate;
+    private String initiativeRewardType;
     private String organizationId;
+    private String organizationName;
     private String initiativeStatus;
     private LocalDate rankingStartDate;
     private LocalDate rankingEndDate;
@@ -36,4 +39,5 @@ public class InitiativeConfig {
     private long totalEligibleOk;
     private long totalEligibleKo;
     private long totalOnboardingKo;
+    private Boolean isLogoPresent;
 }

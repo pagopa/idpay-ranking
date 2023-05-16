@@ -2,10 +2,7 @@ package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
-import it.gov.pagopa.ranking.dto.initiative.AutomatedCriteriaDTO;
-import it.gov.pagopa.ranking.dto.initiative.InitiativeBeneficiaryRuleDTO;
-import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
-import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
+import it.gov.pagopa.ranking.dto.initiative.*;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
@@ -53,6 +50,7 @@ public class Initiative2BuildDTOFaker {
         out.initiativeId(bias!=null? "initiativeId_%d".formatted(bias) : "?????");
         out.initiativeName(bias!=null? "initiativeName_%d".formatted(bias) : "?????");
         out.organizationId(bias!=null? "organizationId_%d".formatted(bias) : "?????");
+        out.organizationName(bias!=null? "organizationName_%d".formatted(bias) : "?????");
         out.status(bias!=null? "status_%d".formatted(bias) : "?????");
 
         InitiativeGeneralDTO initiativeGeneralDTO = InitiativeGeneralDTO.builder()
@@ -61,6 +59,7 @@ public class Initiative2BuildDTOFaker {
                 .rankingStartDate(nowDate)
                 .rankingEndDate(nowDate.plusMonths(1L))
                 .rankingEnabled(Boolean.TRUE)
+                .endDate(nowDate)
                 .build();
         out.general(initiativeGeneralDTO);
 
@@ -71,7 +70,11 @@ public class Initiative2BuildDTOFaker {
                 .automatedCriteria(automatedCriteriaDTOS)
                 .build();
         out.beneficiaryRule(initiativeBeneficiaryRuleDTO);
-
+        out.initiativeRewardType("REFUND");
+        InitiativeAdditionalInfoDTO additionalInfoDTO = InitiativeAdditionalInfoDTO.builder()
+                .logoFileName("test.png")
+                .build();
+        out.additionalInfo(additionalInfoDTO);
         return out;
 
     }

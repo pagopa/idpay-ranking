@@ -20,12 +20,19 @@ public class InitiativeBuildDTO {
     @JsonProperty("organizationId")
     private String organizationId;
 
+    @JsonProperty("organizationName")
+    private String organizationName;
+
     @JsonProperty("status")
     private String status;
 
     @JsonProperty("general")
     private InitiativeGeneralDTO general;
+    @JsonProperty("additionalInfo")
+    private InitiativeAdditionalInfoDTO additionalInfo;
     @JsonProperty("beneficiaryRule")
     private InitiativeBeneficiaryRuleDTO beneficiaryRule;
+    @JsonProperty("initiativeRewardType")
+    private String initiativeRewardType;
 
 }

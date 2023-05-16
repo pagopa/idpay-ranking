@@ -23,13 +23,16 @@ public class OnboardingRankingRequest2EvaluationMapper {
         evaluationRankingDTO.setUserId(onboardingRankingRequests.getUserId());
         evaluationRankingDTO.setInitiativeId(onboardingRankingRequests.getInitiativeId());
         evaluationRankingDTO.setInitiativeName(initiative.getInitiativeName());
+        evaluationRankingDTO.setInitiativeEndDate(initiative.getInitiativeEndDate());
+        evaluationRankingDTO.setInitiativeRewardType(initiative.getInitiativeRewardType());
         evaluationRankingDTO.setStatus(transcodeRankingStatus(onboardingRankingRequests));
         evaluationRankingDTO.setAdmissibilityCheckDate(onboardingRankingRequests.getAdmissibilityCheckDate());
         evaluationRankingDTO.setCriteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp());
         evaluationRankingDTO.setOrganizationId(onboardingRankingRequests.getOrganizationId());
+        evaluationRankingDTO.setOrganizationName(initiative.getOrganizationName());
         evaluationRankingDTO.setBeneficiaryBudget(initiative.getBeneficiaryInitiativeBudget());
         evaluationRankingDTO.setOnboardingRejectionReasons(this.buildRejectionReasons(onboardingRankingRequests.getBeneficiaryRankingStatus(), onboardingRankingRequests.getRank()));
-
+        evaluationRankingDTO.setIsLogoPresent(initiative.getIsLogoPresent());
         return evaluationRankingDTO;
     }
 

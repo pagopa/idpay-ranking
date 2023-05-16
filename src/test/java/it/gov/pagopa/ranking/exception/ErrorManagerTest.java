@@ -17,16 +17,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 class ErrorManagerTest extends BaseIntegrationTest {
 
     @MockBean
-    RankingApiController controller;
+    private RankingApiController controller;
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @Test
     void handleExceptionClientExceptionNoBody() throws Exception {
 
         Mockito.when(controller.rankingRequests("ClientExceptionNoBody", "INITIATIVE_ID", 0, 10, new RankingRequestFilter()))
-                .thenThrow(new ClientExceptionNoBody(HttpStatus.NOT_FOUND));
+                .thenThrow(new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "NOTFOUND"));
 
         mvc.perform(MockMvcRequestBuilders.get("/idpay/ranking/organization/{organizationId}/initiative/{initiativeId}",
                         "ClientExceptionNoBody", "INITIATIVE_ID"))

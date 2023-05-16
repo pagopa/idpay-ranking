@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.dto.event;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,8 +24,10 @@ public class EvaluationRankingDTO {
     @NotEmpty
     private String initiativeId;
     private String initiativeName;
+    private LocalDate initiativeEndDate;
     @NotEmpty
     private String organizationId;
+    private String organizationName;
     @NotNull
     private LocalDateTime admissibilityCheckDate;
     private LocalDateTime criteriaConsensusTimestamp;
@@ -33,4 +36,6 @@ public class EvaluationRankingDTO {
     @NotNull
     private List<OnboardingRejectionReason> onboardingRejectionReasons;
     private BigDecimal beneficiaryBudget;
+    private String initiativeRewardType;
+    private Boolean isLogoPresent;
 }

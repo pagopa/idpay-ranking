@@ -1,12 +1,14 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.initiative.AutomatedCriteriaDTO;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeAdditionalInfoDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,11 +21,15 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
     @Override
     public InitiativeConfig apply(InitiativeBuildDTO initiativeBuildDTO) {
         List<AutomatedCriteriaDTO> automatedCriteriaList = initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria();
+        InitiativeAdditionalInfoDTO additionalInfo = initiativeBuildDTO.getAdditionalInfo();
 
         return InitiativeConfig.builder()
                 .initiativeId(initiativeBuildDTO.getInitiativeId())
                 .initiativeName(initiativeBuildDTO.getInitiativeName())
+                .initiativeEndDate(initiativeBuildDTO.getGeneral().getEndDate())
+                .initiativeRewardType(initiativeBuildDTO.getInitiativeRewardType())
                 .organizationId(initiativeBuildDTO.getOrganizationId())
+                .organizationName(initiativeBuildDTO.getOrganizationName())
                 .initiativeStatus(initiativeBuildDTO.getStatus())
                 .rankingStartDate(initiativeBuildDTO.getGeneral().getRankingStartDate())
                 .rankingEndDate(initiativeBuildDTO.getGeneral().getRankingEndDate())
@@ -32,6 +38,7 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
+                .isLogoPresent(additionalInfo != null && !StringUtils.isEmpty(additionalInfo.getLogoFileName()))
                 .build();
     }
 
