@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.config;
+package it.gov.pagopa.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

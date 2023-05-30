@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.dto;
+package it.gov.pagopa.common.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -16,10 +16,8 @@ import javax.validation.constraints.NotBlank;
 public class ErrorDTO {
 
     @NotBlank
-//    @ApiModelProperty(required = true, value = "Code of the error message", example = "Code")
-    String code;
+    private String code;
     @NotBlank
-//    @ApiModelProperty(required = true, value = "Content of the error message", example = "Message")
-    String message;
+    private String message;
 
 }

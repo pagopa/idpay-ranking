@@ -1,8 +1,11 @@
 package it.gov.pagopa.ranking.exception;
 
+import it.gov.pagopa.common.web.exception.ClientException;
+import it.gov.pagopa.common.web.exception.ClientExceptionNoBody;
+import it.gov.pagopa.common.web.exception.ClientExceptionWithBody;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.controller.RankingApiController;
-import it.gov.pagopa.ranking.dto.ErrorDTO;
+import it.gov.pagopa.common.web.dto.ErrorDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

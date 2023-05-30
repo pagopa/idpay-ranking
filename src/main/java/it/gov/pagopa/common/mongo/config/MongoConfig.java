@@ -1,4 +1,4 @@
-package it.gov.pagopa.ranking.config;
+package it.gov.pagopa.common.mongo.config;
 
 import com.mongodb.lang.NonNull;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
@@ -20,11 +20,11 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableMongoRepositories(basePackageClasses = OnboardingRankingRequestsRepository.class)
-public class DbConfig {
+public class MongoConfig {
 
     @Configuration
     @ConfigurationProperties(prefix = "spring.data.mongodb.config")
-    static class MongoDbCustomProperties {
+    public static class MongoDbCustomProperties {
         @Setter
         ConnectionPoolSettings connectionPool;
 

@@ -1,7 +1,8 @@
 package it.gov.pagopa.ranking.service;
 
 import com.fasterxml.jackson.databind.ObjectReader;
-import it.gov.pagopa.ranking.utils.Utils;
+import it.gov.pagopa.common.kafka.utils.KafkaConstants;
+import it.gov.pagopa.common.utils.CommonUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -43,7 +44,7 @@ public abstract class BaseKafkaConsumer<T> {
     }
 
     private boolean isRetryFromOtherApps(Message<String> message) {
-        byte[] retryingApplicationName = message.getHeaders().get(ErrorNotifierServiceImpl.ERROR_MSG_HEADER_APPLICATION_NAME, byte[].class);
+        byte[] retryingApplicationName = message.getHeaders().get(KafkaConstants.ERROR_MSG_HEADER_APPLICATION_NAME, byte[].class);
         if(retryingApplicationName != null && !new String(retryingApplicationName, StandardCharsets.UTF_8).equals(this.applicationName)){
             log.info("[{}] Discarding message due to other application retry ({}): {}", getFlowName(), new String(retryingApplicationName, StandardCharsets.UTF_8), message.getPayload());
             return true;
@@ -70,7 +71,7 @@ public abstract class BaseKafkaConsumer<T> {
     protected abstract Consumer<Throwable> onDeserializationError(Message<String> message);
 
     protected T deserializeMessage(Message<String> message) {
-        return Utils.deserializeMessage(message, getObjectReader(), onDeserializationError(message));
+        return CommonUtilities.deserializeMessage(message, getObjectReader(), onDeserializationError(message));
     }
 
     /** The function invoked in order to process the current message */
