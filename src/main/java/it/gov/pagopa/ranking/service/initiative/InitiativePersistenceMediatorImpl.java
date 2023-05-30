@@ -8,7 +8,7 @@ import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.BaseKafkaConsumer;
-import it.gov.pagopa.ranking.service.ErrorNotifierService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,21 +23,21 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
     private final InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper;
     private final InitiativeConfigService initiativeConfigService;
     private final RankingContextHolderService rankingContextHolderService;
-    private final ErrorNotifierService errorNotifierService;
+    private final RankingErrorNotifierService rankingErrorNotifierService;
     private final ObjectReader objectReader;
 
     public InitiativePersistenceMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                              InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper,
                                              InitiativeConfigService initiativeConfigService,
                                              RankingContextHolderService rankingContextHolderService,
-                                             ErrorNotifierService errorNotifierService,
+                                             RankingErrorNotifierService rankingErrorNotifierService,
 
                                              ObjectMapper objectMapper){
         super(applicationName);
         this.initiativeBuild2ConfigMapper = initiativeBuild2ConfigMapper;
         this.initiativeConfigService = initiativeConfigService;
         this.rankingContextHolderService = rankingContextHolderService;
-        this.errorNotifierService = errorNotifierService;
+        this.rankingErrorNotifierService = rankingErrorNotifierService;
 
         this.objectReader = objectMapper.readerFor(InitiativeBuildDTO.class);
 
@@ -49,7 +49,7 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
     @Override
     protected Consumer<Throwable> onDeserializationError(Message<String> message) {
-        return e -> errorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] Unexpected JSON", true, e);
+        return e -> rankingErrorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] Unexpected JSON", true, e);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                    log.error("The initiative is in the ending phase: {}", payload);
                 }
             }catch (MongoException | IllegalStateException e){
-                errorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] An error occurred handling initiative ranking build", true, e);
+                rankingErrorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] An error occurred handling initiative ranking build", true, e);
             }
         }
     }

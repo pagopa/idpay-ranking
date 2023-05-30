@@ -1,16 +1,16 @@
 package it.gov.pagopa.ranking.event;
 
 import com.mongodb.MongoException;
+import it.gov.pagopa.common.kafka.utils.KafkaConstants;
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequestsDTO2ModelMapper;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.repository.OnboardingRankingRequestsRepository;
-import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
@@ -66,8 +66,8 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         onboardingPayloads.addAll(buildValidPayloads(errorUseCases.size() + (validOnboardings / 2), validOnboardings / 2));
 
         long timeStart=System.currentTimeMillis();
-        onboardingPayloads.forEach(i->publishIntoEmbeddedKafka(topicOnboardingRankingRequest, null, null, i));
-        publishIntoEmbeddedKafka(topicOnboardingRankingRequest, List.of(new RecordHeader(ErrorNotifierServiceImpl.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHERAPPNAME".getBytes(StandardCharsets.UTF_8))), null, "OTHERAPPMESSAGE");
+        onboardingPayloads.forEach(i->kafkaTestUtilitiesService.publishIntoEmbeddedKafka(topicOnboardingRankingRequest, null, null, i));
+        kafkaTestUtilitiesService.publishIntoEmbeddedKafka(topicOnboardingRankingRequest, List.of(new RecordHeader(KafkaConstants.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHERAPPNAME".getBytes(StandardCharsets.UTF_8))), null, "OTHERAPPMESSAGE");
         long timePublishingEnd=System.currentTimeMillis();
 
         long countSaved = waitForOnboardingStored(validOnboardings);
@@ -96,7 +96,7 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
         );
 
         long timeCommitCheckStart = System.currentTimeMillis();
-        final Map<TopicPartition, OffsetAndMetadata> srcCommitOffsets = checkCommittedOffsets(topicOnboardingRankingRequest, groupIdOnboardingRankingRequest,onboardingPayloads.size()+1); // +1 due to other applicationName useCase
+        final Map<TopicPartition, OffsetAndMetadata> srcCommitOffsets = kafkaTestUtilitiesService.checkCommittedOffsets(topicOnboardingRankingRequest, groupIdOnboardingRankingRequest,onboardingPayloads.size()+1); // +1 due to other applicationName useCase
         long timeCommitCheckEnd = System.currentTimeMillis();
         System.out.printf("""
                         ************************
@@ -140,7 +140,7 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
 
     private long waitForOnboardingStored(int N) {
         long[] countSaved={0};
-        waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved onboarding ranking request, read %d".formatted(N, countSaved[0]), 60, 1000);
+        TestUtils.waitFor(()->(countSaved[0]=onboardingRankingRequestsRepository.count()) >= N, ()->"Expected %d saved onboarding ranking request, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }
 
@@ -183,7 +183,7 @@ class OnboardingRankingRequestsConsumerConfigTest extends BaseIntegrationTest {
     }
 
     private void checkErrorMessageHeaders(ConsumerRecord<String, String> errorMessage, String errorDescription, String expectedPayload) {
-        checkErrorMessageHeaders(topicOnboardingRankingRequest, groupIdOnboardingRankingRequest, errorMessage, errorDescription, expectedPayload,true,true);
+        checkErrorMessageHeaders(topicOnboardingRankingRequest, groupIdOnboardingRankingRequest, errorMessage, errorDescription, expectedPayload, null);
     }
     //endregion
 }

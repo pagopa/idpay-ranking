@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.connector.rest.pdv;
 
+import feign.FeignException.FeignClientException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.model.User;
 import org.junit.jupiter.api.Assertions;
@@ -7,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
-import feign.FeignException.FeignClientException;
 
-@SuppressWarnings("squid:S3577") // suppressing class name not match alert
+/**
+ * See confluence page: <a href="https://pagopa.atlassian.net/wiki/spaces/IDPAY/pages/615974424/Secrets+UnitTests">Secrets for UnitTests</a>
+ */
+@SuppressWarnings({"squid:S3577", "NewClassNamingConvention"}) // suppressing class name not match alert: we are not using the Test suffix in order to let not execute this test by default maven configuration because it depends on properties not pushable. See
 @TestPropertySource(locations = {
         "classpath:/secrets/appPdv.properties",
         },

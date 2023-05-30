@@ -9,7 +9,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
 import it.gov.pagopa.ranking.service.BaseKafkaConsumer;
-import it.gov.pagopa.ranking.service.ErrorNotifierService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.service.OnboardingRankingRequestsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,21 +25,21 @@ public class OnboardingRankingRequestsMediatorImpl extends BaseKafkaConsumer<Onb
 
     private final OnboardingRankingRequestsService onboardingRankingRequestsService;
     private final InitiativeConfigRepository initiativeConfigRepository;
-    private final ErrorNotifierService errorNotifierService;
+    private final RankingErrorNotifierService rankingErrorNotifierService;
     private final OnboardingRankingRequestsDTO2ModelMapper onboardingRankingRequestsDTO2ModelMapper;
 
     private final ObjectReader objectReader;
 
     public OnboardingRankingRequestsMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                                  OnboardingRankingRequestsService onboardingRankingRequestsService,
-                                                 InitiativeConfigRepository initiativeConfigRepository, ErrorNotifierService errorNotifierService,
+                                                 InitiativeConfigRepository initiativeConfigRepository, RankingErrorNotifierService rankingErrorNotifierService,
                                                  OnboardingRankingRequestsDTO2ModelMapper onboardingRankingRequestsDTO2ModelMapper,
                                                  ObjectMapper objectMapper) {
         super(applicationName);
 
         this.onboardingRankingRequestsService = onboardingRankingRequestsService;
         this.initiativeConfigRepository = initiativeConfigRepository;
-        this.errorNotifierService = errorNotifierService;
+        this.rankingErrorNotifierService = rankingErrorNotifierService;
         this.onboardingRankingRequestsDTO2ModelMapper = onboardingRankingRequestsDTO2ModelMapper;
         this.objectReader = objectMapper.readerFor(OnboardingRankingRequestDTO.class);
     }
@@ -51,10 +51,10 @@ public class OnboardingRankingRequestsMediatorImpl extends BaseKafkaConsumer<Onb
                 OnboardingRankingRequests onboardingRankingRequests = onboardingRankingRequestsDTO2ModelMapper.apply(onboardingRankingRequestDTO, initiative);
                 onboardingRankingRequestsService.save(onboardingRankingRequests);
             } else {
-                errorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] The input initiative doesn't exists: %s".formatted(onboardingRankingRequestDTO.getInitiativeId()), true, new IllegalStateException("The input initiative doesn't exists!"));
+                rankingErrorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] The input initiative doesn't exists: %s".formatted(onboardingRankingRequestDTO.getInitiativeId()), true, new IllegalStateException("The input initiative doesn't exists!"));
             }
         } catch (MongoException e){
-            errorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", true, e);
+            rankingErrorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request", true, e);
         }
     }
 
@@ -65,6 +65,6 @@ public class OnboardingRankingRequestsMediatorImpl extends BaseKafkaConsumer<Onb
 
     @Override
     protected Consumer<Throwable> onDeserializationError(Message<String> message) {
-        return e -> errorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] Unexpected JSON", true, e);
+        return e -> rankingErrorNotifierService.notifyOnboardingRankingRequest(message, "[ONBOARDING_RANKING_REQUEST] Unexpected JSON", true, e);
     }
 }

@@ -2,18 +2,18 @@ package it.gov.pagopa.ranking.service.onboarding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.MongoException;
+import it.gov.pagopa.common.kafka.utils.KafkaConstants;
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequestsDTO2ModelMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
-import it.gov.pagopa.ranking.service.ErrorNotifierService;
-import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.service.OnboardingRankingRequestsService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class OnboardingRankingRequestsMediatorImplTest {
     private InitiativeConfigRepository initiativeConfigRepositoryMock;
 
     @Mock
-    private ErrorNotifierService errorNotifierServiceMock;
+    private RankingErrorNotifierService rankingErrorNotifierServiceMock;
 
     @Mock
     private OnboardingRankingRequestsDTO2ModelMapper onboardingRankingRequestsDTO2ModelMapperMock;
@@ -45,7 +45,7 @@ class OnboardingRankingRequestsMediatorImplTest {
 
     @BeforeEach
     void setUp() {
-        onboardingRankingRequestsMediator = new OnboardingRankingRequestsMediatorImpl("appName",onboardingRankingRequestsServiceMock, initiativeConfigRepositoryMock, errorNotifierServiceMock, onboardingRankingRequestsDTO2ModelMapperMock, TestUtils.objectMapper);
+        onboardingRankingRequestsMediator = new OnboardingRankingRequestsMediatorImpl("appName",onboardingRankingRequestsServiceMock, initiativeConfigRepositoryMock, rankingErrorNotifierServiceMock, onboardingRankingRequestsDTO2ModelMapperMock, TestUtils.objectMapper);
     }
 
     @Test
@@ -69,7 +69,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock).apply(Mockito.any(), Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
+        Mockito.verify(rankingErrorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
     }
 
     @Test
@@ -84,7 +84,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         onboardingRankingRequestsMediator.execute(message);
 
         // Then
-        Mockito.verify(errorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
+        Mockito.verify(rankingErrorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
     }
 
     @Test
@@ -93,7 +93,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         OnboardingRankingRequestDTO onboarding = OnboardingRankingRequestsDTOFaker.mockInstance(1);
         Message<String> messageFromAnotherApp = MessageBuilder
                 .withPayload(TestUtils.jsonSerializer(onboarding))
-                .setHeader(ErrorNotifierServiceImpl.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHER_APP".getBytes(StandardCharsets.UTF_8))
+                .setHeader(KafkaConstants.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHER_APP".getBytes(StandardCharsets.UTF_8))
                 .build();
         // When
         onboardingRankingRequestsMediator.execute(messageFromAnotherApp);
@@ -101,7 +101,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock, Mockito.never()).apply(Mockito.any(), Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
+        Mockito.verify(rankingErrorNotifierServiceMock, Mockito.never()).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(Throwable.class));
     }
 
     @Test
@@ -116,7 +116,7 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock, Mockito.never()).apply(Mockito.any(), Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(JsonProcessingException.class));
+        Mockito.verify(rankingErrorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(JsonProcessingException.class));
     }
 
     @Test
@@ -140,6 +140,6 @@ class OnboardingRankingRequestsMediatorImplTest {
         // Then
         Mockito.verify(onboardingRankingRequestsDTO2ModelMapperMock).apply(Mockito.any(), Mockito.any());
         Mockito.verify(onboardingRankingRequestsServiceMock).save(Mockito.any());
-        Mockito.verify(errorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(MongoException.class));
+        Mockito.verify(rankingErrorNotifierServiceMock).notifyOnboardingRankingRequest(Mockito.any(Message.class),Mockito.anyString(),Mockito.anyBoolean(),Mockito.any(MongoException.class));
     }
 }

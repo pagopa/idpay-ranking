@@ -8,7 +8,7 @@ import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.ranking.test.fakers.RankingRequestsApiDTOFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
+import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
