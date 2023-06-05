@@ -1,6 +1,8 @@
 package it.gov.pagopa.ranking.event;
 
 import com.mongodb.MongoException;
+import it.gov.pagopa.common.kafka.utils.KafkaConstants;
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
@@ -8,9 +10,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.repository.InitiativeConfigRepository;
-import it.gov.pagopa.ranking.service.ErrorNotifierServiceImpl;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.junit.jupiter.api.AfterEach;
@@ -59,8 +59,8 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         initiativePayloads.addAll(buildValidPayloads(errorUseCases.size() + (validInitiative / 2), validInitiative / 2));
 
         long timeStart=System.currentTimeMillis();
-        initiativePayloads.forEach(i->publishIntoEmbeddedKafka(topicInitiativeRanking, null, null, i));
-        publishIntoEmbeddedKafka(topicInitiativeRanking, List.of(new RecordHeader(ErrorNotifierServiceImpl.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHERAPPNAME".getBytes(StandardCharsets.UTF_8))), null, "OTHERAPPMESSAGE");
+        initiativePayloads.forEach(i->kafkaTestUtilitiesService.publishIntoEmbeddedKafka(topicInitiativeRanking, null, null, i));
+        kafkaTestUtilitiesService.publishIntoEmbeddedKafka(topicInitiativeRanking, List.of(new RecordHeader(KafkaConstants.ERROR_MSG_HEADER_APPLICATION_NAME, "OTHERAPPNAME".getBytes(StandardCharsets.UTF_8))), null, "OTHERAPPMESSAGE");
         long timePublishingEnd=System.currentTimeMillis();
 
 
@@ -98,7 +98,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     private long waitForInitiativeStored(int N) {
         long[] countSaved={0};
-        waitFor(()->(countSaved[0]=initiativeConfigRepository.count()) >= N, ()->"Expected %d saved ranking initiative, read %d".formatted(N, countSaved[0]), 60, 1000);
+        TestUtils.waitFor(()->(countSaved[0]=initiativeConfigRepository.count()) >= N, ()->"Expected %d saved ranking initiative, read %d".formatted(N, countSaved[0]), 60, 1000);
         return countSaved[0];
     }
 
@@ -271,7 +271,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
         ));
     }
     private void checkErrorMessageHeaders(ConsumerRecord<String, String> errorMessage, String errorDescription, String expectedPayload) {
-        checkErrorMessageHeaders(topicInitiativeRanking, groupIdInitiativeRanking, errorMessage, errorDescription, expectedPayload,true,true);
+        checkErrorMessageHeaders(topicInitiativeRanking, groupIdInitiativeRanking, errorMessage, errorDescription, expectedPayload, null);
     }
     //enregion
 }

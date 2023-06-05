@@ -2,7 +2,7 @@ package it.gov.pagopa.ranking.connector.rest.pdv;
 
 import it.gov.pagopa.ranking.dto.pdv.UserInfoPDV;
 import it.gov.pagopa.ranking.model.User;
-import it.gov.pagopa.ranking.utils.TestUtils;
+import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ReflectionUtils;
-import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
 import java.util.Map;

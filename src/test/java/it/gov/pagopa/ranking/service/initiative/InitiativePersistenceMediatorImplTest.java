@@ -5,11 +5,11 @@ import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
-import it.gov.pagopa.ranking.service.ErrorNotifierService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
+import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ class InitiativePersistenceMediatorImplTest {
     private RankingContextHolderService rankingContextHolderServiceMock;
 
     @Mock
-    private ErrorNotifierService errorNotifierServiceMock;
+    private RankingErrorNotifierService rankingErrorNotifierServiceMock;
 
     private InitiativePersistenceMediator initiativePersistenceMediator;
 
@@ -43,7 +43,7 @@ class InitiativePersistenceMediatorImplTest {
                 initiativeBuild2ConfigMapperMock,
                 initiativeConfigServiceMock,
                 rankingContextHolderServiceMock,
-                errorNotifierServiceMock,
+                rankingErrorNotifierServiceMock,
                 TestUtils.objectMapper);
     }
 
