@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.service.initiative;
 
-import it.gov.pagopa.ranking.exception.ClientException;
+import it.gov.pagopa.common.web.exception.ClientException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;

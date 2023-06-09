@@ -3,7 +3,7 @@ package it.gov.pagopa.ranking.dto.mapper;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
+import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

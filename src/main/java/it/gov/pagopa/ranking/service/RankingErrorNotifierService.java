@@ -2,7 +2,7 @@ package it.gov.pagopa.ranking.service;
 
 import org.springframework.messaging.Message;
 
-public interface ErrorNotifierService {
+public interface RankingErrorNotifierService {
     void notifyOnboardingRankingRequest(Message<?> message, String description, boolean retryable, Throwable exception);
     void notifyInitiativeBuild(Message<?> message, String description, boolean retryable, Throwable exception);
 

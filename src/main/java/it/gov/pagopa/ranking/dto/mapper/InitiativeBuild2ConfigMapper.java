@@ -6,7 +6,7 @@ import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
-import it.gov.pagopa.ranking.utils.Utils;
+import it.gov.pagopa.common.utils.CommonUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -44,8 +44,8 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
 
     public static long calculateSize(InitiativeBuildDTO initiativeBuildDTO) {
         try {
-            Long totalBudget = Utils.euro2Cents(initiativeBuildDTO.getGeneral().getBudget());
-            Long beneficiaryBudget = Utils.euro2Cents(initiativeBuildDTO.getGeneral().getBeneficiaryBudget());
+            Long totalBudget = CommonUtilities.euroToCents(initiativeBuildDTO.getGeneral().getBudget());
+            Long beneficiaryBudget = CommonUtilities.euroToCents(initiativeBuildDTO.getGeneral().getBeneficiaryBudget());
 
             return totalBudget/beneficiaryBudget;
         }catch (NullPointerException e){

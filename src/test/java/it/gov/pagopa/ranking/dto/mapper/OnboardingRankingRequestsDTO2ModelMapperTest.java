@@ -6,7 +6,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsDTOFaker;
-import it.gov.pagopa.ranking.utils.TestUtils;
+import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
