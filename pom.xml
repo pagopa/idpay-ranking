@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.2</version>
+		<version>3.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>it.gov.pagopa</groupId>
 	<artifactId>idpay-ranking</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>idpay-ranking</name>
 	<description>Ranking Microservice</description>
 	<properties>
@@ -105,8 +105,8 @@
 		</dependency>
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<version>3.5.0</version>
+			<artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
+			<version>4.6.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -118,6 +118,7 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-contract-wiremock</artifactId>
+			<version>4.0.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -127,7 +128,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>2021.0.3</version>
+				<version>2022.0.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
