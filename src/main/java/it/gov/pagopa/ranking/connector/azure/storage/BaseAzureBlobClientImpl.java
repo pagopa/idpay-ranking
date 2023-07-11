@@ -48,7 +48,7 @@ public abstract class BaseAzureBlobClientImpl implements AzureBlobClient{
             log.info("Uploaded {}", destination);
 
         } catch (StorageException | URISyntaxException | IOException e) {
-            throw new FileUploadException(e);
+            throw new FileUploadException(e.getMessage());
         }
     }
 }

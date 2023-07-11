@@ -10,9 +10,9 @@ spring:
     activate:
       on-profile: default
   cloud:
+    function:
+      definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking
     stream:
-      function:
-        definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking
       bindings:
         onboardingRankingRequestsConsumer-in-0:
           destination: ${KAFKA_ONBOARDING_RANKING_REQUESTS_TOPIC:idpay-onboarding-ranking-request}
