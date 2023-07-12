@@ -5,6 +5,7 @@ import feign.Response;
 import feign.RetryableException;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
 @Slf4j
 public class PdvErrorDecoder implements ErrorDecoder {
@@ -15,7 +16,7 @@ public class PdvErrorDecoder implements ErrorDecoder {
         log.info("Feign Client Exception caught with Status [{}] during [{}] to [{}]", response.status(), response.request().httpMethod().name(), response.request().url());
 
         // Retry if status is 429
-        if (response.status() == 429) {
+        if (response.status() == HttpStatus.TOO_MANY_REQUESTS.value()) {
             log.info("Retrying PDV invocation {}", response.request().url());
             return new RetryableException(
                     response.status(),
