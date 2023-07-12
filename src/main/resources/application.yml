@@ -122,6 +122,16 @@ spring:
                 retry.backoff.ms: ${KAFKA_EVALUATION_ONBOARDING_OUTCOME_KAFKA_RETRY_MS:${KAFKA_RETRY_MS:10000}}
                 linger.ms: ${KAFKA_EVALUATION_ONBOARDING_OUTCOME_LINGER_MS:${KAFKA_LINGER_MS:2}}
                 batch.size: ${KAFKA_EVALUATION_ONBOARDING_OUTCOME_BATCH_SIZE:${KAFKA_BATCH_SIZE:16384}}
+    openfeign:
+      okhttp:
+        enabled: true
+      client:
+        config:
+          default:
+            retryer: feign.Retryer.Default
+          pdv:
+            errorDecoder: it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoder
+            loggerLevel: ${FEIGN_PDV_LOGGER_LEVEL:${FEIGN_LOGGER_LEVEL:basic}}
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017}
@@ -135,17 +145,6 @@ spring:
           maxConnectionLifeTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_LIFE_MS:0}
           maxConnectionIdleTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_IDLE_MS:0}
           maxConnecting: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTING:2}
-
-feign:
-  okhttp:
-    enabled: true
-  client:
-    config:
-      default:
-        retryer: feign.Retryer.Default
-      pdv:
-        errorDecoder: it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoder
-        loggerLevel: ${FEIGN_PDV_LOGGER_LEVEL:${FEIGN_LOGGER_LEVEL:basic}}
 
 management.endpoints:
   web:
@@ -175,7 +174,7 @@ app:
     schedule-max-number: ${THREADS_SCHEDULE_MAX_NUMBER:1}
   pdv:
     base-url: ${PDV_DECRYPT_BASE_URL:}
-    headers.x-api-key: ${PDV_DECRYPT_API_KEY:}
+    headers.x-api-key: ${PDV_DECRYPT_API_KEY:x_api_key}
   ranking-build-file:
     retrieve-initiative:
       schedule: ${SCHEDULE_RETRIEVE_INITIATIVE:0 0 1 * * ?} # each day at 01:00AM

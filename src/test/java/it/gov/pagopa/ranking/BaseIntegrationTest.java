@@ -84,8 +84,7 @@ import java.util.regex.Pattern;
                 //region wiremock
                 "logging.level.WireMock=OFF",
                 "app.pdv.base-url=http://localhost:${wiremock.server.port}",
-                "app.pdv.headers.x-api-key=x_api_key",
-                "feign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy"
+                "spring.cloud.openfeign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy"
                 //endregion
         })
 @AutoConfigureDataMongo
