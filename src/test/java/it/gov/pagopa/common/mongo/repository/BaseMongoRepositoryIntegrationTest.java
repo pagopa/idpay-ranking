@@ -29,7 +29,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
-import org.springframework.data.util.ClassTypeInformation;
+import org.springframework.data.util.TypeInformation;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -40,7 +40,7 @@ import java.util.Set;
 
 @TestPropertySource(
         properties = {
-                "spring.mongodb.embedded.version=4.0.21",
+                "de.flapdoodle.mongodb.embedded.version=4.0.21",
 
                 "spring.data.mongodb.database=idpay",
                 "spring.data.mongodb.config.connectionPool.maxSize: 100",
@@ -81,7 +81,7 @@ class BaseMongoRepositoryIntegrationTest {
 
         @Bean
         public TestRepository configureTestRepository(MongoOperations mongoOperations) throws NoSuchFieldException {
-            ClassTypeInformation<TestCollection> testTypeInformation = ClassTypeInformation.from(TestCollection.class);
+            TypeInformation<TestCollection> testTypeInformation = TypeInformation.of(TestCollection.class);
             BasicMongoPersistentEntity<TestCollection> testPersistentEntity = new BasicMongoPersistentEntity<>(testTypeInformation);
             testPersistentEntity.addPersistentProperty(new BasicMongoPersistentProperty(
                     Property.of(testTypeInformation, TestCollection.class.getDeclaredField("id")),

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -26,6 +26,6 @@ public class OnboardingRejectionReason {
         INVALID_REQUEST,
         BUDGET_EXHAUSTED,
         AUTOMATED_CRITERIA_FAIL,
-        OUT_OF_RANKING;
+        OUT_OF_RANKING,
     }
 }
