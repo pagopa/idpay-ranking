@@ -24,9 +24,9 @@ class UserRestServiceImplTestIntegrated extends BaseIntegrationTest {
     @Autowired
     private UserRestService userRestService;
 
-    @Value("${app.pdv.userIdOk:02105b50-9a81-4cd2-8e17-6573ebb09196}")
+    @Value("${app.pdv.userIdOk:a85268f9-1d62-4123-8f86-8cf630b60998}")
     private String userIdOK;
-    @Value("${app.pdv.userFiscalCodeExpected:125}")
+    @Value("${app.pdv.userFiscalCodeExpected:A4p9Y4QUlTtutHT}")
     private String fiscalCodeOKExpected;
     @Value("${app.pdv.userIdNotFound:02105b50-9a81-4cd2-8e17-6573ebb09195}")
     private String userIdNotFound;

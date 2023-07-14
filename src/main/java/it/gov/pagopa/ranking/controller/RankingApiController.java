@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * Component that exposes APIs
  * */
+@RestController
 @RequestMapping("/idpay/ranking")
 public interface RankingApiController {
 
