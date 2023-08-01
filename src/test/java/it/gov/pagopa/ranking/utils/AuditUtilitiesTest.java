@@ -30,7 +30,7 @@ public class AuditUtilitiesTest {
         auditUtilities.logDeleteInitiativeConfig(INITIATIVE_ID);
 
         Assertions.assertEquals(
-                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Ranking dstip=%s msg=Initiative config deleted" +
+                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Ranking dstip=%s msg=Initiative ranking rule deleted" +
                         " cs1Label=initiativeId cs1=%s")
                         .formatted(
                                 AuditUtilities.SRCIP,
@@ -45,7 +45,7 @@ public class AuditUtilitiesTest {
         auditUtilities.logDeleteInitiativeRanking(USER_ID, INITIATIVE_ID);
 
         Assertions.assertEquals(
-                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Ranking dstip=%s msg=Initiative ranking deleted" +
+                ("CEF:0|PagoPa|IDPAY|1.0|7|User interaction|2| event=Ranking dstip=%s msg=Initiative ranking request deleted" +
                         " suser=%s cs1Label=initiativeId cs1=%s")
                         .formatted(
                                 AuditUtilities.SRCIP,
