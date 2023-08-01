@@ -13,4 +13,5 @@ public interface InitiativeConfigService {
     Optional<InitiativeConfig> findByIdOptional(String initiativeId);
     List<InitiativeConfig> findByRankingStatusRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive);
     void setInitiativeRankingEndDateAndStatusWaitingEnd(String initiativeId, LocalDate date);
+    Optional<InitiativeConfig> deleteByInitiativeId(String initiativeId);
 }

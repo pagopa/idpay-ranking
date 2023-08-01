@@ -1,15 +1,19 @@
 package it.gov.pagopa.ranking.service.initiative;
 
+import it.gov.pagopa.ranking.dto.event.QueueCommandOperationDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
+import it.gov.pagopa.ranking.service.OnboardingRankingRequestsService;
 import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.common.utils.TestUtils;
+import it.gov.pagopa.ranking.utils.AuditUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class InitiativePersistenceMediatorImplTest {
@@ -35,7 +41,13 @@ class InitiativePersistenceMediatorImplTest {
     @Mock
     private RankingErrorNotifierService rankingErrorNotifierServiceMock;
 
+    @Mock
+    private OnboardingRankingRequestsService onboardingRankingRequestsServiceMock;
+
     private InitiativePersistenceMediator initiativePersistenceMediator;
+
+    @Mock
+    private AuditUtilities auditUtilities;
 
     @BeforeEach
     void setUp(){
@@ -44,6 +56,9 @@ class InitiativePersistenceMediatorImplTest {
                 initiativeConfigServiceMock,
                 rankingContextHolderServiceMock,
                 rankingErrorNotifierServiceMock,
+                onboardingRankingRequestsServiceMock,
+                auditUtilities,
+
                 TestUtils.objectMapper);
     }
 
@@ -155,6 +170,71 @@ class InitiativePersistenceMediatorImplTest {
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
+    }
+
+    @Test
+    void processCommand_commandNotDeleteInitiative(){
+        // Given
+        QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
+                .operationId("OperationId")
+                .operationType("NOT_DELETE_INITIATIVE")
+                .build();
+
+        // When
+        initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
+
+        // Then
+        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+    }
+
+    @Test
+    void processCommand_emptyDeletedInitiativeConfig(){
+        // Given
+        QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
+                .operationId("OperationId")
+                .operationType("DELETE_INITIATIVE")
+                .build();
+        Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
+                .thenReturn(Optional.empty());
+
+        // When
+        initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
+
+        // Then
+        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+
+    }
+
+    @Test
+    void processCommand(){
+        // Given
+        QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
+                .operationId("OperationId")
+                .operationType("DELETE_INITIATIVE")
+                .build();
+        InitiativeConfig initiativeConfig = InitiativeConfig.builder()
+                .initiativeId(queueCommandOperationDTO.getOperationId())
+                .initiativeName("InitiativeName")
+                .build();
+        OnboardingRankingRequests onboardingRankingRequests = OnboardingRankingRequests.builder()
+                .id("Id")
+                .userId("UserId")
+                .initiativeId(queueCommandOperationDTO.getOperationId())
+                .organizationId("OrganizationId")
+                .build();
+        Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
+                .thenReturn(Optional.of(initiativeConfig));
+        Mockito.when(onboardingRankingRequestsServiceMock.deleteByInitiativeId(Mockito.any()))
+                .thenReturn(List.of(onboardingRankingRequests));
+
+        // When
+        initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
+
+        // Then
+        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
     }
 
     private InitiativeConfig getInitiativeConfigExpected(InitiativeBuildDTO initiativeRequest) {

@@ -3,18 +3,21 @@ package it.gov.pagopa.ranking.service.initiative;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.mongodb.MongoException;
+import it.gov.pagopa.ranking.dto.event.QueueCommandOperationDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.mapper.InitiativeBuild2ConfigMapper;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
-import it.gov.pagopa.ranking.service.BaseKafkaConsumer;
-import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
-import it.gov.pagopa.ranking.service.RankingContextHolderService;
+import it.gov.pagopa.ranking.service.*;
+import it.gov.pagopa.ranking.utils.AuditUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Service
@@ -24,13 +27,18 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
     private final InitiativeConfigService initiativeConfigService;
     private final RankingContextHolderService rankingContextHolderService;
     private final RankingErrorNotifierService rankingErrorNotifierService;
+    private final OnboardingRankingRequestsService onboardingRankingRequestsService;
     private final ObjectReader objectReader;
+    private final AuditUtilities auditUtilities;
+    public static final String SERVICE_PROCESS_COMMAND = "PROCESS_COMMAND";
 
     public InitiativePersistenceMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                              InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper,
                                              InitiativeConfigService initiativeConfigService,
                                              RankingContextHolderService rankingContextHolderService,
                                              RankingErrorNotifierService rankingErrorNotifierService,
+                                             OnboardingRankingRequestsService onboardingRankingRequestsService,
+                                             AuditUtilities auditUtilities,
 
                                              ObjectMapper objectMapper){
         super(applicationName);
@@ -38,6 +46,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
         this.initiativeConfigService = initiativeConfigService;
         this.rankingContextHolderService = rankingContextHolderService;
         this.rankingErrorNotifierService = rankingErrorNotifierService;
+        this.onboardingRankingRequestsService = onboardingRankingRequestsService;
+        this.auditUtilities = auditUtilities;
 
         this.objectReader = objectMapper.readerFor(InitiativeBuildDTO.class);
 
@@ -70,5 +80,32 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                 rankingErrorNotifierService.notifyInitiativeBuild(message, "[INITIATIVE_RANKING] An error occurred handling initiative ranking build", true, e);
             }
         }
+    }
+
+    @Override
+    public void processCommand(QueueCommandOperationDTO queueCommandOperationDTO) {
+        long startTime = System.currentTimeMillis();
+
+        if (("DELETE_INITIATIVE").equals(queueCommandOperationDTO.getOperationType())) {
+            Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+            List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+
+            if (deletedInitiativeConfig.isEmpty()){
+                log.info("[DELETE OPERATION] Initiative config for initiativeId {} was not found", queueCommandOperationDTO.getOperationId());
+            } else {
+                log.info("[DELETE OPERATION] Deleted initiative config for initiativeId {}", queueCommandOperationDTO.getOperationId());
+                auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getOperationId());
+            }
+
+            log.info("[DELETE OPERATION] Deleted {} onboarding ranking requests for initiativeId {}", deletedOnboardingRankingRequestes.size(), queueCommandOperationDTO.getOperationId());
+            deletedOnboardingRankingRequestes.forEach(deletedOnboardingRankingRequest -> auditUtilities.logDeleteInitiativeRanking(deletedOnboardingRankingRequest.getUserId(), deletedOnboardingRankingRequest.getInitiativeId()));
+
+        }
+
+        log.info(
+                "[PERFORMANCE_LOG] [{}}] Time occurred to perform business logic: {} ms on initiativeId: {}",
+                SERVICE_PROCESS_COMMAND,
+                System.currentTimeMillis() - startTime,
+                queueCommandOperationDTO.getOperationId());
     }
 }
