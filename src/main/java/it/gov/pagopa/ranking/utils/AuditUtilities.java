@@ -38,14 +38,14 @@ public class AuditUtilities {
     public void logDeleteInitiativeConfig(String initiativeId){
         logAuditString(
                 CEF_PATTERN_INITIATIVE_ID,
-                "Initiative config deleted", initiativeId
+                "Initiative ranking rule deleted", initiativeId
         );
     }
 
     public void logDeleteInitiativeRanking(String userId, String initiativeId){
         logAuditString(
                 CEF_PATTERN,
-                "Initiative ranking deleted", userId, initiativeId
+                "Initiative ranking request deleted", userId, initiativeId
         );
     }
 }

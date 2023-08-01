@@ -11,7 +11,7 @@ spring:
       on-profile: default
   cloud:
     function:
-      definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking;consumerCommand
+      definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking;consumerCommands
     stream:
       bindings:
         onboardingRankingRequestsConsumer-in-0:
@@ -24,7 +24,7 @@ spring:
           group: ${KAFKA_INITIATIVE_RANKING_GROUP_ID:idpay-rule-update-ranking-consumer-group}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
           binder: kafka-initiative-ranking
-        consumerCommand-in-0:
+        consumerCommands-in-0:
           destination: ${KAFKA_TOPIC_COMMANDS:idpay-commands}
           group: ${KAFKA_COMMANDS_GROUP_IN:idpay-commands-ranking-consumer-group}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
@@ -67,7 +67,7 @@ spring:
               configuration:
                 sasl.jaas.config: ${KAFKA_ERRORS_SASL_JAAS_CONFIG:}
                 key.serializer: org.apache.kafka.common.serialization.StringSerializer
-        kafka-command:
+        kafka-commands:
           type: kafka
           environment:
             spring.cloud.stream.kafka.binder:
@@ -118,7 +118,7 @@ spring:
                 socket.connection.setup.timeout:
                   max.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MAX_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MAX_MS:200000}}
                   ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MS:100000}}
-          consumerCommand-in-0:
+          consumerCommands-in-0:
             consumer:
               startOffset: ${KAFKA_COMMANDS_REQUEST_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
               autoCommitOffset: ${KAFKA_COMMANDS_AUTO_COMMIT:${KAFKA_CONSUMER_CONFIG_AUTO_COMMIT:true}}

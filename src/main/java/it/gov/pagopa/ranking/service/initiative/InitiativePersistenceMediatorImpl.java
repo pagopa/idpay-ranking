@@ -91,9 +91,9 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
             List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
 
             if (deletedInitiativeConfig.isEmpty()){
-                log.info("[DELETE OPERATION] Initiative config for initiativeId {} was not found", queueCommandOperationDTO.getOperationId());
+                log.info("[DELETE OPERATION] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getOperationId());
             } else {
-                log.info("[DELETE OPERATION] Deleted initiative config for initiativeId {}", queueCommandOperationDTO.getOperationId());
+                log.info("[DELETE OPERATION] Deleted initiative ranking rule for initiativeId {}", queueCommandOperationDTO.getOperationId());
                 auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getOperationId());
             }
 
