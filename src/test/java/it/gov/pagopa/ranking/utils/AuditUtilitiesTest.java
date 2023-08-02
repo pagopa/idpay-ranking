@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
-public class AuditUtilitiesTest {
+class AuditUtilitiesTest {
     private static final String USER_ID = "TEST_USER_ID";
     private static final String INITIATIVE_ID = "TEST_INITIATIVE_ID";
 
