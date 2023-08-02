@@ -28,7 +28,7 @@ spring:
           destination: ${KAFKA_TOPIC_COMMANDS:idpay-commands}
           group: ${KAFKA_COMMANDS_GROUP_IN:idpay-commands-ranking-consumer-group}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
-          binder: kafka-command
+          binder: kafka-commands
         evaluationOnboardingRanking-out-0:
           destination: ${KAFKA_EVALUATION_ONBOARDING_OUTCOME_TOPIC:idpay-onboarding-outcome}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}

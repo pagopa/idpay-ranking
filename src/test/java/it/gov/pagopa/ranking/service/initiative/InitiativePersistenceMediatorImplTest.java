@@ -176,7 +176,7 @@ class InitiativePersistenceMediatorImplTest {
     void processCommand_commandNotDeleteInitiative(){
         // Given
         QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
-                .operationId("OperationId")
+                .entityId("EntityId")
                 .operationType("NOT_DELETE_INITIATIVE")
                 .build();
 
@@ -184,15 +184,15 @@ class InitiativePersistenceMediatorImplTest {
         initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
 
         // Then
-        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
-        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(initiativeConfigServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.never()).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
     }
 
     @Test
     void processCommand_emptyDeletedInitiativeConfig(){
         // Given
         QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
-                .operationId("OperationId")
+                .entityId("EntityId")
                 .operationType("DELETE_INITIATIVE")
                 .build();
         Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
@@ -202,8 +202,8 @@ class InitiativePersistenceMediatorImplTest {
         initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
 
         // Then
-        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
-        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
 
     }
 
@@ -211,17 +211,17 @@ class InitiativePersistenceMediatorImplTest {
     void processCommand(){
         // Given
         QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
-                .operationId("OperationId")
+                .entityId("EntityId")
                 .operationType("DELETE_INITIATIVE")
                 .build();
         InitiativeConfig initiativeConfig = InitiativeConfig.builder()
-                .initiativeId(queueCommandOperationDTO.getOperationId())
+                .initiativeId(queueCommandOperationDTO.getEntityId())
                 .initiativeName("InitiativeName")
                 .build();
         OnboardingRankingRequests onboardingRankingRequests = OnboardingRankingRequests.builder()
                 .id("Id")
                 .userId("UserId")
-                .initiativeId(queueCommandOperationDTO.getOperationId())
+                .initiativeId(queueCommandOperationDTO.getEntityId())
                 .organizationId("OrganizationId")
                 .build();
         Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
@@ -233,8 +233,8 @@ class InitiativePersistenceMediatorImplTest {
         initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
 
         // Then
-        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
-        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+        Mockito.verify(initiativeConfigServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
     }
 
     private InitiativeConfig getInitiativeConfigExpected(InitiativeBuildDTO initiativeRequest) {

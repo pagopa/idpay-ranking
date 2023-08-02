@@ -87,17 +87,17 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
         long startTime = System.currentTimeMillis();
 
         if (("DELETE_INITIATIVE").equals(queueCommandOperationDTO.getOperationType())) {
-            Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
-            List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getOperationId());
+            Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
+            List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
 
             if (deletedInitiativeConfig.isEmpty()){
-                log.info("[DELETE OPERATION] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getOperationId());
+                log.info("[DELETE OPERATION] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getEntityId());
             } else {
-                log.info("[DELETE OPERATION] Deleted initiative ranking rule for initiativeId {}", queueCommandOperationDTO.getOperationId());
-                auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getOperationId());
+                log.info("[DELETE OPERATION] Deleted initiative ranking rule for initiativeId {}", queueCommandOperationDTO.getEntityId());
+                auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getEntityId());
             }
 
-            log.info("[DELETE OPERATION] Deleted {} onboarding ranking requests for initiativeId {}", deletedOnboardingRankingRequestes.size(), queueCommandOperationDTO.getOperationId());
+            log.info("[DELETE OPERATION] Deleted {} onboarding ranking requests for initiativeId {}", deletedOnboardingRankingRequestes.size(), queueCommandOperationDTO.getEntityId());
             deletedOnboardingRankingRequestes.forEach(deletedOnboardingRankingRequest -> auditUtilities.logDeleteInitiativeRanking(deletedOnboardingRankingRequest.getUserId(), deletedOnboardingRankingRequest.getInitiativeId()));
 
         }
@@ -106,6 +106,6 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                 "[PERFORMANCE_LOG] [{}}] Time occurred to perform business logic: {} ms on initiativeId: {}",
                 SERVICE_PROCESS_COMMAND,
                 System.currentTimeMillis() - startTime,
-                queueCommandOperationDTO.getOperationId());
+                queueCommandOperationDTO.getEntityId());
     }
 }
