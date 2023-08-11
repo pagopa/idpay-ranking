@@ -11,7 +11,7 @@ spring:
       on-profile: default
   cloud:
     function:
-      definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking
+      definition: onboardingRankingRequestsConsumer;initiativeRankingConsumer;errors;evaluationOnboardingRanking;consumerCommands
     stream:
       bindings:
         onboardingRankingRequestsConsumer-in-0:
@@ -24,6 +24,11 @@ spring:
           group: ${KAFKA_INITIATIVE_RANKING_GROUP_ID:idpay-rule-update-ranking-consumer-group}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
           binder: kafka-initiative-ranking
+        consumerCommands-in-0:
+          destination: ${KAFKA_TOPIC_COMMANDS:idpay-commands}
+          group: ${KAFKA_COMMANDS_GROUP_IN:idpay-commands-ranking-consumer-group}
+          content-type: ${KAFKA_CONTENT_TYPE:application/json}
+          binder: kafka-commands
         evaluationOnboardingRanking-out-0:
           destination: ${KAFKA_EVALUATION_ONBOARDING_OUTCOME_TOPIC:idpay-onboarding-outcome}
           content-type: ${KAFKA_CONTENT_TYPE:application/json}
@@ -62,6 +67,13 @@ spring:
               configuration:
                 sasl.jaas.config: ${KAFKA_ERRORS_SASL_JAAS_CONFIG:}
                 key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        kafka-commands:
+          type: kafka
+          environment:
+            spring.cloud.stream.kafka.binder:
+              brokers: ${KAFKA_ERRORS_BROKER}
+              configuration:
+                sasl.jaas.config: ${KAFKA_COMMANDS_SASL_JAAS_CONFIG:}
       kafka:
         binder:
           auto-create-topics: false
@@ -106,6 +118,19 @@ spring:
                 socket.connection.setup.timeout:
                   max.ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MAX_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MAX_MS:200000}}
                   ms: ${KAFKA_ONBOARDING_RANKING_REQUESTS_CONNECTION_TIMEOUT_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MS:100000}}
+          consumerCommands-in-0:
+            consumer:
+              startOffset: ${KAFKA_COMMANDS_REQUEST_START_OFFSET:${KAFKA_CONSUMER_CONFIG_START_OFFSET:earliest}}
+              autoCommitOffset: ${KAFKA_COMMANDS_AUTO_COMMIT:${KAFKA_CONSUMER_CONFIG_AUTO_COMMIT:true}}
+              standardHeaders: ${KAFKA_COMMANDS_STANDARD_HEADERS:${KAFKA_CONSUMER_CONFIG_STANDARD_HEADERS:both}}
+              configuration:
+                max.poll:
+                  records: ${KAFKA_COMMANDS_MAX_POLL_SIZE:${KAFKA_CONSUMER_CONFIG_MAX_POLL_SIZE:500}}
+                  interval.ms: ${KAFKA_COMMANDS_INTERVAL_TIMEOUT_MS:${KAFKA_CONFIG_MAX_POLL_INTERVAL_TIMEOUT_MS:300000}}
+                connections.max.idle.ms: ${KAFKA_COMMANDS_REQUEST_CONNECTIONS_MAX_IDLE_MS:${KAFKA_CONSUMER_CONFIG_CONNECTIONS_MAX_IDLE_MS:180000}}
+                socket.connection.setup.timeout:
+                  max.ms: ${KAFKA_COMMANDS_REQUEST_CONNECTION_TIMEOUT_MAX_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MAX_MS:200000}}
+                  ms: ${KAFKA_COMMANDS_REQUEST_CONNECTION_TIMEOUT_MS:${KAFKA_CONSUMER_CONFIG_CONNECTION_TIMEOUT_MS:100000}}
           errors-out-0:
             producer:
               configuration:
@@ -146,9 +171,21 @@ spring:
           maxConnectionIdleTimeMS: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTION_IDLE_MS:0}
           maxConnecting: ${MONGODB_CONNECTIONPOOL_MAX_CONNECTING:2}
 
-management.endpoints:
-  web:
-    exposure.include: info, health
+management:
+  health:
+    probes.enabled: true
+    mongo.enabled: ${HEALTH_MONGO_ENABLED:true}
+  endpoint:
+    health:
+      group:
+        readiness.include: "*"
+        liveness.include: livenessState,diskSpace,ping,binders,streams
+      logging.slow-indicator-threshold: ${HEALTH_ACTUATOR_LOGGER_TIMEOUT_DURATION:PT1S}
+  endpoints:
+    jmx:
+      exposure.include: "*"
+    web:
+      exposure.include: info, health
 
 logging:
   level:

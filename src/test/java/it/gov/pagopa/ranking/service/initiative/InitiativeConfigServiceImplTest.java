@@ -108,4 +108,29 @@ class InitiativeConfigServiceImplTest {
         Assertions.assertThrows(ClientException.class, executable);
         Mockito.verify(initiativeConfigRepositoryMock, Mockito.never()).save(Mockito.any());
     }
+
+    @Test
+    void deleteByInitiativeId() {
+        // Given
+        LocalDate now = LocalDate.now();
+        String initiativeId = "InitiativeId";
+        InitiativeConfig initiative = InitiativeConfigFaker.mockInstanceBuilder(1)
+                .initiativeId(initiativeId)
+                .rankingEndDate(now.plusDays(7))
+                .rankingStatus(RankingStatus.READY)
+                .build();
+
+        Mockito.when(initiativeConfigRepositoryMock.deleteByInitiativeId(Mockito.any()))
+                .thenReturn(Optional.of(initiative));
+
+        // When
+        Optional<InitiativeConfig> result =  initiativeConfigService.deleteByInitiativeId(initiativeId);
+
+        // Then
+        Assertions.assertFalse(result.isEmpty());
+        Assertions.assertEquals(initiative.getInitiativeId(), result.get().getInitiativeId());
+        Assertions.assertEquals(initiative.getRankingEndDate(), result.get().getRankingEndDate());
+        Assertions.assertEquals(initiative.getRankingStatus(), result.get().getRankingStatus());
+        Mockito.verify(initiativeConfigRepositoryMock, Mockito.times(1)).deleteByInitiativeId(initiativeId);
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface InitiativeConfigRepository extends MongoRepository<InitiativeConfig, String> {
     /**
@@ -15,4 +16,6 @@ public interface InitiativeConfigRepository extends MongoRepository<InitiativeCo
      * @param endIntervalExclusive ending value for the interval (not included)
      * */
     List<InitiativeConfig> findByRankingStatusAndRankingEndDateBetween(RankingStatus rankingStatus, LocalDate startIntervalExclusive, LocalDate endIntervalExclusive);
+
+    Optional<InitiativeConfig> deleteByInitiativeId(String initiativeId);
 }

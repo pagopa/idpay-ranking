@@ -16,4 +16,6 @@ public interface OnboardingRankingRequestsRepository extends MongoRepository<Onb
     List<OnboardingRankingRequests> findAllByOrganizationIdAndInitiativeId(String organizationId, String initiativeId);
 
     List<OnboardingRankingRequests> findAllByInitiativeId(String initiativeId, Pageable pageable);
+
+    List<OnboardingRankingRequests> deleteByInitiativeId(String initiativeId);
 }

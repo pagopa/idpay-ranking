@@ -55,4 +55,9 @@ public class InitiativeConfigServiceImpl implements InitiativeConfigService{
             throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "[RANKING][FORCE_RANKING_END] Could not find initiative having id %s".formatted(initiativeId));
         }
     }
+
+    @Override
+    public Optional<InitiativeConfig> deleteByInitiativeId(String initiativeId){
+        return initiativeConfigRepository.deleteByInitiativeId(initiativeId);
+    }
 }
