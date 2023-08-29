@@ -100,7 +100,7 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
             log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: onboarding_ranking_requests", queueCommandOperationDTO.getEntityId());
             deletedOnboardingRankingRequestes.forEach(deletedOnboardingRankingRequest -> auditUtilities.logDeleteInitiativeRanking(deletedOnboardingRankingRequest.getUserId(), deletedOnboardingRankingRequest.getInitiativeId()));
             log.info(
-                    "[PERFORMANCE_LOG] [{}}] Time occurred to perform business logic: {} ms on initiativeId: {}",
+                    "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms on initiativeId: {}",
                     SERVICE_COMMAND_DELETE_INITIATIVE,
                     System.currentTimeMillis() - startTime,
                     queueCommandOperationDTO.getEntityId());
