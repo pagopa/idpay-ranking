@@ -30,7 +30,7 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
     private final OnboardingRankingRequestsService onboardingRankingRequestsService;
     private final ObjectReader objectReader;
     private final AuditUtilities auditUtilities;
-    public static final String SERVICE_PROCESS_COMMAND = "PROCESS_COMMAND";
+    public static final String SERVICE_COMMAND_DELETE_INITIATIVE = "DELETE_INITIATIVE";
 
     public InitiativePersistenceMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                              InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper,
@@ -84,28 +84,26 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
     @Override
     public void processCommand(QueueCommandOperationDTO queueCommandOperationDTO) {
-        long startTime = System.currentTimeMillis();
 
-        if (("DELETE_INITIATIVE").equals(queueCommandOperationDTO.getOperationType())) {
+        if ((SERVICE_COMMAND_DELETE_INITIATIVE).equals(queueCommandOperationDTO.getOperationType())) {
+            long startTime = System.currentTimeMillis();
             Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
             List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
 
             if (deletedInitiativeConfig.isEmpty()){
-                log.info("[DELETE OPERATION] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getEntityId());
+                log.info("[DELETE_INITIATIVE] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getEntityId());
             } else {
-                log.info("[DELETE OPERATION] Deleted initiative ranking rule for initiativeId {}", queueCommandOperationDTO.getEntityId());
+                log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: onboarding_ranking_rule", queueCommandOperationDTO.getEntityId());
                 auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getEntityId());
             }
 
-            log.info("[DELETE OPERATION] Deleted {} onboarding ranking requests for initiativeId {}", deletedOnboardingRankingRequestes.size(), queueCommandOperationDTO.getEntityId());
+            log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: onboarding_ranking_requests", queueCommandOperationDTO.getEntityId());
             deletedOnboardingRankingRequestes.forEach(deletedOnboardingRankingRequest -> auditUtilities.logDeleteInitiativeRanking(deletedOnboardingRankingRequest.getUserId(), deletedOnboardingRankingRequest.getInitiativeId()));
-
+            log.info(
+                    "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms on initiativeId: {}",
+                    SERVICE_COMMAND_DELETE_INITIATIVE,
+                    System.currentTimeMillis() - startTime,
+                    queueCommandOperationDTO.getEntityId());
         }
-
-        log.info(
-                "[PERFORMANCE_LOG] [{}}] Time occurred to perform business logic: {} ms on initiativeId: {}",
-                SERVICE_PROCESS_COMMAND,
-                System.currentTimeMillis() - startTime,
-                queueCommandOperationDTO.getEntityId());
     }
 }
