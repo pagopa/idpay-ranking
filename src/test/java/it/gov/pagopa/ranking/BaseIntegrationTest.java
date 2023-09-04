@@ -47,7 +47,8 @@ import java.util.regex.Pattern;
         "${spring.cloud.stream.bindings.onboardingRankingRequestsConsumer-in-0.destination}",
         "${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}",
         "${spring.cloud.stream.bindings.errors-out-0.destination}",
-        "${spring.cloud.stream.bindings.evaluationOnboardingRanking-out-0.destination}"
+        "${spring.cloud.stream.bindings.evaluationOnboardingRanking-out-0.destination}",
+        "${spring.cloud.stream.bindings.consumerCommands-in-0.destination}"
 }, controlledShutdown = true)
 @TestPropertySource(
         properties = {
@@ -68,6 +69,7 @@ import java.util.regex.Pattern;
                 "spring.cloud.stream.binders.kafka-initiative-ranking.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.binders.kafka-errors.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 "spring.cloud.stream.binders.kafka-evaluation-onboarding-ranking-outcome.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
+                "spring.cloud.stream.binders.kafka-commands.environment.spring.cloud.stream.kafka.binder.brokers=${spring.embedded.kafka.brokers}",
                 //endregion
 
                 //region service bus mock

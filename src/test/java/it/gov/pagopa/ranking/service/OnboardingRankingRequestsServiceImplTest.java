@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+
 class OnboardingRankingRequestsServiceImplTest {
 
     @Test
@@ -29,5 +31,32 @@ class OnboardingRankingRequestsServiceImplTest {
         Assertions.assertEquals(requests.getAdmissibilityCheckDate(), result.getAdmissibilityCheckDate());
         Assertions.assertEquals(requests.getCriteriaConsensusTimestamp(), result.getCriteriaConsensusTimestamp());
         Assertions.assertEquals(requests.getRankingValue(), result.getRankingValue());
+    }
+
+    @Test
+    void deleteByInitiativeId() {
+        // Given
+        OnboardingRankingRequestsRepository onboardingRankingRequestsRepositoryMock = Mockito.mock(OnboardingRankingRequestsRepository.class);
+        OnboardingRankingRequestsService onboardingRankingRequestsService = new OnboardingRankingRequestsServiceImpl(onboardingRankingRequestsRepositoryMock);
+
+        String initiativeId = "InitiativeId";
+        OnboardingRankingRequests onboardingRankingRequest = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest.setInitiativeId(initiativeId);
+        Mockito.when(onboardingRankingRequestsRepositoryMock.deleteByInitiativeId(Mockito.any()))
+                        .thenReturn(List.of(onboardingRankingRequest));
+
+        // When
+        List<OnboardingRankingRequests> result = onboardingRankingRequestsService.deleteByInitiativeId(initiativeId);
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(onboardingRankingRequest.getId(), result.get(0).getId());
+        Assertions.assertEquals(onboardingRankingRequest.getUserId(), result.get(0).getUserId());
+        Assertions.assertEquals(onboardingRankingRequest.getInitiativeId(), result.get(0).getInitiativeId());
+        Assertions.assertEquals(onboardingRankingRequest.getAdmissibilityCheckDate(), result.get(0).getAdmissibilityCheckDate());
+        Assertions.assertEquals(onboardingRankingRequest.getCriteriaConsensusTimestamp(), result.get(0).getCriteriaConsensusTimestamp());
+        Assertions.assertEquals(onboardingRankingRequest.getRankingValue(), result.get(0).getRankingValue());
+        Mockito.verify(onboardingRankingRequestsRepositoryMock, Mockito.times(1)).deleteByInitiativeId(initiativeId);
     }
 }
