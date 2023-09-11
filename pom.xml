@@ -49,6 +49,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+			<version>1.18.28</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -58,22 +59,22 @@
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
-			<version>3.1.8</version>
+			<version>3.1.10</version>
 		</dependency>
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-messaging-servicebus</artifactId>
-			<version>7.13.0</version>
+			<version>7.14.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.9</version>
+			<version>1.6.15</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>5.7.1</version>
+			<version>5.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.azure</groupId>
@@ -83,7 +84,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15to18</artifactId>
-			<version>1.72</version>
+			<version>1.76</version>
 		</dependency>
 
 		<!-- Security fixes -->
@@ -121,7 +122,7 @@
 		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
-			<version>4.6.2</version>
+			<version>4.7.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -133,7 +134,7 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-contract-wiremock</artifactId>
-			<version>4.0.2</version>
+			<version>4.0.4</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -143,7 +144,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>2022.0.2</version>
+				<version>2022.0.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
