@@ -96,11 +96,13 @@ class OnboardingNotifierServiceImplTest {
 
         EvaluationRankingDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequests1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
         onboardingRankingRequests1.setFamilyId("FAMILYID_" + onboardingRankingRequests1.getUserId());
         onboardingRankingRequests1.setMemberIds(Set.of(onboardingRankingRequests1.getUserId(),
                 onboardingRankingRequests1.getUserId() + "MEMBER2"));
 
         OnboardingRankingRequests onboardingRankingRequests2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequests2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
         onboardingRankingRequests2.setFamilyId("FAMILYID_" + onboardingRankingRequests2.getUserId());
         onboardingRankingRequests2.setMemberIds(Set.of(onboardingRankingRequests2.getUserId(),
                 onboardingRankingRequests2.getUserId() + "MEMBER2"));
@@ -136,11 +138,13 @@ class OnboardingNotifierServiceImplTest {
 
         EvaluationRankingDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
         OnboardingRankingRequests onboardingRankingRequests1 = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequests1.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
         onboardingRankingRequests1.setFamilyId("FAMILYID_" + onboardingRankingRequests1.getUserId());
         onboardingRankingRequests1.setMemberIds(Set.of(onboardingRankingRequests1.getUserId(),
                 onboardingRankingRequests1.getUserId() + "MEMBER2"));
 
         OnboardingRankingRequests onboardingRankingRequests2 = OnboardingRankingRequestsFaker.mockInstance(2);
+        onboardingRankingRequests2.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_OK);
         onboardingRankingRequests2.setFamilyId("FAMILYID_" + onboardingRankingRequests2.getUserId());
         onboardingRankingRequests2.setMemberIds(Set.of(onboardingRankingRequests2.getUserId(),
                 onboardingRankingRequests2.getUserId() + "MEMBER2"));
