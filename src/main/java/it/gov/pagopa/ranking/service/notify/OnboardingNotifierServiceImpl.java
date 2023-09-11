@@ -46,7 +46,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
             EvaluationRankingDTO evaluationDTO = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequest, initiative);
             log.debug("[NOTIFY_CITIZEN] - notifying onboarding request to onboarding outcome topic: {}", evaluationDTO);
 
-            callOnboardingNotifier(evaluationDTO);
+            callOnboardingUserNotifier(evaluationDTO);
 
             inviteFamilyMembers(onboardingRankingRequest, evaluationDTO);
         });
@@ -60,7 +60,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
         if(request.getFamilyId()!=null && BeneficiaryRankingStatus.ELIGIBLE_OK.equals(request.getBeneficiaryRankingStatus())){
             request.getMemberIds().forEach(userId -> {
                 if(!userId.equals(request.getUserId())){
-                    callOnboardingNotifier(evaluation.toBuilder()
+                    callOnboardingUserNotifier(evaluation.toBuilder()
                             .userId(userId)
                             .status(OnboardingConstants.ONBOARDING_STATUS_DEMANDED)
                             .build());
@@ -69,7 +69,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
         }
     }
 
-    private void callOnboardingNotifier(EvaluationRankingDTO evaluationCompletedDTO) {
+    private void callOnboardingUserNotifier(EvaluationRankingDTO evaluationCompletedDTO) {
         log.info("[ONBOARDING_REQUEST] notifying onboarding request to outcome topic: {}", evaluationCompletedDTO);
         try {
             if (!onboardingNotifierProducer.notify(evaluationCompletedDTO)) {
