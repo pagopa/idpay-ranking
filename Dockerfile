@@ -1,7 +1,7 @@
 #
 # Build
 #
-FROM maven:3.9.4-amazoncorretto-17-al2023@sha256:c668a2ee8a376c82977408f57970a996f5d6d3d5f017149d02d396eed2c850b3 AS buildtime
+FROM maven:3.9.3-amazoncorretto-17@sha256:1d4c323f286a39da2c0930ab42115b04b4d7efd40710273e38f6e80f28069753 as buildtime
 
 WORKDIR /build
 COPY . .
@@ -11,9 +11,10 @@ RUN mvn clean package -DskipTests
 #
 # Docker RUNTIME
 #
-FROM amazoncorretto:17.0.8-alpine3.18@sha256:f59b4f511346db4e473fb98c65b86254926061ce2b398295e975d0632fa4e2fd AS runtime
+FROM amazoncorretto:17.0.8-alpine3.18@sha256:f59b4f511346db4e473fb98c65b86254926061ce2b398295e975d0632fa4e2fd as runtime
 
 RUN apk add shadow
+RUN apk upgrade libssl3 libcrypto3 busybox ssl_client
 RUN useradd --uid 10000 runner
 
 VOLUME /tmp
