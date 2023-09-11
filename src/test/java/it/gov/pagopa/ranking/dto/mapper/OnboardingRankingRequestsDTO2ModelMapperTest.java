@@ -78,7 +78,7 @@ class OnboardingRankingRequestsDTO2ModelMapperTest {
         Assertions.assertEquals(requestDto.getRankingValue(), result.getRankingValue2Show());
         Assertions.assertEquals(expectedRankingValue, result.getRankingValue());
         Assertions.assertEquals(expectedRankingValue, result.getRankingValueOriginal());
-        TestUtils.checkNotNullFields(result);
+        TestUtils.checkNotNullFields(result, "familyId", "memberIds");
     }
 
 }

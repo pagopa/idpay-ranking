@@ -18,6 +18,7 @@ public class OnboardingRankingRequest2RankingRequestsApiDTOMapper {
         out.setRankingValue(onboardingRankingRequests.getRankingValue2Show());
         out.setRanking(onboardingRankingRequests.getRank());
         out.setBeneficiaryRankingStatus(onboardingRankingRequests.getBeneficiaryRankingStatus());
+        out.setFamilyId(onboardingRankingRequests.getFamilyId());
 
         return out;
     }

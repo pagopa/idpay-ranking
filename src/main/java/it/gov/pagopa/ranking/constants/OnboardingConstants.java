@@ -6,6 +6,10 @@ public final class OnboardingConstants {
     //region onboarding statuses
     public static final String ONBOARDING_STATUS_KO = "ONBOARDING_KO";
     public static final String ONBOARDING_STATUS_OK = "ONBOARDING_OK";
+
+    //for family unit
+    public static final String ONBOARDING_STATUS_DEMANDED = "DEMANDED";
+
     //endregion
 
     //region rejection reasons

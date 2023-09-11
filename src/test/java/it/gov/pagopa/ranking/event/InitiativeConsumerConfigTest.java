@@ -203,6 +203,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
                 ))
                 .initiativeRewardType("REFUND")
                 .isLogoPresent(Boolean.FALSE)
+                .beneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF)
                 .build();
     }
 
