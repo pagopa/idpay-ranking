@@ -10,6 +10,7 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,17 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     private final OnboardingNotifierProducer onboardingNotifierProducer;
     private final OnboardingRankingRequest2EvaluationMapper onboardingRankingRequest2EvaluationMapper;
     private final RankingContextHolderService rankingContextHolderService;
+    private final RankingErrorNotifierService rankingErrorNotifierService;
 
     public OnboardingNotifierServiceImpl(
             OnboardingNotifierProducer onboardingNotifierProducer,
             OnboardingRankingRequest2EvaluationMapper onboardingRankingRequest2EvaluationMapper,
-            RankingContextHolderService rankingContextHolderService
-            ) {
+            RankingContextHolderService rankingContextHolderService,
+            RankingErrorNotifierService rankingErrorNotifierService) {
         this.onboardingNotifierProducer = onboardingNotifierProducer;
         this.onboardingRankingRequest2EvaluationMapper = onboardingRankingRequest2EvaluationMapper;
         this.rankingContextHolderService = rankingContextHolderService;
+        this.rankingErrorNotifierService = rankingErrorNotifierService;
     }
 
     @Override
@@ -74,9 +77,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
             }
         } catch (Exception e) {
             log.error(String.format("[UNEXPECTED_ONBOARDING_NOTIFIER_PROCESSOR_ERROR] Unexpected error occurred publishing onboarding ranking result: %s", evaluationCompletedDTO), e);
-
-            //TODO add
-//            rankingErrorNotifierService.notifyRankingOutcome(OnboardingNotifierProducerImpl.buildMessage(evaluationCompletedDTO), "[ONBOARDING_REQUEST] An error occurred while publishing the onboarding evaluation result", true, e);
+            rankingErrorNotifierService.notifyRankingOnboardingOutcome(OnboardingNotifierProducerImpl.buildMessage(evaluationCompletedDTO), "[ONBOARDING_REQUEST] An error occurred while publishing the onboarding evaluation result", true, e);
         }
     }
 }
