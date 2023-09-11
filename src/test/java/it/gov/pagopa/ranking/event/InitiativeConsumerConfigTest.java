@@ -37,6 +37,7 @@ import java.util.stream.IntStream;
         "logging.level.it.gov.pagopa.ranking.service.initiative.InitiativePersistenceMediatorImpl=OFF",
         "logging.level.it.gov.pagopa.ranking.service.initiative.InitiativeConfigServiceImpl=WARN",
         "logging.level.it.gov.pagopa.ranking.service.BaseKafkaConsumer=WARN",
+        "logging.level.it.gov.pagopa.ranking.controller.RankingApiControllerImpl=OFF",
 })
 class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 

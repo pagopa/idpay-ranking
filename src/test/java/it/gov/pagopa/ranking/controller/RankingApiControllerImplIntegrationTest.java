@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -32,6 +33,10 @@ import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+@TestPropertySource(properties = {
+        "logging.level.it.gov.pagopa.ranking.controller.RankingApiControllerImpl=WARN",
+
+})
 class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private InitiativeConfigRepository initiativeConfigRepository;
