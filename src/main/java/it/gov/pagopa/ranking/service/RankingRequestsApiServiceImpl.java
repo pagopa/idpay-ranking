@@ -57,7 +57,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                             PageRequest.of(page, size, Sort.by(OnboardingRankingRequests.Fields.initiativeId, OnboardingRankingRequests.Fields.rank))
                     ).getContent()
                     .stream()
-                    .map(dtoMapper::apply)
+                    .map(request -> dtoMapper.apply(request, initiative))
                     .toList();
         } else {
             return Collections.emptyList();
@@ -79,7 +79,9 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
 
             return pageDtoMapper.apply(
                     pageRequests,
-                    pageRequests.getContent().stream().map(dtoMapper::apply).toList(),
+                    pageRequests.getContent().stream()
+                            .map(request -> dtoMapper.apply(request, initiative))
+                            .toList(),
                     initiative
             );
         } else {
