@@ -17,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class EvaluationRankingDTO {
     @NotEmpty
     private String userId;
