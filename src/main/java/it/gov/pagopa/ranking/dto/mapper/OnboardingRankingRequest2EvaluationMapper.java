@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -33,6 +34,11 @@ public class OnboardingRankingRequest2EvaluationMapper {
         evaluationRankingDTO.setBeneficiaryBudget(initiative.getBeneficiaryInitiativeBudget());
         evaluationRankingDTO.setOnboardingRejectionReasons(this.buildRejectionReasons(onboardingRankingRequests.getBeneficiaryRankingStatus(), onboardingRankingRequests.getRank()));
         evaluationRankingDTO.setIsLogoPresent(initiative.getIsLogoPresent());
+
+        if(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF.equals(initiative.getBeneficiaryType())) {
+            evaluationRankingDTO.setFamilyId(onboardingRankingRequests.getFamilyId());
+        }
+
         return evaluationRankingDTO;
     }
 
