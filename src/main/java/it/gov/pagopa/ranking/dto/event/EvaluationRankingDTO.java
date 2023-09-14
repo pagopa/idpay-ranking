@@ -38,4 +38,5 @@ public class EvaluationRankingDTO {
     private BigDecimal beneficiaryBudget;
     private String initiativeRewardType;
     private Boolean isLogoPresent;
+    private String familyId;
 }
