@@ -30,6 +30,8 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.TestPropertySource;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
+import org.springframework.test.web.servlet.MockMvc;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -94,6 +96,8 @@ import java.util.regex.Pattern;
 @AutoConfigureWireMock(stubs = "classpath:/stub/pdv", port = 0)
 public abstract class BaseIntegrationTest {
 
+    @Autowired
+    protected MockMvc mockMvc;
     @Autowired
     protected KafkaTestUtilitiesService kafkaTestUtilitiesService;
     @Autowired

@@ -22,6 +22,10 @@ public class RankingErrorNotifierServiceImpl implements RankingErrorNotifierServ
     private final String initiativeRankingTopic;
     private final String initiativeRankingdGroup;
 
+    private final String rankingOnboardingOutcomeServiceType;
+    private final String rankingOnboardingOutcomeServer;
+    private final String rankingOnboardingOutcomeTopic;
+
 
     @SuppressWarnings("squid:S00107") // suppressing too many parameters constructor alert
     public RankingErrorNotifierServiceImpl(ErrorNotifierService errorNotifierService,
@@ -34,7 +38,11 @@ public class RankingErrorNotifierServiceImpl implements RankingErrorNotifierServ
                                            @Value("${spring.cloud.stream.binders.kafka-initiative-ranking.type}") String initiativeBuildServiceType,
                                            @Value("${spring.cloud.stream.binders.kafka-initiative-ranking.environment.spring.cloud.stream.kafka.binder.brokers}") String initiativeRankingServer,
                                            @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.destination}") String initiativeRankingTopic,
-                                           @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}") String initiativeRankingdGroup){
+                                           @Value("${spring.cloud.stream.bindings.initiativeRankingConsumer-in-0.group}") String initiativeRankingdGroup,
+
+                                           @Value("${spring.cloud.stream.binders.kafka-evaluation-onboarding-ranking-outcome.type}") String rankingOnboardingOutcomeServiceType,
+                                           @Value("${spring.cloud.stream.binders.kafka-evaluation-onboarding-ranking-outcome.environment.spring.cloud.stream.kafka.binder.brokers}") String rankingOnboardingOutcomeServer,
+                                           @Value("${spring.cloud.stream.bindings.evaluationOnboardingRanking-out-0.destination}") String rankingOnboardingOutcomeTopic){
         this.errorNotifierService = errorNotifierService;
 
         this.onboardingRankingRequestMessagingServiceType = onboardingRankingRequestMessagingServiceType;
@@ -45,6 +53,9 @@ public class RankingErrorNotifierServiceImpl implements RankingErrorNotifierServ
         this.initiativeRankingServer = initiativeRankingServer;
         this.initiativeRankingTopic = initiativeRankingTopic;
         this.initiativeRankingdGroup = initiativeRankingdGroup;
+        this.rankingOnboardingOutcomeServiceType = rankingOnboardingOutcomeServiceType;
+        this.rankingOnboardingOutcomeServer = rankingOnboardingOutcomeServer;
+        this.rankingOnboardingOutcomeTopic = rankingOnboardingOutcomeTopic;
     }
 
     @Override
@@ -55,6 +66,12 @@ public class RankingErrorNotifierServiceImpl implements RankingErrorNotifierServ
     @Override
     public void notifyInitiativeBuild(Message<?> message, String description, boolean retryable, Throwable exception) {
         notify(initiativeRankingMessagingServiceType, initiativeRankingServer, initiativeRankingTopic, initiativeRankingdGroup, message, description, retryable, true, exception);
+    }
+
+    @Override
+    public void notifyRankingOnboardingOutcome(Message<?> message, String description, boolean retryable, Throwable exception) {
+        notify(rankingOnboardingOutcomeServiceType, rankingOnboardingOutcomeServer, rankingOnboardingOutcomeTopic,null, message, description, retryable, false, exception);
+
     }
 
     @Override

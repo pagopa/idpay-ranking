@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -36,4 +37,9 @@ public class OnboardingRankingRequests {
     private long rankingValue2Show;
     private long rank;
     private BeneficiaryRankingStatus beneficiaryRankingStatus;
+
+    //region family
+    private String familyId;
+    private Set<String> memberIds;
+    //endregion
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class EvaluationRankingDTO {
     @NotEmpty
     private String userId;
@@ -38,4 +38,5 @@ public class EvaluationRankingDTO {
     private BigDecimal beneficiaryBudget;
     private String initiativeRewardType;
     private Boolean isLogoPresent;
+    private String familyId;
 }
