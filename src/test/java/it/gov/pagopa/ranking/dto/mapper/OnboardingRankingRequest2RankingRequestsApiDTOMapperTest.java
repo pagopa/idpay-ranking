@@ -1,7 +1,9 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
+import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
 import it.gov.pagopa.ranking.test.fakers.OnboardingRankingRequestsFaker;
 import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -13,16 +15,18 @@ class OnboardingRankingRequest2RankingRequestsApiDTOMapperTest {
         // Given
         OnboardingRankingRequest2RankingRequestsApiDTOMapper mapper = new OnboardingRankingRequest2RankingRequestsApiDTOMapper();
 
+        InitiativeConfig initiative = InitiativeConfigFaker.mockInstance(1);
+
         OnboardingRankingRequests request = OnboardingRankingRequestsFaker.mockInstance(1);
         request.setRankingValue(-1);
         request.setRankingValueOriginal(-1);
 
         // When
-        RankingRequestsApiDTO result = mapper.apply(request);
+        RankingRequestsApiDTO result = mapper.apply(request, initiative);
 
         // Then
         Assertions.assertNotNull(request);
-        TestUtils.checkNotNullFields(result, "rankingFilePath");
+        TestUtils.checkNotNullFields(result, "rankingFilePath", "familyId", "memberIds");
         checkResult(request, result);
 
     }

@@ -60,6 +60,7 @@ public class Initiative2BuildDTOFaker {
                 .rankingEndDate(nowDate.plusMonths(1L))
                 .rankingEnabled(Boolean.TRUE)
                 .endDate(nowDate)
+                .beneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF)
                 .build();
         out.general(initiativeGeneralDTO);
 

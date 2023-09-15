@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.model;
 
+import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,4 +41,5 @@ public class InitiativeConfig {
     private long totalEligibleKo;
     private long totalOnboardingKo;
     private Boolean isLogoPresent;
+    private InitiativeGeneralDTO.BeneficiaryTypeEnum beneficiaryType;
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -28,4 +29,9 @@ public class RankingRequestsApiDTO {
     private long rankingValue;
     private long ranking;
     private BeneficiaryRankingStatus beneficiaryRankingStatus;
+
+    //region family
+    private String familyId;
+    private Set<String> memberIds;
+    //endregion
 }

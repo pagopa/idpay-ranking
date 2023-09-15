@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,4 +26,9 @@ public class OnboardingRankingRequestDTO {
     private LocalDateTime criteriaConsensusTimestamp;
     private long rankingValue;
     private boolean onboardingKo;
+
+    //region family
+    private String familyId;
+    private Set<String> memberIds;
+    //endregion
 }

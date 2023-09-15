@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.test.fakers;
 
 import com.github.javafaker.service.FakeValuesService;
 import com.github.javafaker.service.RandomService;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -72,6 +73,7 @@ public class InitiativeConfigFaker {
         out.totalOnboardingKo(0);
         out.initiativeRewardType("REFUND");
         out.isLogoPresent(Boolean.FALSE);
+        out.beneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.PF);
 
         return out;
 

@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
 import it.gov.pagopa.ranking.dto.OnboardingRankingRequestDTO;
+import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -22,6 +23,11 @@ public class OnboardingRankingRequestsDTO2ModelMapper implements BiFunction<Onbo
         out.setAdmissibilityCheckDate(onboardingRankingRequestDTO.getAdmissibilityCheckDate());
         out.setCriteriaConsensusTimestamp(onboardingRankingRequestDTO.getCriteriaConsensusTimestamp());
         out.setRankingValue2Show(onboardingRankingRequestDTO.getRankingValue());
+
+        if(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF.equals(initiativeConfig.getBeneficiaryType())) {
+            out.setFamilyId(onboardingRankingRequestDTO.getFamilyId());
+            out.setMemberIds(onboardingRankingRequestDTO.getMemberIds());
+        }
 
         // when onboarding KO, it will store the lowest precedence value
         if(onboardingRankingRequestDTO.isOnboardingKo()){
