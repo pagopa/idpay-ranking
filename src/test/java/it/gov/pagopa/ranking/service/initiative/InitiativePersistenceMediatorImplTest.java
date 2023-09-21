@@ -223,13 +223,11 @@ class InitiativePersistenceMediatorImplTest {
                     .thenReturn(Optional.of(initiativeConfig));
         }
 
-
         // When
         if(times == 2){
             Thread.currentThread().interrupt();
         }
         initiativePersistenceMediator.processCommand(queueCommandOperationDTO);
-
 
         // Then
         Mockito.verify(initiativeConfigServiceMock, Mockito.times(times == 0 ? 0 : 1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
