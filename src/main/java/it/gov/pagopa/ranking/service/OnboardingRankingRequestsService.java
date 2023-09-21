@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface OnboardingRankingRequestsService {
     OnboardingRankingRequests save(OnboardingRankingRequests onboardingRankingRequests);
-
-    List<OnboardingRankingRequests> deleteByInitiativeId(String initiativeId);
+    List<OnboardingRankingRequests> deletePaged(String initiativeId, int pageSize);
 }
