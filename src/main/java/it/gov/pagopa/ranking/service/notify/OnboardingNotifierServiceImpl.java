@@ -57,15 +57,27 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     }
 
     private void inviteFamilyMembers(OnboardingRankingRequests request,EvaluationRankingDTO evaluation) {
-        if(request.getFamilyId()!=null && BeneficiaryRankingStatus.ELIGIBLE_OK.equals(request.getBeneficiaryRankingStatus())){
-            request.getMemberIds().forEach(userId -> {
-                if(!userId.equals(request.getUserId())){
-                    callOnboardingUserNotifier(evaluation.toBuilder()
-                            .userId(userId)
-                            .status(OnboardingConstants.ONBOARDING_STATUS_DEMANDED)
-                            .build());
-                }
-            });
+        if(request.getFamilyId()!=null){
+            if(BeneficiaryRankingStatus.ELIGIBLE_OK.equals(request.getBeneficiaryRankingStatus())){
+                request.getMemberIds().forEach(userId -> {
+                    if(!userId.equals(request.getUserId())){
+                        callOnboardingUserNotifier(evaluation.toBuilder()
+                                .userId(userId)
+                                .status(OnboardingConstants.ONBOARDING_STATUS_DEMANDED)
+                                .build());
+                    }
+                });
+            }
+            if(BeneficiaryRankingStatus.ELIGIBLE_KO.equals(request.getBeneficiaryRankingStatus())){
+                request.getMemberIds().forEach(userId -> {
+                    if(!userId.equals(request.getUserId())){
+                        callOnboardingUserNotifier(evaluation.toBuilder()
+                                .userId(userId)
+                                .status(OnboardingConstants.ONBOARDING_STATUS_KO)
+                                .build());
+                    }
+                });
+            }
         }
     }
 

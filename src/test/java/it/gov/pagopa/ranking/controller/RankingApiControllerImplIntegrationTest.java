@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
 import it.gov.pagopa.ranking.constants.OnboardingConstants;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
+import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
@@ -90,6 +91,15 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
         EvaluationRankingDTO evRequestEligibleKo = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequestsEligibleKO, initiativeConfig);
         expectedOutcome.add(evRequestEligibleKo);
 
+        expectedOutcome.add(evRequestEligibleKo.toBuilder()
+                .userId("FAMILYID2_MEMBER2")
+                .status(OnboardingConstants.ONBOARDING_STATUS_KO)
+                .onboardingRejectionReasons(List.of(OnboardingRejectionReason.builder()
+                        .type(OnboardingRejectionReason.OnboardingRejectionReasonType.OUT_OF_RANKING)
+                        .code(OnboardingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING)
+                        .detail("0")
+                        .build()))
+                .build());
 
         Mockito.doReturn(false).when(onboardingNotifierProducerSpy).notify(evRequestEligibleOk);
 
