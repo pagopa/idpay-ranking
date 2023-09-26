@@ -20,7 +20,7 @@ public class OnboardingRankingRequestsServiceImpl implements OnboardingRankingRe
     }
 
     @Override
-    public List<OnboardingRankingRequests> deleteByInitiativeId(String initiativeId) {
-        return onboardingRankingRequestsRepository.deleteByInitiativeId(initiativeId);
+    public List<OnboardingRankingRequests> deletePaged(String initiativeId, int pageSize) {
+        return onboardingRankingRequestsRepository.deletePaged(initiativeId, pageSize);
     }
 }
