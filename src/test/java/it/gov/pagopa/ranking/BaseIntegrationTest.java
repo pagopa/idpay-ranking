@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import it.gov.pagopa.common.kafka.KafkaTestUtilitiesService;
 import it.gov.pagopa.common.mongo.MongoTestUtilitiesService;
+import it.gov.pagopa.common.stream.StreamsHealthIndicator;
 import it.gov.pagopa.common.utils.TestIntegrationUtils;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
 import it.gov.pagopa.ranking.connector.azure.storage.InitiativeRankingBlobClient;
 import it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy;
-import it.gov.pagopa.common.stream.StreamsHealthIndicator;
+import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,9 +29,6 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.data.util.Pair;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.TestPropertySource;
-
-import jakarta.annotation.PostConstruct;
-import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.management.InstanceNotFoundException;
@@ -88,7 +86,12 @@ import java.util.regex.Pattern;
                 //region wiremock
                 "logging.level.WireMock=OFF",
                 "app.pdv.base-url=http://localhost:${wiremock.server.port}",
-                "spring.cloud.openfeign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy"
+                "spring.cloud.openfeign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy",
+                //endregion
+
+                //region delete
+                "app.delete.paginationSize=100",
+                "app.delete.delayTime=1000"
                 //endregion
         })
 @AutoConfigureDataMongo

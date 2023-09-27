@@ -33,8 +33,10 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
     private final ObjectReader objectReader;
     private final AuditUtilities auditUtilities;
     public static final String SERVICE_COMMAND_DELETE_INITIATIVE = "DELETE_INITIATIVE";
-    private static final String PAGINATION_KEY = "pagination";
-    private static final String DELAY_KEY = "delay";
+
+    private final String pagination;
+
+    private final String delay;
 
     public InitiativePersistenceMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                              InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper,
@@ -43,6 +45,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                                              RankingErrorNotifierService rankingErrorNotifierService,
                                              OnboardingRankingRequestsService onboardingRankingRequestsService,
                                              AuditUtilities auditUtilities,
+                                             @Value("${app.delete.paginationSize}")String pagination,
+                                             @Value("${app.delete.delayTime}")String delay,
 
                                              ObjectMapper objectMapper){
         super(applicationName);
@@ -52,6 +56,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
         this.rankingErrorNotifierService = rankingErrorNotifierService;
         this.onboardingRankingRequestsService = onboardingRankingRequestsService;
         this.auditUtilities = auditUtilities;
+        this.pagination = pagination;
+        this.delay = delay;
 
         this.objectReader = objectMapper.readerFor(InitiativeBuildDTO.class);
 
@@ -88,7 +94,6 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
     @Override
     public void processCommand(QueueCommandOperationDTO queueCommandOperationDTO) {
-
         if ((SERVICE_COMMAND_DELETE_INITIATIVE).equals(queueCommandOperationDTO.getOperationType())) {
             long startTime = System.currentTimeMillis();
             Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
@@ -105,15 +110,15 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
             do {
                 fetchedOnboardingRankingRequests = onboardingRankingRequestsService.deletePaged(queueCommandOperationDTO.getEntityId(),
-                        Integer.parseInt(queueCommandOperationDTO.getAdditionalParams().get(PAGINATION_KEY)));
+                        Integer.parseInt(pagination));
                 deletedOnboardingRankingRequests.addAll(fetchedOnboardingRankingRequests);
                 try{
-                    Thread.sleep(Long.parseLong(queueCommandOperationDTO.getAdditionalParams().get(DELAY_KEY)));
+                    Thread.sleep(Long.parseLong(delay));
                 } catch (InterruptedException e){
                     log.error("An error has occurred while waiting {}", e.getMessage());
                     Thread.currentThread().interrupt();
                 }
-            } while (fetchedOnboardingRankingRequests.size() == (Integer.parseInt(queueCommandOperationDTO.getAdditionalParams().get(PAGINATION_KEY))));
+            } while (fetchedOnboardingRankingRequests.size() == (Integer.parseInt(pagination)));
 
 
             List<String> usersId = deletedOnboardingRankingRequests.stream().map(OnboardingRankingRequests::getUserId).distinct().toList();

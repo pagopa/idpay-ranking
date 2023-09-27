@@ -298,3 +298,6 @@ app:
     csv:
       separator: ${RANKING_CSV_SEPARATOR:${CSV_SEPARATOR:;}}
       tmp-dir: ${CSV_TEMP_DIR:/tmp}
+  delete:
+    paginationSize: ${DELETE_PAGINATION_SIZE}
+    delayTime: ${DELETE_DELAY_TIME}
