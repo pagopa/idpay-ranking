@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.service.initiative;
 
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.dto.event.QueueCommandOperationDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
@@ -8,11 +9,10 @@ import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.service.OnboardingRankingRequestsService;
-import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.service.RankingContextHolderService;
+import it.gov.pagopa.ranking.service.RankingErrorNotifierService;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
-import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.utils.AuditUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,10 +58,9 @@ class InitiativePersistenceMediatorImplTest {
     private static final String ONBOARDING_RANKING_REQUEST_ID = "REQUEST_ID";
     private static final String OPERATION_TYPE_DELETE_INITIATIVE = "DELETE_INITIATIVE";
     private static final String INITIATIVE_ID = "TEST_INITIATIVE_ID";
-    private static final String PAGINATION_KEY = "pagination";
-    private static final String PAGINATION_VALUE = "100";
-    private static final String DELAY_KEY = "delay";
-    private static final String DELAY_VALUE = "1500";
+    private static final int PAGINATION_VALUE = 100;
+    private static final long DELAY_VALUE = 1000;
+
 
     @BeforeEach
     void setUp(){
@@ -72,6 +71,8 @@ class InitiativePersistenceMediatorImplTest {
                 rankingErrorNotifierServiceMock,
                 onboardingRankingRequestsServiceMock,
                 auditUtilities,
+                PAGINATION_VALUE,
+                DELAY_VALUE,
 
                 TestUtils.objectMapper);
     }
@@ -190,14 +191,10 @@ class InitiativePersistenceMediatorImplTest {
     @MethodSource("operationTypeAndInvocationTimes")
     void processCommand(String operationType, int times) {
         // Given
-        Map<String, String> additionalParams = new HashMap<>();
-        additionalParams.put(PAGINATION_KEY, PAGINATION_VALUE);
-        additionalParams.put(DELAY_KEY, DELAY_VALUE);
         final QueueCommandOperationDTO queueCommandOperationDTO = QueueCommandOperationDTO.builder()
                 .entityId(INITIATIVE_ID)
                 .operationType(operationType)
                 .operationTime(LocalDateTime.now().minusMinutes(5))
-                .additionalParams(additionalParams)
                 .build();
         OnboardingRankingRequests onboardingRankingRequest = OnboardingRankingRequests.builder()
                 .id(ONBOARDING_RANKING_REQUEST_ID)
@@ -210,14 +207,14 @@ class InitiativePersistenceMediatorImplTest {
         final List<OnboardingRankingRequests> deletedPage = List.of(onboardingRankingRequest);
 
         if(times == 2){
-            final List<OnboardingRankingRequests> onboardingRankingRequestPage = createOnboardingRankingRequestPage(Integer.parseInt(PAGINATION_VALUE));
-            when(onboardingRankingRequestsServiceMock.deletePaged(queueCommandOperationDTO.getEntityId(), Integer.parseInt(queueCommandOperationDTO.getAdditionalParams().get(PAGINATION_KEY))))
+            final List<OnboardingRankingRequests> onboardingRankingRequestPage = createOnboardingRankingRequestPage(PAGINATION_VALUE);
+            when(onboardingRankingRequestsServiceMock.deletePaged(queueCommandOperationDTO.getEntityId(), PAGINATION_VALUE))
                     .thenReturn(onboardingRankingRequestPage)
                     .thenReturn(deletedPage);
             Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
                     .thenReturn(Optional.empty());
         } else if (times == 1) {
-            when(onboardingRankingRequestsServiceMock.deletePaged(queueCommandOperationDTO.getEntityId(), Integer.parseInt(queueCommandOperationDTO.getAdditionalParams().get(PAGINATION_KEY))))
+            when(onboardingRankingRequestsServiceMock.deletePaged(queueCommandOperationDTO.getEntityId(), PAGINATION_VALUE))
                     .thenReturn(deletedPage);
             Mockito.when(initiativeConfigServiceMock.deleteByInitiativeId(Mockito.any()))
                     .thenReturn(Optional.of(initiativeConfig));
@@ -231,7 +228,7 @@ class InitiativePersistenceMediatorImplTest {
 
         // Then
         Mockito.verify(initiativeConfigServiceMock, Mockito.times(times == 0 ? 0 : 1)).deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
-        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(times)).deletePaged(queueCommandOperationDTO.getEntityId(), Integer.parseInt(queueCommandOperationDTO.getAdditionalParams().get(PAGINATION_KEY)));
+        Mockito.verify(onboardingRankingRequestsServiceMock, Mockito.times(times)).deletePaged(queueCommandOperationDTO.getEntityId(), PAGINATION_VALUE);
     }
 
     private static Stream<Arguments> operationTypeAndInvocationTimes() {
