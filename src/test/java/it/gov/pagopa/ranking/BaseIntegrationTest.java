@@ -88,11 +88,6 @@ import java.util.regex.Pattern;
                 "app.pdv.base-url=http://localhost:${wiremock.server.port}",
                 "spring.cloud.openfeign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy",
                 //endregion
-
-                //region delete
-                "app.delete.paginationSize=100",
-                "app.delete.delayTime=1000"
-                //endregion
         })
 @AutoConfigureDataMongo
 @AutoConfigureMockMvc
