@@ -40,13 +40,14 @@ class OnboardingRankingRequestsServiceImplTest {
         OnboardingRankingRequestsService onboardingRankingRequestsService = new OnboardingRankingRequestsServiceImpl(onboardingRankingRequestsRepositoryMock);
 
         String initiativeId = "InitiativeId";
+        int pageSize = 100;
         OnboardingRankingRequests onboardingRankingRequest = OnboardingRankingRequestsFaker.mockInstance(1);
         onboardingRankingRequest.setInitiativeId(initiativeId);
-        Mockito.when(onboardingRankingRequestsRepositoryMock.deleteByInitiativeId(Mockito.any()))
+        Mockito.when(onboardingRankingRequestsRepositoryMock.deletePaged(initiativeId, pageSize))
                         .thenReturn(List.of(onboardingRankingRequest));
 
         // When
-        List<OnboardingRankingRequests> result = onboardingRankingRequestsService.deleteByInitiativeId(initiativeId);
+        List<OnboardingRankingRequests> result = onboardingRankingRequestsService.deletePaged(initiativeId, pageSize);
 
         // Then
         Assertions.assertNotNull(result);
@@ -57,6 +58,6 @@ class OnboardingRankingRequestsServiceImplTest {
         Assertions.assertEquals(onboardingRankingRequest.getAdmissibilityCheckDate(), result.get(0).getAdmissibilityCheckDate());
         Assertions.assertEquals(onboardingRankingRequest.getCriteriaConsensusTimestamp(), result.get(0).getCriteriaConsensusTimestamp());
         Assertions.assertEquals(onboardingRankingRequest.getRankingValue(), result.get(0).getRankingValue());
-        Mockito.verify(onboardingRankingRequestsRepositoryMock, Mockito.times(1)).deleteByInitiativeId(initiativeId);
+        Mockito.verify(onboardingRankingRequestsRepositoryMock, Mockito.times(1)).deletePaged(initiativeId, pageSize);
     }
 }

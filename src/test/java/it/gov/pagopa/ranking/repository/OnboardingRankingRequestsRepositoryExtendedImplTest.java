@@ -168,6 +168,20 @@ class OnboardingRankingRequestsRepositoryExtendedImplTest extends BaseIntegratio
         Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(listOfUserExpected, result.getContent());
     }
+
+    @Test
+    void deletePaged (){
+        // Given
+        int pageSize = 100;
+
+        // When
+        List<OnboardingRankingRequests> result = repository.deletePaged(TEST_INITIATIVE_ID, pageSize);
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(11, result.size());
+    }
+
     private void checkFindAllResult(Page<OnboardingRankingRequests> result) {
         for(OnboardingRankingRequests r : result) {
             Assertions.assertNotNull(r);

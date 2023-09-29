@@ -2,8 +2,11 @@ package it.gov.pagopa.ranking.repository;
 
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
+import it.gov.pagopa.ranking.model.OnboardingRankingRequests.Fields;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -12,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class OnboardingRankingRequestsRepositoryExtendedImpl implements OnboardingRankingRequestsRepositoryExtended {
 
     private final MongoTemplate mongoTemplate;
@@ -32,6 +36,16 @@ public class OnboardingRankingRequestsRepositoryExtendedImpl implements Onboardi
         List<OnboardingRankingRequests> onboardingRankingRequests = mongoTemplate.find(query.with(pageable), OnboardingRankingRequests.class);
         // Convert in pageable
         return new PageImpl<>(onboardingRankingRequests, pageable, count);
+    }
+
+    @Override
+    public List<OnboardingRankingRequests> deletePaged(String initiativeId, int pageSize) {
+        log.trace("[DELETE_PAGED] Deleting onboarding ranking requests in pages");
+        Pageable pageable = PageRequest.of(0, pageSize);
+        return mongoTemplate.findAllAndRemove(
+                Query.query(Criteria.where(Fields.initiativeId).is(initiativeId)).with(pageable),
+                OnboardingRankingRequests.class
+        );
     }
 
     private Criteria getCriteria(String initiativeId, RankingRequestFilter filters) {

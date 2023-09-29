@@ -16,12 +16,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 @Service
 @Slf4j
+@SuppressWarnings("BusyWait")
 public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<InitiativeBuildDTO> implements InitiativePersistenceMediator {
     private final InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper;
     private final InitiativeConfigService initiativeConfigService;
@@ -32,6 +34,10 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
     private final AuditUtilities auditUtilities;
     public static final String SERVICE_COMMAND_DELETE_INITIATIVE = "DELETE_INITIATIVE";
 
+    private final int pageSize;
+
+    private final long delay;
+
     public InitiativePersistenceMediatorImpl(@Value("${spring.application.name}")String applicationName,
                                              InitiativeBuild2ConfigMapper initiativeBuild2ConfigMapper,
                                              InitiativeConfigService initiativeConfigService,
@@ -39,6 +45,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                                              RankingErrorNotifierService rankingErrorNotifierService,
                                              OnboardingRankingRequestsService onboardingRankingRequestsService,
                                              AuditUtilities auditUtilities,
+                                             @Value("${app.delete.paginationSize}")int pageSize,
+                                             @Value("${app.delete.delayTime}")long delay,
 
                                              ObjectMapper objectMapper){
         super(applicationName);
@@ -48,6 +56,8 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
         this.rankingErrorNotifierService = rankingErrorNotifierService;
         this.onboardingRankingRequestsService = onboardingRankingRequestsService;
         this.auditUtilities = auditUtilities;
+        this.pageSize = pageSize;
+        this.delay = delay;
 
         this.objectReader = objectMapper.readerFor(InitiativeBuildDTO.class);
 
@@ -84,11 +94,9 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
 
     @Override
     public void processCommand(QueueCommandOperationDTO queueCommandOperationDTO) {
-
         if ((SERVICE_COMMAND_DELETE_INITIATIVE).equals(queueCommandOperationDTO.getOperationType())) {
             long startTime = System.currentTimeMillis();
             Optional<InitiativeConfig> deletedInitiativeConfig = initiativeConfigService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
-            List<OnboardingRankingRequests> deletedOnboardingRankingRequestes = onboardingRankingRequestsService.deleteByInitiativeId(queueCommandOperationDTO.getEntityId());
 
             if (deletedInitiativeConfig.isEmpty()){
                 log.info("[DELETE_INITIATIVE] Initiative ranking rule for initiativeId {} was not found", queueCommandOperationDTO.getEntityId());
@@ -97,8 +105,25 @@ public class InitiativePersistenceMediatorImpl extends BaseKafkaConsumer<Initiat
                 auditUtilities.logDeleteInitiativeConfig(queueCommandOperationDTO.getEntityId());
             }
 
+            List<OnboardingRankingRequests> deletedOnboardingRankingRequests = new ArrayList<>();
+            List<OnboardingRankingRequests> fetchedOnboardingRankingRequests;
+
+            do {
+                fetchedOnboardingRankingRequests = onboardingRankingRequestsService.deletePaged(queueCommandOperationDTO.getEntityId(),
+                        pageSize);
+                deletedOnboardingRankingRequests.addAll(fetchedOnboardingRankingRequests);
+                try{
+                    Thread.sleep(delay);
+                } catch (InterruptedException e){
+                    log.error("An error has occurred while waiting {}", e.getMessage());
+                    Thread.currentThread().interrupt();
+                }
+            } while (fetchedOnboardingRankingRequests.size() == pageSize);
+
+
+            List<String> usersId = deletedOnboardingRankingRequests.stream().map(OnboardingRankingRequests::getUserId).distinct().toList();
             log.info("[DELETE_INITIATIVE] Deleted initiative {} from collection: onboarding_ranking_requests", queueCommandOperationDTO.getEntityId());
-            deletedOnboardingRankingRequestes.forEach(deletedOnboardingRankingRequest -> auditUtilities.logDeleteInitiativeRanking(deletedOnboardingRankingRequest.getUserId(), deletedOnboardingRankingRequest.getInitiativeId()));
+            usersId.forEach(userId -> auditUtilities.logDeleteInitiativeRanking(userId, queueCommandOperationDTO.getEntityId()));
             log.info(
                     "[PERFORMANCE_LOG] [{}] Time occurred to perform business logic: {} ms on initiativeId: {}",
                     SERVICE_COMMAND_DELETE_INITIATIVE,
