@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-messaging-servicebus</artifactId>
-			<version>7.14.3</version>
+			<version>7.14.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -106,6 +106,12 @@
 			<artifactId>guava</artifactId>
 			<!-- Forced to 32.1.2-jre due to https://nvd.nist.gov/vuln/detail/CVE-2023-2976 -->
 			<version>32.1.2-jre</version>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor.netty</groupId>
+			<artifactId>reactor-netty-http</artifactId>
+			<!-- Forced to 1.1.12 due to https://nvd.nist.gov/vuln/detail/CVE-2023-44487 -->
+			<version>1.1.12</version>
 		</dependency>
 
 		<!--TEST-->
@@ -151,6 +157,15 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
 				<version>2022.0.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-bom</artifactId>
+				<!-- Forced to 4.1.100 due to https://nvd.nist.gov/vuln/detail/CVE-2023-44487 -->
+				<version>4.1.100.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
