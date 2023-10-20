@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>it.gov.pagopa</groupId>
 	<artifactId>idpay-ranking</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.2</version>
 	<name>idpay-ranking</name>
 	<description>Ranking Microservice</description>
 	<properties>

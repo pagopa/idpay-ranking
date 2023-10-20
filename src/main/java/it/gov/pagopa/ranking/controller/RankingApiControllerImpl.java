@@ -24,7 +24,7 @@ public class RankingApiControllerImpl implements RankingApiController{
     @Override
     public List<RankingRequestsApiDTO> rankingRequests(String organizationId, String initiativeId, int page, int size, RankingRequestFilter filter) {
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
-                initiativeId, organizationId, page, size);
+                organizationId, initiativeId, page, size);
 
         return rankingRequestsApiService.findByInitiativeId(organizationId, initiativeId, page, size, filter);
 
@@ -33,7 +33,7 @@ public class RankingApiControllerImpl implements RankingApiController{
     @Override
     public RankingPageDTO rankingRequestsPaged(String organizationId, String initiativeId, int page, int size, RankingRequestFilter filter) {
         log.info("[RANKING_LIST] Requesting ranking list of organizationId {} and initiativeId {}, with page {} and size {}",
-                initiativeId, organizationId, page, size);
+                organizationId, initiativeId, page, size);
 
         return rankingRequestsApiService.findByInitiativeIdPaged(organizationId, initiativeId, page, size, filter);
     }
