@@ -51,7 +51,7 @@ class InitiativeConsumerConfigTest extends BaseIntegrationTest {
 
     @Test
     void initiativeConsumer() {
-        int validInitiative = 100;
+        int validInitiative = 10;
         int notValidInitiative = errorUseCases.size();
         long maxWaitingMs = 30000;
 

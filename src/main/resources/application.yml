@@ -184,10 +184,10 @@ spring:
 
 management:
   health:
-    probes.enabled: true
     mongo.enabled: ${HEALTH_MONGO_ENABLED:true}
   endpoint:
     health:
+      probes.enabled: true
       group:
         readiness.include: "*"
         liveness.include: livenessState,diskSpace,ping,binders,streams
@@ -202,7 +202,7 @@ logging:
   level:
     root: ${LOG_LEVEL_ROOT:INFO}
     it.gov.pagopa: ${LOG_LEVEL_PAGOPA:INFO}
-    it.gov.pagopa.idpay: ${LOG_LEVEL_IDPAY:INFO}
+    it.gov.pagopa.ranking: ${LOG_LEVEL_RANKING:INFO}
     org.springframework.integration: ${LOG_LEVEL_SPRING_INTEGRATION:INFO}
     org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:INFO}
     org.springframework.ws: ${LOG_LEVEL_SPRING_WS:INFO}
@@ -210,6 +210,7 @@ logging:
     org.springframework.data: ${LOG_LEVEL_SPRING_DATA:INFO}
     org.springframework.hateoas: ${LOG_LEVEL_SPRING_HATEOAS:INFO}
     org.springframework.boot: ${LOG_LEVEL_SPRING_BOOT:INFO}
+    org.springframework.boot.availability: ${LOG_LEVEL_SPRING_BOOT_AVAILABILITY:DEBUG}
     org.springframework.kafka: ${LOG_LEVEL_SPRING_KAFKA:INFO}
     org.springframework.batch: ${LOG_LEVEL_SPRING_BATCH:INFO}
     io.swagger: ${LOG_LEVEL_IO_SWAGGER:WARN}
