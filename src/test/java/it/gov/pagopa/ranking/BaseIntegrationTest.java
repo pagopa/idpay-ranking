@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import it.gov.pagopa.common.kafka.KafkaTestUtilitiesService;
 import it.gov.pagopa.common.mongo.MongoTestUtilitiesService;
+import it.gov.pagopa.common.mongo.singleinstance.AutoConfigureSingleInstanceMongodb;
 import it.gov.pagopa.common.stream.StreamsHealthIndicator;
 import it.gov.pagopa.common.utils.TestIntegrationUtils;
 import it.gov.pagopa.ranking.connector.azure.servicebus.AzureServiceBusClient;
@@ -80,7 +81,7 @@ import java.util.regex.Pattern;
                 //region mongodb
                 "logging.level.org.mongodb.driver=WARN",
                 "logging.level.de.flapdoodle.embed.mongo.spring.autoconfigure=WARN",
-                "de.flapdoodle.mongodb.embedded.version=4.0.21",
+                "de.flapdoodle.mongodb.embedded.version=4.2.24",
                 //endregion
 
                 //region wiremock
@@ -89,7 +90,7 @@ import java.util.regex.Pattern;
                 "spring.cloud.openfeign.client.config.pdv.errorDecoder=it.gov.pagopa.ranking.connector.rest.pdv.PdvErrorDecoderSpy",
                 //endregion
         })
-@AutoConfigureDataMongo
+@AutoConfigureSingleInstanceMongodb
 @AutoConfigureMockMvc
 @AutoConfigureWireMock(stubs = "classpath:/stub/pdv", port = 0)
 public abstract class BaseIntegrationTest {
