@@ -14,5 +14,6 @@ public final class OnboardingConstants {
 
     //region rejection reasons
     public static final String REJECTION_REASON_CITIZEN_OUT_OF_RANKING = "CITIZEN_OUT_OF_RANKING";
+    public static final String REJECTION_REASON_FAMILY_CRITERIA_FAIL = "FAMILY_CRITERIA_FAIL";
     //endregion
 }

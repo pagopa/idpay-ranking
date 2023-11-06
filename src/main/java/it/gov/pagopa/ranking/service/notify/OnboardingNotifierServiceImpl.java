@@ -2,6 +2,7 @@ package it.gov.pagopa.ranking.service.notify;
 
 import it.gov.pagopa.ranking.constants.OnboardingConstants;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
+import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducerImpl;
@@ -74,6 +75,12 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
                         callOnboardingUserNotifier(evaluation.toBuilder()
                                 .userId(userId)
                                 .status(OnboardingConstants.ONBOARDING_STATUS_KO)
+                                .onboardingRejectionReasons(
+                                        List.of(OnboardingRejectionReason.builder()
+                                                .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
+                                                .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                                                .detail("Nucleo familiare non soddisfa i requisiti")
+                                                .build()))
                                 .build());
                     }
                 });

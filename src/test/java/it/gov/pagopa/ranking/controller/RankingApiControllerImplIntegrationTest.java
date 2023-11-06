@@ -95,9 +95,9 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
                 .userId("FAMILYID2_MEMBER2")
                 .status(OnboardingConstants.ONBOARDING_STATUS_KO)
                 .onboardingRejectionReasons(List.of(OnboardingRejectionReason.builder()
-                        .type(OnboardingRejectionReason.OnboardingRejectionReasonType.OUT_OF_RANKING)
-                        .code(OnboardingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING)
-                        .detail("0")
+                        .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
+                        .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                        .detail("Nucleo familiare non soddisfa i requisiti")
                         .build()))
                 .build());
 
