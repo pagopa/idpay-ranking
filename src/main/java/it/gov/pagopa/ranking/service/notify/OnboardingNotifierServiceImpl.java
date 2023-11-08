@@ -60,6 +60,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
     private void inviteFamilyMembers(OnboardingRankingRequests request,EvaluationRankingDTO evaluation) {
         if(request.getFamilyId()!=null){
             if(BeneficiaryRankingStatus.ELIGIBLE_OK.equals(request.getBeneficiaryRankingStatus())){
+                log.info("[NOTIFY_CITIZEN] - notify onboarding demanded to onboarding outcome topic for family {}", request.getFamilyId());
                 request.getMemberIds().forEach(userId -> {
                     if(!userId.equals(request.getUserId())){
                         callOnboardingUserNotifier(evaluation.toBuilder()
@@ -70,6 +71,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
                 });
             }
             if(BeneficiaryRankingStatus.ELIGIBLE_KO.equals(request.getBeneficiaryRankingStatus())){
+                log.info("[NOTIFY_CITIZEN] - notify onboarding KO to onboarding outcome topic for family {}", request.getFamilyId());
                 request.getMemberIds().forEach(userId -> {
                     if(!userId.equals(request.getUserId())){
                         callOnboardingUserNotifier(evaluation.toBuilder()
