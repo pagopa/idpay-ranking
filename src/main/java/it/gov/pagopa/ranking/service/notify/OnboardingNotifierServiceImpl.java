@@ -70,17 +70,17 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
                 });
             }
             if(BeneficiaryRankingStatus.ELIGIBLE_KO.equals(request.getBeneficiaryRankingStatus())){
+                evaluation.getOnboardingRejectionReasons().add(OnboardingRejectionReason.builder()
+                        .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
+                        .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                        .detail("Nucleo familiare non soddisfa i requisiti")
+                        .build());
+
                 request.getMemberIds().forEach(userId -> {
                     if(!userId.equals(request.getUserId())){
                         callOnboardingUserNotifier(evaluation.toBuilder()
                                 .userId(userId)
                                 .status(OnboardingConstants.ONBOARDING_STATUS_KO)
-                                .onboardingRejectionReasons(
-                                        List.of(OnboardingRejectionReason.builder()
-                                                .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
-                                                .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
-                                                .detail("Nucleo familiare non soddisfa i requisiti")
-                                                .build()))
                                 .build());
                     }
                 });
