@@ -280,4 +280,20 @@ class RankingRequestsApiServiceImplTest {
         IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
     }
 
+    @Test
+    void givenInitiativeInCOMPLETEDStatus_thenDoNothing() {
+        // Given organizationId and initiativeID on DB for Status Publishing
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
+
+        // When
+        Mockito.when(contextHolderServiceMock.getInitiativeConfig(Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(initiativeConfig);
+
+        // Then
+        Executable executable = () -> service.notifyCitizenRankings("orgId", "initiativeId");
+        Assertions.assertDoesNotThrow(executable);
+        Mockito.verify(contextHolderServiceMock, Mockito.times(0)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
+    }
+
 }
