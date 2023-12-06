@@ -61,7 +61,7 @@ microservice-chart:
     DELETE_PAGINATION_SIZE: "100"
     DELETE_DELAY_TIME: "1000"
 
-  envConfigMapExternals:
+  externalConfigMapValues:
     rest-client:
       PDV_DECRYPT_BASE_URL: pdv_decrypt_base_url
     idpay-common:
@@ -92,3 +92,9 @@ microservice-chart:
     RANKING_P7M_CERT: ranking-p7m-cert
     RANKING_P7M_KEY_PEM: ranking-p7m-key
     PDV_DECRYPT_API_KEY: pdv-api-key
+
+  externalConfigMapFiles:
+    create: true
+    configMaps:
+      - name: appinsights-config
+        key: applicationinsights.json
