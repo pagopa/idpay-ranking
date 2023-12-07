@@ -27,5 +27,6 @@ public class OnboardingRejectionReason {
         BUDGET_EXHAUSTED,
         AUTOMATED_CRITERIA_FAIL,
         OUT_OF_RANKING,
+        FAMILY_CRITERIA_KO
     }
 }

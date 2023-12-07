@@ -97,7 +97,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
     public void notifyCitizenRankings(String organizationId, String initiativeId) {
         String genericExceptionMessage;
         InitiativeConfig initiativeConfig = rankingContextHolderService.getInitiativeConfig(initiativeId, organizationId);
-        if(initiativeConfig.getRankingStatus().equals(RankingStatus.READY)){
+        if(RankingStatus.READY.equals(initiativeConfig.getRankingStatus())){
             List<OnboardingRankingRequests> onboardingRankingRequests = onboardingRankingRequestsRepository.findAllByOrganizationIdAndInitiativeId(organizationId, initiativeId);
             onboardingRankingRequests = onboardingRankingRequests.stream()
                     .filter(onboardingRankingRequest ->
@@ -117,7 +117,7 @@ public class RankingRequestsApiServiceImpl implements RankingRequestsApiService 
                 initiativeConfig.setRankingStatus(RankingStatus.COMPLETED);
                 rankingContextHolderService.setInitiativeConfig(initiativeConfig);
             }
-        }else {
+        }else if(!RankingStatus.COMPLETED.equals(initiativeConfig.getRankingStatus())){
             genericExceptionMessage = String.format("Initiative ranking state [%s] not valid", initiativeConfig.getRankingStatus());
             log.error(genericExceptionMessage);
             throw new IllegalStateException("[NOTIFY_CITIZEN]-[Error] - " + genericExceptionMessage);

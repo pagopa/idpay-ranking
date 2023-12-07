@@ -27,9 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -89,16 +87,21 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
         onboardingRankingRequestsRepository.save(onboardingRankingRequestsEligibleKO);
 
         EvaluationRankingDTO evRequestEligibleKo = onboardingRankingRequest2EvaluationMapper.apply(onboardingRankingRequestsEligibleKO, initiativeConfig);
+
         expectedOutcome.add(evRequestEligibleKo);
+
+        List<OnboardingRejectionReason> familyKo = new ArrayList<>(evRequestEligibleKo.getOnboardingRejectionReasons());
+        familyKo.add(OnboardingRejectionReason.builder()
+                .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
+                .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                .detail("Nucleo familiare non soddisfa i requisiti")
+                .build());
+
 
         expectedOutcome.add(evRequestEligibleKo.toBuilder()
                 .userId("FAMILYID2_MEMBER2")
                 .status(OnboardingConstants.ONBOARDING_STATUS_KO)
-                .onboardingRejectionReasons(List.of(OnboardingRejectionReason.builder()
-                        .type(OnboardingRejectionReason.OnboardingRejectionReasonType.OUT_OF_RANKING)
-                        .code(OnboardingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING)
-                        .detail("0")
-                        .build()))
+                .onboardingRejectionReasons(familyKo)
                 .build());
 
         Mockito.doReturn(false).when(onboardingNotifierProducerSpy).notify(evRequestEligibleOk);
@@ -115,7 +118,13 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
         Set<EvaluationRankingDTO> outcomeResult = payloadOutcomeConsumer.stream()
                 .map(this::deserializerMessage)
                 .collect(Collectors.toSet());
-        Assertions.assertEquals(expectedOutcome, outcomeResult);
+
+        Assertions.assertEquals(
+                getOrderEvaluationListFromUserId(expectedOutcome),
+                getOrderEvaluationListFromUserId(outcomeResult));
+    }
+    private List<EvaluationRankingDTO> getOrderEvaluationListFromUserId(Set<EvaluationRankingDTO> evaluations){
+        return  evaluations.stream().sorted(Comparator.comparing(EvaluationRankingDTO::getUserId)).collect(Collectors.toList());
     }
 
     private EvaluationRankingDTO deserializerMessage(ConsumerRecord<String, String> rc) {
