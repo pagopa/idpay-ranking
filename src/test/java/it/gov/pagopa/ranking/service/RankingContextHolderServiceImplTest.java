@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service;
 
 import it.gov.pagopa.common.web.exception.ClientExceptionNoBody;
+import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
@@ -60,7 +61,7 @@ class RankingContextHolderServiceImplTest {
         Executable executable = () -> rankingContextHolderService.getInitiativeConfig(initiativeIdTest, "ANOTHER_ORGANIZATIONID");
 
         // Then
-        Assertions.assertThrows(ClientExceptionNoBody.class, executable);
+        Assertions.assertThrows(InitiativeNotFoundException.class, executable);
 
         Mockito.verify(initiativeConfigServiceMock).findByIdOptional(initiativeIdTest);
     }

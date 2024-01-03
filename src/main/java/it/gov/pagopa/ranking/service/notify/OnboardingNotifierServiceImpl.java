@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.service.notify;
 
-import it.gov.pagopa.ranking.constants.OnboardingConstants;
+import it.gov.pagopa.ranking.constants.RankingConstants;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
@@ -64,7 +64,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
                     if(!userId.equals(request.getUserId())){
                         callOnboardingUserNotifier(evaluation.toBuilder()
                                 .userId(userId)
-                                .status(OnboardingConstants.ONBOARDING_STATUS_DEMANDED)
+                                .status(RankingConstants.ONBOARDING_STATUS_DEMANDED)
                                 .build());
                     }
                 });
@@ -72,7 +72,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
             if(BeneficiaryRankingStatus.ELIGIBLE_KO.equals(request.getBeneficiaryRankingStatus())){
                 evaluation.getOnboardingRejectionReasons().add(OnboardingRejectionReason.builder()
                         .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
-                        .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                        .code(RankingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
                         .detail("Nucleo familiare non soddisfa i requisiti")
                         .build());
 
@@ -80,7 +80,7 @@ public class OnboardingNotifierServiceImpl implements OnboardingNotifierService 
                     if(!userId.equals(request.getUserId())){
                         callOnboardingUserNotifier(evaluation.toBuilder()
                                 .userId(userId)
-                                .status(OnboardingConstants.ONBOARDING_STATUS_KO)
+                                .status(RankingConstants.ONBOARDING_STATUS_KO)
                                 .build());
                     }
                 });

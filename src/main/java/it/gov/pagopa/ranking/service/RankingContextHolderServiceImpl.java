@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service;
 
 import it.gov.pagopa.common.web.exception.ClientExceptionNoBody;
+import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
         if (initiativeConfigRetrieved.getOrganizationId().equals(organizationId)) {
             return initiativeConfigRetrieved;
         } else {
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "The initiative %s does not related with organization %s".formatted(initiativeId, organizationId));
+            throw new InitiativeNotFoundException("The initiative %s does not related with organization %s".formatted(initiativeId, organizationId));
         }
     }
 
