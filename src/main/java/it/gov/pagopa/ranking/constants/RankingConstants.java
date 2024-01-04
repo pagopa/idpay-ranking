@@ -19,6 +19,7 @@ public final class RankingConstants {
 
     public static final class ExceptionCode {
         public static final String INITIATIVE_NOT_FOUND = "INITIATIVE_NOT_FOUND";
+        public static final String INITIATIVE_NOT_RELATED = "RANKING_INITIATIVE_NOT_RELATED";
         public static final String GENERIC_ERROR = "RANKING_GENERIC_ERROR";
         public static final String TOO_MANY_REQUESTS = "RANKING_TOO_MANY_REQUESTS";
         public static final String INVALID_REQUEST = "RANKING_INVALID_REQUEST";
