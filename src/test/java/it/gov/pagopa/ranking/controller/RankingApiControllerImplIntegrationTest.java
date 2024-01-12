@@ -113,7 +113,7 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
                 .andDo(print())
                 .andReturn();
 
-        List<ConsumerRecord<String, String>> payloadOutcomeConsumer = kafkaTestUtilitiesService.consumeMessages(topicEvaluationOnboardingRankingOutcome, 2, maxWaitingMs);
+        List<ConsumerRecord<String, String>> payloadOutcomeConsumer = kafkaTestUtilitiesService.consumeMessages(topicEvaluationOnboardingRankingOutcome, expectedOutcome.size(), maxWaitingMs);
         Assertions.assertEquals(expectedOutcome.size(), payloadOutcomeConsumer.size());
         Set<EvaluationRankingDTO> outcomeResult = payloadOutcomeConsumer.stream()
                 .map(this::deserializerMessage)
