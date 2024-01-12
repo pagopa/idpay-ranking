@@ -1,6 +1,8 @@
 package it.gov.pagopa.ranking.service;
 
 import it.gov.pagopa.common.web.exception.ClientExceptionNoBody;
+import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
+import it.gov.pagopa.ranking.exception.InitiativeNotRelatedException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
         if (initiativeConfigRetrieved.getOrganizationId().equals(organizationId)) {
             return initiativeConfigRetrieved;
         } else {
-            throw new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "The initiative %s does not related with organization %s".formatted(initiativeId, organizationId));
+            throw new InitiativeNotRelatedException("The initiative %s does not related with organization %s".formatted(initiativeId, organizationId));
         }
     }
 
@@ -34,7 +36,7 @@ public class RankingContextHolderServiceImpl implements RankingContextHolderServ
     private InitiativeConfig retrieveInitiativeConfig(String initiativeId) {
         log.debug("[CACHE_MISS] Cannot find locally initiativeId {}", initiativeId);
         long startTime = System.currentTimeMillis();
-        InitiativeConfig initiativeConfig = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(() -> new ClientExceptionNoBody(HttpStatus.NOT_FOUND, "[RANKING_CONTEXT] cannot find initiative having id %s".formatted(initiativeId)));
+        InitiativeConfig initiativeConfig = initiativeConfigService.findByIdOptional(initiativeId).orElseThrow(() -> new InitiativeNotFoundException("[RANKING_CONTEXT] cannot find initiative having id %s".formatted(initiativeId)));
         log.info("[CACHE_MISS] [PERFORMANCE_LOG] Time spent fetching initiativeId: {} ms", System.currentTimeMillis() - startTime);
         return initiativeConfig;
     }

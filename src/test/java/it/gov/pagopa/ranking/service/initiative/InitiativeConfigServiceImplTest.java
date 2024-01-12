@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service.initiative;
 
 import it.gov.pagopa.common.web.exception.ClientException;
+import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
@@ -105,7 +106,7 @@ class InitiativeConfigServiceImplTest {
 
         Executable executable = () -> initiativeConfigService.setInitiativeRankingEndDateAndStatusWaitingEnd(initiativeId, now);
 
-        Assertions.assertThrows(ClientException.class, executable);
+        Assertions.assertThrows(InitiativeNotFoundException.class, executable);
         Mockito.verify(initiativeConfigRepositoryMock, Mockito.never()).save(Mockito.any());
     }
 
