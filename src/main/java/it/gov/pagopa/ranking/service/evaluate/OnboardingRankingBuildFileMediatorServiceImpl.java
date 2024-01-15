@@ -75,7 +75,7 @@ public class OnboardingRankingBuildFileMediatorServiceImpl implements Onboarding
     private void uploadFileAndSaveUpdatedInitiative(Path signedFilePath, InitiativeConfig initiativeConfig) {
 
         rankingBlobClient.uploadFile(
-                signedFilePath,
+                signedFilePath.toFile(),
                 initiativeConfig.getRankingFilePath(),
                 "application/pkcs7-mime");
 

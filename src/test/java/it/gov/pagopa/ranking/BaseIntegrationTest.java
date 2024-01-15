@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +34,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -158,7 +158,7 @@ public abstract class BaseIntegrationTest {
 
         Mockito.lenient()
                 .doAnswer(i -> {
-                    Path uploadingFile = i.getArgument(0);
+                    Path uploadingFile = ((File)i.getArgument(0)).toPath();
                     Path destination = uploadingFile.getParent().resolve(uploadingFile.getFileName().toString().replaceAll("\\.([^.]+$)", ".uploaded.$1"));
                     try {
                         Files.copy(uploadingFile,
@@ -170,7 +170,7 @@ public abstract class BaseIntegrationTest {
                     return null;
                 })
                 .when(initiativeRankingBlobClientMock)
-                .uploadFile(Mockito.<Path>any(), Mockito.any(), Mockito.any());
+                .uploadFile(Mockito.any(), Mockito.any(), Mockito.any());
 
         // reset counter of Feign retries
         PdvErrorDecoderSpy.resetCounter();
