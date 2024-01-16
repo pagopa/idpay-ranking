@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.controller;
 
+import it.gov.pagopa.ranking.config.ServiceExceptionConfig;
 import it.gov.pagopa.ranking.dto.controller.RankingPageDTO;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestsApiDTO;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -27,7 +29,8 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@WebMvcTest(RankingApiControllerImpl.class)
+@WebMvcTest(value = {
+        RankingApiController.class, ServiceExceptionConfig.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class RankingApiControllerImplTest {
 
     @MockBean
