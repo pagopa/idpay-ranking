@@ -2,7 +2,7 @@ package it.gov.pagopa.ranking.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import it.gov.pagopa.ranking.BaseIntegrationTest;
-import it.gov.pagopa.ranking.constants.OnboardingConstants;
+import it.gov.pagopa.ranking.constants.RankingConstants;
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
 import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
@@ -74,7 +74,7 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
 
         expectedOutcome.add(evRequestEligibleOk.toBuilder()
                 .userId("FAMILYID1_MEMBER2")
-                .status(OnboardingConstants.ONBOARDING_STATUS_DEMANDED)
+                .status(RankingConstants.ONBOARDING_STATUS_DEMANDED)
                 .build());
 
         OnboardingRankingRequests onboardingRankingRequestsEligibleKO = OnboardingRankingRequestsFaker.mockInstance(2);
@@ -93,14 +93,14 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
         List<OnboardingRejectionReason> familyKo = new ArrayList<>(evRequestEligibleKo.getOnboardingRejectionReasons());
         familyKo.add(OnboardingRejectionReason.builder()
                 .type(OnboardingRejectionReason.OnboardingRejectionReasonType.FAMILY_CRITERIA_KO)
-                .code(OnboardingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
+                .code(RankingConstants.REJECTION_REASON_FAMILY_CRITERIA_FAIL)
                 .detail("Nucleo familiare non soddisfa i requisiti")
                 .build());
 
 
         expectedOutcome.add(evRequestEligibleKo.toBuilder()
                 .userId("FAMILYID2_MEMBER2")
-                .status(OnboardingConstants.ONBOARDING_STATUS_KO)
+                .status(RankingConstants.ONBOARDING_STATUS_KO)
                 .onboardingRejectionReasons(familyKo)
                 .build());
 
@@ -113,7 +113,7 @@ class RankingApiControllerImplIntegrationTest extends BaseIntegrationTest {
                 .andDo(print())
                 .andReturn();
 
-        List<ConsumerRecord<String, String>> payloadOutcomeConsumer = kafkaTestUtilitiesService.consumeMessages(topicEvaluationOnboardingRankingOutcome, 2, maxWaitingMs);
+        List<ConsumerRecord<String, String>> payloadOutcomeConsumer = kafkaTestUtilitiesService.consumeMessages(topicEvaluationOnboardingRankingOutcome, expectedOutcome.size(), maxWaitingMs);
         Assertions.assertEquals(expectedOutcome.size(), payloadOutcomeConsumer.size());
         Set<EvaluationRankingDTO> outcomeResult = payloadOutcomeConsumer.stream()
                 .map(this::deserializerMessage)

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.gov.pagopa.ranking.constants.OnboardingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING;
+import static it.gov.pagopa.ranking.constants.RankingConstants.REJECTION_REASON_CITIZEN_OUT_OF_RANKING;
 
 @Service
 public class OnboardingRankingRequest2EvaluationMapper {
