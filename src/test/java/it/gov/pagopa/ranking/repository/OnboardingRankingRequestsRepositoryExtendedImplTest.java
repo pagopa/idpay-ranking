@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.repository;
 
-import it.gov.pagopa.ranking.BaseIntegrationTest;
+import it.gov.pagopa.common.mongo.MongoTest;
 import it.gov.pagopa.ranking.dto.controller.RankingRequestFilter;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
 import it.gov.pagopa.ranking.model.OnboardingRankingRequests;
@@ -16,8 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
-
-class OnboardingRankingRequestsRepositoryExtendedImplTest extends BaseIntegrationTest {
+@MongoTest
+class OnboardingRankingRequestsRepositoryExtendedImplTest {
 
     public static final String TEST_INITIATIVE_ID = "TEST_INITIATIVE";
     public static final String USER_ID1 = "userId1";

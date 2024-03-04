@@ -23,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.LocalDate;
@@ -185,6 +186,15 @@ class InitiativePersistenceMediatorImplTest {
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
+    }
+
+    @Test
+    void executeInitiativeError(){ //TODO check and finalized
+        //Given
+        InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(1);
+        Message<String> message = MessageBuilder.withPayload(TestUtils.jsonSerializer(initiativeBuildDTO)).build();
+        //When
+        initiativePersistenceMediator.execute(message);
     }
 
     @ParameterizedTest
