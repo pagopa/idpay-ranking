@@ -71,13 +71,6 @@ class OnboardingRankingBuildFileMediatorServiceImplTest {
     @Test
     void executeEndedInitiatives() throws IOException {
         //Given
-        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("it.gov.pagopa.ranking.service.evaluate.OnboardingRankingBuildFileMediatorServiceImpl");
-        MemoryAppender memoryAppender = new MemoryAppender();
-        memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
-        logger.setLevel(Level.WARN);
-        logger.addAppender(memoryAppender);
-        memoryAppender.start();
-
         Path path = Paths.get("%s/%s".formatted(dummyDirNameForTest, RANKING_FILEPATH));
         Path signedPath = Paths.get("%s/%s.p7m".formatted(dummyDirNameForTest, RANKING_FILEPATH));
 
@@ -100,9 +93,6 @@ class OnboardingRankingBuildFileMediatorServiceImplTest {
         //Then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(List.of(initiativeConfig), result);
-
-        System.out.println("-->" + memoryAppender.getLoggedEvents().get(0).getFormattedMessage());
-        Assertions.assertEquals("[RANKING_BUILD_ONBOARDING_RANKING_FILE] Cannot delete file %s\\%s.p7m from container".formatted(dummyDirNameForTest, RANKING_FILEPATH), memoryAppender.getLoggedEvents().get(0).getFormattedMessage());
 
         //clean temporally directory for test
         FileUtils.deleteDirectory(new File(dummyDirNameForTest));

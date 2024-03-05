@@ -2,8 +2,10 @@ package it.gov.pagopa.ranking.service.evaluate.csv;
 
 import it.gov.pagopa.ranking.dto.csv.RankingCsvDTO;
 import it.gov.pagopa.ranking.model.BeneficiaryRankingStatus;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,7 +49,7 @@ class RankingCsvWriterServiceImplTest {
         //TODO added check lines
 
         //clean temporally directory for test
-//        FileUtils.delete(new File(filePathString));
-//        FileUtils.deleteDirectory(new File(directoryName));
+        FileUtils.delete(new File(filePathString));
+        FileUtils.deleteDirectory(new File(directoryName));
     }
 }
