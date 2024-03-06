@@ -2,16 +2,11 @@ package it.gov.pagopa.ranking.connector.rest.pdv;
 
 import feign.*;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PdvErrorDecoderTest {
 
@@ -31,7 +26,7 @@ class PdvErrorDecoderTest {
 
         Assertions.assertNotNull(result);
 
-        if (retryStatus){ //TODO refine
+        if (retryStatus){
             Assertions.assertTrue(result instanceof RetryableException);
         }
         else {
