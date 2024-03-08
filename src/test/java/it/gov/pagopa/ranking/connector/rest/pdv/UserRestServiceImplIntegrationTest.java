@@ -3,19 +3,33 @@ package it.gov.pagopa.ranking.connector.rest.pdv;
 import feign.FeignException;
 import feign.FeignException.FeignClientException;
 import feign.RetryableException;
-import it.gov.pagopa.ranking.BaseIntegrationTest;
+import it.gov.pagopa.common.wiremock.BaseWireMockTest;
+import it.gov.pagopa.ranking.config.RestConnectorConfig;
 import it.gov.pagopa.ranking.model.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static it.gov.pagopa.common.wiremock.BaseWireMockTest.WIREMOCK_TEST_PROP2BASEPATH_MAP_PREFIX;
 
-@TestPropertySource(properties = {
-        "logging.level.it.gov.pagopa.reward.notification.rest.UserRestClientImpl=WARN",
+@ContextConfiguration(
+        classes = {UserRestServiceImpl.class,
+                FeignAutoConfiguration.class,
+                RestConnectorConfig.class,
+                HttpMessageConvertersAutoConfiguration.class,
+                PdvErrorDecoderSpy.class
 })
-class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
+@TestPropertySource(
+        properties = {
+                WIREMOCK_TEST_PROP2BASEPATH_MAP_PREFIX + "app.pdv.base-url=",
+                "app.pdv.headers.x-api-key=x_api_key0"
+        }
+)
+class UserRestServiceImplIntegrationTest extends BaseWireMockTest {
 
     @Autowired
     private UserRestService userRestService;
@@ -71,6 +85,7 @@ class UserRestServiceImplIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void retrieveUserInfoTooManyRequest() {
+        PdvErrorDecoderSpy.resetCounter();
         String userId = "USERID_TOOMANYREQUEST_1";
 
         try{

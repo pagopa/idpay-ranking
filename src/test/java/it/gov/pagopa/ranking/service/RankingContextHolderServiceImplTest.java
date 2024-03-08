@@ -1,12 +1,11 @@
 package it.gov.pagopa.ranking.service;
 
-import it.gov.pagopa.common.web.exception.ClientExceptionNoBody;
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
 import it.gov.pagopa.ranking.exception.InitiativeNotRelatedException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.service.initiative.InitiativeConfigService;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
-import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,5 +79,18 @@ class RankingContextHolderServiceImplTest {
         Assertions.assertThrows(InitiativeNotFoundException.class, executable);
 
         Mockito.verify(initiativeConfigServiceMock).findByIdOptional(initiativeIdTest);
+    }
+
+    @Test
+    void setInitiativeConfig(){
+        //Given
+        InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
+        Mockito.when(initiativeConfigServiceMock.save(initiativeConfig)).thenAnswer(a -> a.getArguments()[0]);
+
+        //When
+        rankingContextHolderService.setInitiativeConfig(initiativeConfig);
+
+        //Then
+        Mockito.verifyNoMoreInteractions(initiativeConfigServiceMock);
     }
 }
