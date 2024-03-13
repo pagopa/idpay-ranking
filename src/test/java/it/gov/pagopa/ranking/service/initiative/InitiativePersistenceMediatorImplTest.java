@@ -1,5 +1,6 @@
 package it.gov.pagopa.ranking.service.initiative;
 
+import com.mongodb.MongoException;
 import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.dto.event.QueueCommandOperationDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
@@ -23,11 +24,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
@@ -185,6 +189,22 @@ class InitiativePersistenceMediatorImplTest {
         Mockito.verify(initiativeConfigServiceMock).findById(Mockito.anyString());
         Mockito.verify(initiativeBuild2ConfigMapperMock, Mockito.never()).apply(Mockito.any());
         Mockito.verify(rankingContextHolderServiceMock, Mockito.never()).setInitiativeConfig(Mockito.any());
+    }
+
+    @Test
+    void executeInitiativeError(){
+        //Given
+        InitiativeBuildDTO initiativeBuildDTO = Initiative2BuildDTOFaker.mockInstance(1);
+        Message<String> message = MessageBuilder.withPayload(TestUtils.jsonSerializer(initiativeBuildDTO)).build();
+
+        Mockito.when(initiativeConfigServiceMock.findById(initiativeBuildDTO.getInitiativeId()))
+                .thenThrow(new MongoException("DUMMY_EXCEPTION"));
+
+        //When
+        initiativePersistenceMediator.execute(message);
+
+        //Then
+        Mockito.verify(rankingErrorNotifierServiceMock, Mockito.times(1)).notifyInitiativeBuild(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any());
     }
 
     @ParameterizedTest

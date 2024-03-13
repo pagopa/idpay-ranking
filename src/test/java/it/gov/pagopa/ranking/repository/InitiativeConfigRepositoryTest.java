@@ -1,6 +1,6 @@
 package it.gov.pagopa.ranking.repository;
 
-import it.gov.pagopa.ranking.BaseIntegrationTest;
+import it.gov.pagopa.common.mongo.MongoTest;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.test.fakers.InitiativeConfigFaker;
@@ -8,17 +8,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@TestPropertySource(properties = {
-        "logging.level.it.gov.pagopa.ranking.repository.InitiativeConfigRepository=WARN",
-})
-class InitiativeConfigRepositoryTest extends BaseIntegrationTest {
+@MongoTest
+class InitiativeConfigRepositoryTest {
     private final String initiativeId = "initiativeid_test_%d";
     private final int initiativeBeforeStartInterval = 10;
     private final int initiativeEqualsStartDate = 20;
