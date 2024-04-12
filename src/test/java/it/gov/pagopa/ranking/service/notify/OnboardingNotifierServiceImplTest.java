@@ -1,6 +1,7 @@
 package it.gov.pagopa.ranking.service.notify;
 
 import it.gov.pagopa.ranking.dto.event.EvaluationRankingDTO;
+import it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.dto.mapper.OnboardingRankingRequest2EvaluationMapper;
 import it.gov.pagopa.ranking.event.producer.OnboardingNotifierProducer;
@@ -18,6 +19,8 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static it.gov.pagopa.ranking.dto.event.OnboardingRejectionReason.OnboardingRejectionReasonType.OUT_OF_RANKING;
 
 class OnboardingNotifierServiceImplTest {
 
@@ -162,5 +165,49 @@ class OnboardingNotifierServiceImplTest {
         Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size()*2)).notify(Mockito.any(EvaluationRankingDTO.class));
         Mockito.verify(rankingContextHolderService, Mockito.times(1)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
         Mockito.verify(rankingErrorNotifierService, Mockito.times(onboardingRankingRequests.size()*2)).notifyRankingOnboardingOutcome(Mockito.any(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.any(Throwable.class));
+    }
+
+    @Test
+    void testOnboardingNotifier_withInitiativeNfType_inviteFamiliesForEligibleKO(){
+        // Given
+        InitiativeConfig initiativeConfig = new InitiativeConfig();
+        initiativeConfig.setRankingStatus(RankingStatus.READY);
+        initiativeConfig.setBeneficiaryType(InitiativeGeneralDTO.BeneficiaryTypeEnum.NF);
+        List<OnboardingRankingRequests> onboardingRankingRequests = new ArrayList<>();
+
+        OnboardingRankingRequest2EvaluationMapper mapper = Mockito.mock(OnboardingRankingRequest2EvaluationMapper.class);
+
+        OnboardingRankingRequests onboardingRankingRequest = OnboardingRankingRequestsFaker.mockInstance(1);
+        onboardingRankingRequest.setBeneficiaryRankingStatus(BeneficiaryRankingStatus.ELIGIBLE_KO);
+        onboardingRankingRequest.setFamilyId("FAMILYID_" + onboardingRankingRequest.getUserId());
+        onboardingRankingRequest.setMemberIds(Set.of(onboardingRankingRequest.getUserId(),
+                onboardingRankingRequest.getUserId() + "MEMBER2"));
+
+        onboardingRankingRequests.add(onboardingRankingRequest);
+
+        EvaluationRankingDTO evaluationDTO = EvaluationRankingDTOFaker.mockInstance(1);
+        evaluationDTO.setStatus(BeneficiaryRankingStatus.ELIGIBLE_KO.toString());
+
+
+        evaluationDTO.setOnboardingRejectionReasons(new ArrayList<>(List.of(new OnboardingRejectionReason(OUT_OF_RANKING, "CODE", "AUTH", "AUTH_LABEL", "DETAIL"))));
+        Mockito.when(mapper.apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class))).thenReturn(evaluationDTO);
+
+        OnboardingNotifierProducer onboardingNotifierProducer = Mockito.mock(OnboardingNotifierProducer.class);
+        Mockito.when(onboardingNotifierProducer.notify(Mockito.any(EvaluationRankingDTO.class))).thenReturn(true);
+
+        RankingContextHolderService rankingContextHolderService = Mockito.mock(RankingContextHolderService.class);
+        RankingErrorNotifierService rankingErrorNotifierService = Mockito.mock(RankingErrorNotifierService.class);
+        OnboardingNotifierServiceImpl onboardingNotifierService = new OnboardingNotifierServiceImpl(onboardingNotifierProducer, mapper, rankingContextHolderService, rankingErrorNotifierService);
+
+        //When
+        onboardingNotifierService.callOnboardingNotifier(initiativeConfig, onboardingRankingRequests);
+
+        //Then
+        Mockito.verify(mapper, Mockito.times(onboardingRankingRequests.size())).apply(Mockito.any(OnboardingRankingRequests.class), Mockito.any(InitiativeConfig.class));
+        Mockito.verify(onboardingNotifierProducer, Mockito.times(onboardingRankingRequests.size()*2)).notify(Mockito.any(EvaluationRankingDTO.class)); //2 members for single family
+        Mockito.verify(rankingContextHolderService, Mockito.times(1)).setInitiativeConfig(Mockito.any(InitiativeConfig.class));
+        Mockito.verify(rankingErrorNotifierService, Mockito.never()).notifyRankingOnboardingOutcome(Mockito.any(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.any(Throwable.class));
+
+
     }
 }

@@ -134,4 +134,31 @@ class InitiativeConfigServiceImplTest {
         Assertions.assertEquals(initiative.getRankingStatus(), result.get().getRankingStatus());
         Mockito.verify(initiativeConfigRepositoryMock, Mockito.times(1)).deleteByInitiativeId(initiativeId);
     }
+
+    @Test
+    void findByIdOptional(){
+        String initiativeId = "INITIATIVEID";
+        InitiativeConfig initiativeConfig = InitiativeConfigFaker.mockInstance(1);
+        Mockito.when(initiativeConfigRepositoryMock.findById(initiativeId)).thenReturn(Optional.of(initiativeConfig));
+
+        InitiativeConfig result = initiativeConfigService.findByIdOptional(initiativeId).orElse(null);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(initiativeConfig, result);
+    }
+
+    @Test
+    void findByRankingStatusRankingEndDateBetween(){
+        String initiativeId = "INITIATIVEID";
+        LocalDate date = LocalDate.now();
+
+        List<InitiativeConfig> initiativeConfigs = List.of(InitiativeConfigFaker.mockInstance(1));
+        Mockito.when(initiativeConfigRepositoryMock.findByRankingStatusAndRankingEndDateBetween(RankingStatus.READY, date.minusDays(1), date.plusDays(1)))
+                .thenReturn(initiativeConfigs);
+
+        List<InitiativeConfig> result = initiativeConfigService.findByRankingStatusRankingEndDateBetween(RankingStatus.READY, date.minusDays(1), date.plusDays(1));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(initiativeConfigs, result);
+    }
 }
