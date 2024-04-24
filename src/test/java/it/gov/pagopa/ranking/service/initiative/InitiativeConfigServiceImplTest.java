@@ -1,6 +1,5 @@
 package it.gov.pagopa.ranking.service.initiative;
 
-import it.gov.pagopa.common.web.exception.ClientException;
 import it.gov.pagopa.ranking.exception.InitiativeNotFoundException;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
@@ -17,7 +16,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +45,8 @@ class InitiativeConfigServiceImplTest {
                 .initiativeStatus("STATUS")
                 .rankingStartDate(now)
                 .rankingEndDate(now.plusMonths(7L))
-                .initiativeBudget(BigDecimal.TEN)
-                .beneficiaryInitiativeBudget(BigDecimal.ONE)
+                .initiativeBudgetCents(10L)
+                .beneficiaryInitiativeBudgetCents(1L)
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(10)
                 .rankingFields(List.of(
@@ -67,8 +65,8 @@ class InitiativeConfigServiceImplTest {
         Assertions.assertEquals(request.getInitiativeStatus(), result.getInitiativeStatus());
         Assertions.assertEquals(request.getRankingStartDate(), result.getRankingStartDate());
         Assertions.assertEquals(request.getRankingEndDate(), result.getRankingEndDate());
-        Assertions.assertEquals(request.getInitiativeBudget(), result.getInitiativeBudget());
-        Assertions.assertEquals(request.getBeneficiaryInitiativeBudget(), result.getBeneficiaryInitiativeBudget());
+        Assertions.assertEquals(request.getInitiativeBudgetCents(), result.getInitiativeBudgetCents());
+        Assertions.assertEquals(request.getBeneficiaryInitiativeBudgetCents(), result.getBeneficiaryInitiativeBudgetCents());
         Assertions.assertEquals(request.getRankingStatus(), result.getRankingStatus());
         Assertions.assertEquals(request.getRankingFields(), result.getRankingFields());
 
