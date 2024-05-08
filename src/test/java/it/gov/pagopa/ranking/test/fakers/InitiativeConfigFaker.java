@@ -8,7 +8,6 @@ import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,8 +58,8 @@ public class InitiativeConfigFaker {
         out.rankingStartDate(now);
         out.rankingEndDate(now.plusMonths(7L));
         out.initiativeEndDate(now.plusMonths(7L));
-        out.initiativeBudget(BigDecimal.TEN);
-        out.beneficiaryInitiativeBudget(BigDecimal.ONE);
+        out.initiativeBudgetCents(10L);
+        out.beneficiaryInitiativeBudgetCents(1L);
         out.rankingStatus(RankingStatus.WAITING_END);
         out.size(10);
         out.rankingFields(List.of(

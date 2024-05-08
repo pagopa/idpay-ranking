@@ -1,15 +1,14 @@
 package it.gov.pagopa.ranking.dto.event;
 
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class EvaluationRankingDTO {
     private String status;
     @NotNull
     private List<OnboardingRejectionReason> onboardingRejectionReasons;
-    private BigDecimal beneficiaryBudget;
+    private Long beneficiaryBudgetCents;
     private String initiativeRewardType;
     private Boolean isLogoPresent;
     private String familyId;

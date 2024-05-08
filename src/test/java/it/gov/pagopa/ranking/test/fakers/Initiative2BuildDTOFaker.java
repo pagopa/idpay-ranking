@@ -5,7 +5,6 @@ import com.github.javafaker.service.RandomService;
 import it.gov.pagopa.ranking.dto.initiative.*;
 import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -54,8 +53,8 @@ public class Initiative2BuildDTOFaker {
         out.status(bias!=null? "status_%d".formatted(bias) : "?????");
 
         InitiativeGeneralDTO initiativeGeneralDTO = InitiativeGeneralDTO.builder()
-                .budget(BigDecimal.TEN)
-                .beneficiaryBudget(BigDecimal.ONE)
+                .budgetCents(10L)
+                .beneficiaryBudgetCents(1L)
                 .rankingStartDate(nowDate)
                 .rankingEndDate(nowDate.plusMonths(1L))
                 .rankingEnabled(Boolean.TRUE)

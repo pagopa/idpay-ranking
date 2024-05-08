@@ -1,15 +1,14 @@
 package it.gov.pagopa.ranking.dto.mapper;
 
+import it.gov.pagopa.common.utils.TestUtils;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.dto.initiative.InitiativeGeneralDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.RankingStatus;
 import it.gov.pagopa.ranking.test.fakers.Initiative2BuildDTOFaker;
-import it.gov.pagopa.common.utils.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 class InitiativeBuild2ConfigMapperTest {
@@ -32,8 +31,8 @@ class InitiativeBuild2ConfigMapperTest {
         Assertions.assertEquals(initiativeBuildDTO.getStatus(), result.getInitiativeStatus());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingStartDate(), result.getRankingStartDate());
         Assertions.assertEquals(initiativeBuildDTO.getGeneral().getRankingEndDate(), result.getRankingEndDate());
-        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBudget(), result.getInitiativeBudget());
-        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBeneficiaryBudget(), result.getBeneficiaryInitiativeBudget());
+        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBudgetCents(), result.getInitiativeBudgetCents());
+        Assertions.assertEquals(initiativeBuildDTO.getGeneral().getBeneficiaryBudgetCents(), result.getBeneficiaryInitiativeBudgetCents());
         Assertions.assertEquals(RankingStatus.WAITING_END, result.getRankingStatus());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.calculateSize(initiativeBuildDTO), result.getSize());
         Assertions.assertEquals(InitiativeBuild2ConfigMapper.retrieveRankingFieldCodes(initiativeBuildDTO.getBeneficiaryRule().getAutomatedCriteria()), result.getRankingFields());
@@ -69,7 +68,7 @@ class InitiativeBuild2ConfigMapperTest {
         LocalDate now = LocalDate.now();
         InitiativeGeneralDTO initiativeGeneralDTO = InitiativeGeneralDTO.builder()
                 .rankingEnabled(Boolean.TRUE)
-                .beneficiaryBudget(BigDecimal.TEN)
+                .beneficiaryBudgetCents(10L)
                 .rankingStartDate(now)
                 .rankingEndDate(now.plusMonths(7L))
                 .build();
