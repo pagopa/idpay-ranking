@@ -7,8 +7,8 @@ info:
 tags:
   - name: "notifyOnboardingRankingRequestError"
     description: "notify onboarding ranking request errors"
-  - name: "notifyInitiativeBuildError"
-    description: "notify initiative ranking build errors"
+  - name: "notifyInitiativeBuildRuleError"
+    description: "notify initiative ranking rule build errors"
   - name: "notifyRankingOnboardingOutcomeError"
     description: "notify ranking onboarding outcome errors"
   - name: "deleteInitiative"
@@ -21,8 +21,8 @@ tags:
     description: "Notify not eligible family members"
   - name: "onboardingRankingRequest"
     description: " onboarding ranking request information"
-  - name: "initiativeRankingBuild"
-    description: "initiative ranking build"
+  - name: "initiativeRankingBuildRule"
+    description: "initiative ranking build rule"
   - name: "onboardingRankingEnded"
     description: "onboarding ranking ended"
 
@@ -44,7 +44,7 @@ channels:
         kafka:
           topic: idpay-errors
       tags:
-        - name: "notifyInitiativeBuildError"
+        - name: "notifyInitiativeBuildRuleError"
   ranking-onboarding-outcome-error:
     publish:
       message:
@@ -107,7 +107,7 @@ channels:
         kafka:
           topic: idpay-rule-update
       tags:
-        - name: "initiativeRankingBuild"
+        - name: "initiativeRankingBuildRule"
 
   ranking-onboarding-ranking-ended:
     subscribe:
@@ -141,7 +141,7 @@ components:
     RankingInitiativeBuildRule:
       contentType: application/json
       description: >-
-        Receive initiative ranking build information
+        Receive initiative ranking rule information
       summary: Initiative build rules info
       payload:
         $ref: "https://raw.githubusercontent.com/pagopa/idpay-portal-welfare-backend-initiative/main/specs/asyncapi.yml#/components/schemas/RuleUpdate"
@@ -157,8 +157,8 @@ components:
     RankingOnboardingOutcomeError:
       contentType: application/json
       description: >-
-        An error occurred during publishing of onboarding ranking result
-      summary: Informs of onboarding ranking error during publishing of onboarding ranking result
+        An error occurred during publishing of onboarding ranking results
+      summary: Informs of onboarding ranking error during publishing of onboarding ranking results
       payload:
         $ref: "#/components/schemas/EvaluationRankingDTO"
       headers:
