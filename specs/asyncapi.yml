@@ -1,0 +1,366 @@
+asyncapi: 2.0.0
+info:
+  title: Ranking Service
+  version: 1.0.0
+  description: >-
+    Its purpose is to notify allowed citizen notification and cancellation of an initiative
+tags:
+  - name: "notifyOnboardingRankingRequestError"
+    description: "notify onboarding ranking request errors"
+  - name: "notifyInitiativeBuildRuleError"
+    description: "notify initiative ranking rule build errors"
+  - name: "notifyRankingOnboardingOutcomeError"
+    description: "notify ranking onboarding outcome errors"
+  - name: "deleteInitiative"
+    description: "Delete the initiative"
+  - name: "notifyRankingOnboardingOutcome"
+    description: "notify ranking onboarding outcome"
+  - name: "notifyEligibleFamilyMembers"
+    description: "Invite eligible family members"
+  - name: "notifyNotEligibleFamilyMembers"
+    description: "Notify not eligible family members"
+  - name: "onboardingRankingRequest"
+    description: " onboarding ranking request information"
+  - name: "initiativeRankingBuildRule"
+    description: "initiative ranking build rule"
+  - name: "onboardingRankingEnded"
+    description: "onboarding ranking ended"
+
+channels:
+  ranking-onboarding-ranking-request-error:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingOnboardingRankingRequestError'
+      bindings:
+        kafka:
+          topic: idpay-errors
+      tags:
+        - name: "notifyOnboardingRankingRequestError"
+  ranking-initiative-build-rule-error:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingInitiativeBuildRuleError'
+      bindings:
+        kafka:
+          topic: idpay-errors
+      tags:
+        - name: "notifyInitiativeBuildRuleError"
+  ranking-onboarding-outcome-error:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingOnboardingOutcomeError'
+      bindings:
+        kafka:
+          topic: idpay-errors
+      tags:
+        - name: "notifyRankingOnboardingOutcomeError"
+  ranking-delete-initiative-consumer:
+    subscribe:
+      message:
+        $ref: '#/components/messages/DeleteInitiative'
+      bindings:
+        kafka:
+          topic: idpay-commands
+      tags:
+        - name: "deleteInitiative"
+  ranking-onboarding-outcome:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingOnboardingOutcome'
+      bindings:
+        kafka:
+          topic: idpay-onboarding-outcome
+      tags:
+        - name: "notifyRankingOnboardingOutcome"
+  ranking-invite-eligible-family-members:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingInviteEligibleFamilyMembers'
+      bindings:
+        kafka:
+          topic: idpay-onboarding-outcome
+      tags:
+        - name: "notifyEligibleFamilyMembers"
+  ranking-not-invite-eligible-family-members:
+    publish:
+      message:
+        $ref: '#/components/messages/RankingNotInviteEligibleFamilyMembers'
+      bindings:
+        kafka:
+          topic: idpay-onboarding-outcome
+      tags:
+        - name: "notifyNotEligibleFamilyMembers"
+  ranking-onboarding-ranking-request-consumer:
+    subscribe:
+      message:
+        $ref: '#/components/messages/RankingOnboardingRankingRequest'
+      bindings:
+        kafka:
+          topic: idpay-onboarding-ranking-request
+      tags:
+        - name: "onboardingRankingRequest"
+  ranking-initiative-build-rule-consumer:
+    subscribe:
+      message:
+        $ref: '#/components/messages/RankingInitiativeBuildRule'
+      bindings:
+        kafka:
+          topic: idpay-rule-update
+      tags:
+        - name: "initiativeRankingBuildRule"
+
+  ranking-onboarding-ranking-ended:
+    subscribe:
+      message:
+        $ref: '#/components/messages/OnboardingRankingEndedReceiveNotification'
+      bindings:
+        servicebus:
+          topic: idpay-onboarding-request
+      tags:
+        - name: "onboardingRankingEnded"
+
+
+components:
+  messages:
+    RankingOnboardingRankingRequest:
+      contentType: application/json
+      description: >-
+        Receive onboarding ranking request information
+      summary: Receive onboarding information
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-admissibility-assessor/main/specs/asyncapi.yml#/components/schemas/RankingRequestDTO"
+    RankingOnboardingRankingRequestError:
+      contentType: application/json
+      description: >-
+        An error occurred during the onboarding ranking request
+      summary: Informs of onboarding ranking request error
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-admissibility-assessor/main/specs/asyncapi.yml#/components/schemas/RankingRequestDTO"
+      headers:
+        $ref: "#/components/schemas/ErrorQueueHeader"
+    RankingInitiativeBuildRule:
+      contentType: application/json
+      description: >-
+        Receive initiative ranking rule information
+      summary: Initiative build rules info
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-portal-welfare-backend-initiative/main/specs/asyncapi.yml#/components/schemas/RuleUpdate"
+    RankingInitiativeBuildRuleError:
+      contentType: application/json
+      description: >-
+        An error occurred during initiative ranking build rules
+      summary: Informs of onboarding initiative ranking build rules error
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-portal-welfare-backend-initiative/main/specs/asyncapi.yml#/components/schemas/RuleUpdate"
+      headers:
+        $ref: "#/components/schemas/ErrorQueueHeader"
+    RankingOnboardingOutcomeError:
+      contentType: application/json
+      description: >-
+        An error occurred during publishing of onboarding ranking results
+      summary: Informs of onboarding ranking error during publishing of onboarding ranking results
+      payload:
+        $ref: "#/components/schemas/EvaluationRankingDTO"
+      headers:
+        $ref: "#/components/schemas/ErrorQueueHeader"
+    RankingOnboardingOutcome:
+      contentType: application/json
+      description: >-
+        Send information about onboarding request to outcome topic
+      summary: Informs of onboarding onboarding request to outcome topic
+      payload:
+        $ref: "#/components/schemas/EvaluationRankingDTO"
+    RankingInviteEligibleFamilyMembers:
+      contentType: application/json
+      description: Invite eligible family members. Send information about onboarding request to outcome topic.
+      summary: Invite eligible family members to onboarding request outcome topic.
+      payload:
+        $ref: "#/components/schemas/EvaluationRankingDTO"
+    RankingNotInviteEligibleFamilyMembers:
+      contentType: application/json
+      description: Notify not eligible family members. Send information about the onboarding request to the outcome topic.
+      summary: Notify not eligible family members of onboarding request outcome.
+      payload:
+        $ref: "#/components/schemas/EvaluationRankingDTO"
+    DeleteInitiative:
+      contentType: application/json
+      description: >-
+        Event consumed from application when a delete initiative command has published
+      summary: Delete documents of the initiative
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-portal-welfare-backend-initiative/main/specs/asyncapi.yml#/components/schemas/QueueCommandOperationDTO"
+    OnboardingRankingEndedReceiveNotification:
+      contentType: application/json
+      description: Channel for signaling the end of initiative rankings
+      summary: Receiving notification of the end of initiative rankings
+      payload:
+        $ref: "https://raw.githubusercontent.com/pagopa/idpay-onboarding-workflow/main/specs/asyncapi.yaml#/components/schemas/OnboardingDTO"
+  schemas:
+    ErrorQueueHeader:
+      type: object
+      required:
+        - srcType
+        - srcServer
+        - srcTopic
+        - description
+        - retryable
+        - stacktrace
+        - rootCauseClass
+        - rootCauseMessage
+      properties:
+        srcType:
+          type: string
+          description: The type of the source of the error message.
+          example: "kafka"
+        srcServer:
+          type: string
+          description: The source server of the error message.
+          example: "kafka-broker-1.example.com:9092"
+        srcTopic:
+          type: string
+          description: The Kafka topic of the source of the error message.
+          example: "idpay-onboarding-ranking-request"
+        description:
+          type: string
+          description: Description of the error.
+          example: "[ONBOARDING_RANKING_REQUEST] An error occurred handling onboarding ranking request"
+        retryable:
+          type: boolean
+          description: Indicates whether the error is retryable or not.
+        stacktrace:
+          type: string
+          description: The stack trace of the error.
+          example: "RankingRuleBuilderException -> Error occurred during handling of ranking rule builder initiative"
+        rootCauseClass:
+          type: string
+          description: Cause of the error.
+          example: "com.example.RewardRuleBuilderException"
+        rootCauseMessage:
+          type: string
+          description: Message of the error.
+          example: "Error occurred during handling of reward rule builder initiative"
+        kafka_messageKey:
+          type: string
+          description: The header containing the record key from the received message.
+          example: 0
+        applicationName:
+          type: string
+          description: The name of the application that generated the error.
+          example: "idpay-ranking"
+        group:
+          type: string
+          description: The Kafka group to which the error message belongs.
+          example: "idpay-onboarding-ranking-request-consumer-group"
+
+    OnboardingRejectionReason:
+      type: object
+      description: Details for the reason of onboarding rejection
+      properties:
+        type:
+          type: string
+          description: Type of the rejection reason
+          enum:
+            - TECHNICAL_ERROR
+            - CONSENSUS_MISSED
+            - INVALID_REQUEST
+            - BUDGET_EXHAUSTED
+            - AUTOMATED_CRITERIA_FAIL
+            - OUT_OF_RANKING
+            - FAMILY_CRITERIA_KO
+          example: FAMILY_CRITERIA_KO
+        code:
+          type: string
+          description: Code representing the rejection reason
+          example: FAMILY_CRITERIA_FAIL
+        authority:
+          type: string
+          description: Authority that issued the rejection
+          example: INPS
+        authorityLabel:
+          type: string
+          description: Label for the authority
+          example: Istituto Nazionale Previdenza Sociale
+        detail:
+          type: string
+          description: Detailed description of the rejection reason
+          example: Nucleo familiare non soddisfa i requisiti
+    EvaluationRankingDTO:
+      type: object
+      description: Data Transfer Object for evaluation ranking
+      properties:
+        userId:
+          type: string
+          description: Identifier of the user
+          example: 03055024-3cca-4574-9656-42951b6aac4f
+        initiativeId:
+          type: string
+          description: Identifier of the initiative
+          example: 6654242a4f47f940241a9df8
+        initiativeName:
+          type: string
+          description: Name of the initiative
+          example: Initiative Test
+        initiativeEndDate:
+          type: string
+          format: date
+          description: End date of the initiative
+          example: 2024-12-31
+        organizationId:
+          type: string
+          description: Identifier of the organization
+          example: c326cac6-a38c-416c-a3c3-f6a407b77950
+        organizationName:
+          type: string
+          description: Name of the organization
+          example: Ente di test IdPay
+        admissibilityCheckDate:
+          type: string
+          format: date-time
+          description: Date and time of the admissibility check
+          example: 2024-05-27T10:15:30
+        criteriaConsensusTimestamp:
+          type: string
+          format: date-time
+          description: Timestamp when criteria consensus was reached
+          example: 2024-05-28T10:15:30
+        status:
+          type: string
+          enum:
+            - ONBOARDING_OK
+            - ONBOARDING_KO
+            - DEMANDED
+          description: Current status of the evaluation
+          example: ONBOARDING_KO
+        onboardingRejectionReasons:
+          type: array
+          description: List of reasons for onboarding rejection
+          items:
+            $ref: '#/components/schemas/OnboardingRejectionReason'
+          example:
+            - type: FAMILY_CRITERIA_KO
+              code: FAMILY_CRITERIA_FAIL
+              detail: Nucleo familiare non soddisfa i requisiti
+        beneficiaryBudgetCents:
+          type: integer
+          description: Budget allocated for the beneficiary in cents
+          example: 500000
+        initiativeRewardType:
+          type: string
+          description: Type of reward associated with the initiative
+          example: DISCOUNT
+        isLogoPresent:
+          type: boolean
+          description: Indicates if the logo is present
+          example: true
+        familyId:
+          type: string
+          description: Identifier for the family, if applicable
+          example: 665419f13355223e0d03d858
+      required:
+        - userId
+        - initiativeId
+        - organizationId
+        - admissibilityCheckDate
+        - status
+        - onboardingRejectionReasons
+ 
