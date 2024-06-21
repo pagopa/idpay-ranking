@@ -6,7 +6,6 @@ import it.gov.pagopa.ranking.dto.initiative.InitiativeBuildDTO;
 import it.gov.pagopa.ranking.model.InitiativeConfig;
 import it.gov.pagopa.ranking.model.Order;
 import it.gov.pagopa.ranking.model.RankingStatus;
-import it.gov.pagopa.common.utils.CommonUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,8 +32,8 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
                 .initiativeStatus(initiativeBuildDTO.getStatus())
                 .rankingStartDate(initiativeBuildDTO.getGeneral().getRankingStartDate())
                 .rankingEndDate(initiativeBuildDTO.getGeneral().getRankingEndDate())
-                .initiativeBudget(initiativeBuildDTO.getGeneral().getBudget())
-                .beneficiaryInitiativeBudget(initiativeBuildDTO.getGeneral().getBeneficiaryBudget())
+                .initiativeBudgetCents(initiativeBuildDTO.getGeneral().getBudgetCents())
+                .beneficiaryInitiativeBudgetCents(initiativeBuildDTO.getGeneral().getBeneficiaryBudgetCents())
                 .rankingStatus(RankingStatus.WAITING_END)
                 .size(calculateSize(initiativeBuildDTO))
                 .rankingFields(retrieveRankingFieldCodes(automatedCriteriaList))
@@ -45,8 +44,8 @@ public class InitiativeBuild2ConfigMapper implements Function<InitiativeBuildDTO
 
     public static long calculateSize(InitiativeBuildDTO initiativeBuildDTO) {
         try {
-            Long totalBudget = CommonUtilities.euroToCents(initiativeBuildDTO.getGeneral().getBudget());
-            Long beneficiaryBudget = CommonUtilities.euroToCents(initiativeBuildDTO.getGeneral().getBeneficiaryBudget());
+            Long totalBudget = initiativeBuildDTO.getGeneral().getBudgetCents();
+            Long beneficiaryBudget = initiativeBuildDTO.getGeneral().getBeneficiaryBudgetCents();
 
             return totalBudget/beneficiaryBudget;
         }catch (NullPointerException e){

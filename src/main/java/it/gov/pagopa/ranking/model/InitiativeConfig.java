@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,8 +28,8 @@ public class InitiativeConfig {
     private String initiativeStatus;
     private LocalDate rankingStartDate;
     private LocalDate rankingEndDate;
-    private BigDecimal initiativeBudget;
-    private BigDecimal beneficiaryInitiativeBudget;
+    private Long initiativeBudgetCents;
+    private Long beneficiaryInitiativeBudgetCents;
     private RankingStatus rankingStatus;
     private long size;
     private List<Order> rankingFields;

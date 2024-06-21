@@ -31,7 +31,7 @@ public class OnboardingRankingRequest2EvaluationMapper {
         evaluationRankingDTO.setCriteriaConsensusTimestamp(onboardingRankingRequests.getCriteriaConsensusTimestamp());
         evaluationRankingDTO.setOrganizationId(onboardingRankingRequests.getOrganizationId());
         evaluationRankingDTO.setOrganizationName(initiative.getOrganizationName());
-        evaluationRankingDTO.setBeneficiaryBudget(initiative.getBeneficiaryInitiativeBudget());
+        evaluationRankingDTO.setBeneficiaryBudgetCents(initiative.getBeneficiaryInitiativeBudgetCents());
         evaluationRankingDTO.setOnboardingRejectionReasons(this.buildRejectionReasons(onboardingRankingRequests.getBeneficiaryRankingStatus(), onboardingRankingRequests.getRank()));
         evaluationRankingDTO.setIsLogoPresent(initiative.getIsLogoPresent());
 

@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -16,14 +15,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class InitiativeGeneralDTO {
-    @JsonProperty("budget")
-    private BigDecimal budget;
+    @JsonProperty("budgetCents")
+    private Long budgetCents;
 
     @JsonProperty("beneficiaryType")
     private BeneficiaryTypeEnum beneficiaryType;
 
-    @JsonProperty("beneficiaryBudget")
-    private BigDecimal beneficiaryBudget;
+    @JsonProperty("beneficiaryBudgetCents")
+    private Long beneficiaryBudgetCents;
 
     /**
      * Start of period of participation/adhesion in an initiative
