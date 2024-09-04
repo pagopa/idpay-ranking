@@ -189,6 +189,18 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>org.apache.tomcat.embed</groupId>
+				<artifactId>tomcat-embed-core</artifactId>
+				<version>10.1.25</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-function-context</artifactId>
+				<version>4.1.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -198,7 +210,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.3</version>
 				<configuration>
-					<argLine>@{argLine} -Duser.timezone=Europe/Rome</argLine>
+					<argLine>-Duser.timezone=Europe/Rome</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
