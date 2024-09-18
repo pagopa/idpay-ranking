@@ -23,7 +23,7 @@ public class PdvErrorDecoder implements ErrorDecoder {
                     exception.getMessage(),
                     response.request().httpMethod(),
                     exception,
-                    null,
+                    0L,
                     response.request());
         }
 

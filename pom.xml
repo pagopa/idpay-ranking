@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.8</version>
+		<version>3.3.3</version>
 	</parent>
 
 	<groupId>it.gov.pagopa</groupId>
@@ -156,6 +156,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
 			<version>4.2.0</version>
@@ -168,7 +172,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>2022.0.4</version>
+				<version>2023.0.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -185,22 +189,11 @@
 			<dependency>
 				<groupId>com.azure.spring</groupId>
 				<artifactId>spring-cloud-azure-dependencies</artifactId>
-				<version>5.8.0</version>
+				<version>5.16.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>org.apache.tomcat.embed</groupId>
-				<artifactId>tomcat-embed-core</artifactId>
-				<version>10.1.25</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-function-context</artifactId>
-				<version>4.1.2</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -209,9 +202,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.3</version>
-				<configuration>
-					<argLine>@{argLine} -Duser.timezone=Europe/Rome</argLine>
-				</configuration>
+
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
