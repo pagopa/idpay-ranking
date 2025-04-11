@@ -44,5 +44,4 @@ public class RankingApiControllerImpl implements RankingApiController{
         log.info("[NOTIFY_CITIZEN] - Request to notify Citizen on Ranking List for initiativeId: {}", initiativeId);
         rankingRequestsApiService.notifyCitizenRankings(organizationId, initiativeId);
     }
-
 }
