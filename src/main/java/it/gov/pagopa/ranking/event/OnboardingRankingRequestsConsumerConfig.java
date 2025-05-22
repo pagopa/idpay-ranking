@@ -12,6 +12,8 @@ public class OnboardingRankingRequestsConsumerConfig {
 
     @Bean
     public Consumer<Message<String>> onboardingRankingRequestsConsumer(OnboardingRankingRequestsMediator onboardingRankingRequestsMediator){
+
         return onboardingRankingRequestsMediator::execute;
+
     }
 }
