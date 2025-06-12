@@ -73,6 +73,11 @@
 			<version>1.11.0</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.11.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>3.1.11</version>
@@ -218,7 +223,7 @@
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
 				<artifactId>tomcat-embed-core</artifactId>
-				<version>10.1.36</version>
+				<version>11.0.8</version>
 			</dependency>
 			<dependency>
 				<groupId>net.minidev</groupId>
